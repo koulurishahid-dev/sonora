@@ -476,3 +476,37 @@ export async function importFullLibraryZip(
     return { success: false, importedCount: 0, message: err?.message || 'Failed to extract backup archive.' };
   }
 }
+
+// Remove only generated sample songs
+export async function resetGeneratedSampleSongs(): Promise<number> {
+  const sampleSongs = await db.songs
+    .filter(s => s.id.startsWith('sample_') || s.hash.startsWith('synth_'))
+    .toArray();
+  const ids = sampleSongs.map(s => s.id);
+  if (ids.length > 0) {
+    await db.songs.bulkDelete(ids);
+    for (const id of ids) {
+      await db.playlistSongs.where('songId').equals(id).delete();
+      await db.favorites.where('songId').equals(id).delete();
+      await db.listeningHistory.where('songId').equals(id).delete();
+      await db.lyrics.where('songId').equals(id).delete();
+      revokeAudioObjectUrl(id);
+    }
+    await syncAlbumsAndArtists();
+  }
+  return ids.length;
+}
+
+// Reset all songs completely from the library
+export async function resetAllSongs(): Promise<number> {
+  const all = await db.songs.toArray();
+  const count = all.length;
+  await db.songs.clear();
+  await db.playlistSongs.clear();
+  await db.favorites.clear();
+  await db.listeningHistory.clear();
+  await db.lyrics.clear();
+  await db.albums.clear();
+  await db.artists.clear();
+  return count;
+}

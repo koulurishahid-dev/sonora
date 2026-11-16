@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Song, Playlist, Album, Artist, ViewType } from '@/types/music';
-import { db, getArtworkObjectUrl, syncAlbumsAndArtists } from '@/lib/db';
+import { db, getArtworkObjectUrl, syncAlbumsAndArtists, resetGeneratedSampleSongs } from '@/lib/db';
 import { usePlayer } from '@/context/PlayerContext';
 import { useToast } from '@/context/ToastContext';
 import { synthesizeTrack, SAMPLE_TRACK_DEFINITIONS } from '@/lib/audioSynthesis';
@@ -40,12 +40,15 @@ export function HomeView({ onNavigate, onOpenUpload, onSongContextMenu }: HomeVi
   const [artists, setArtists] = useState<Artist[]>([]);
   const [isGeneratingSamples, setIsGeneratingSamples] = useState(false);
   const [totalSongsCount, setTotalSongsCount] = useState(0);
+  const [sampleSongsCount, setSampleSongsCount] = useState(0);
 
   const loadData = async () => {
     const total = await db.songs.count();
     setTotalSongsCount(total);
 
     const allSongs = await db.songs.toArray();
+    const samples = allSongs.filter(s => s.id.startsWith('sample_') || s.hash.startsWith('synth_'));
+    setSampleSongsCount(samples.length);
     // Recently added (sorted by dateAdded desc)
     const sortedRecent = [...allSongs].sort((a, b) => b.dateAdded - a.dateAdded).slice(0, 10);
     setRecentSongs(sortedRecent);
@@ -98,6 +101,14 @@ export function HomeView({ onNavigate, onOpenUpload, onSongContextMenu }: HomeVi
     }
   };
 
+  const handleResetSamples = async () => {
+    if (confirm('Reset and remove all generated sample songs from your library?')) {
+      const removed = await resetGeneratedSampleSongs();
+      showToast('Sample Songs Removed', `Removed ${removed} generated tracks.`, 'info');
+      await loadData();
+    }
+  };
+
   // Get greeting based on time of day
   const hour = new Date().getHours();
   const greeting =
@@ -116,20 +127,32 @@ export function HomeView({ onNavigate, onOpenUpload, onSongContextMenu }: HomeVi
           </p>
         </div>
 
-        {totalSongsCount === 0 && (
-          <button
-            onClick={handleGenerateSamples}
-            disabled={isGeneratingSamples}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600/30 hover:bg-purple-600/40 border border-purple-500/40 text-purple-200 text-xs font-semibold transition-all self-start sm:self-center shadow-lg"
-          >
-            {isGeneratingSamples ? (
-              <Loader2 className="w-4 h-4 animate-spin text-purple-300" />
-            ) : (
-              <Sparkles className="w-4 h-4 text-purple-400" />
-            )}
-            <span>Generate Sample Music</span>
-          </button>
-        )}
+        <div className="flex items-center gap-2 self-start sm:self-center">
+          {sampleSongsCount > 0 && (
+            <button
+              onClick={handleResetSamples}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#19191F] hover:bg-[#25252D] border border-amber-800/60 text-amber-300 text-xs font-semibold transition-all shadow-sm"
+              title="Remove generated sample songs"
+            >
+              <span>Reset Sample Songs ({sampleSongsCount})</span>
+            </button>
+          )}
+
+          {totalSongsCount === 0 && (
+            <button
+              onClick={handleGenerateSamples}
+              disabled={isGeneratingSamples}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600/30 hover:bg-purple-600/40 border border-purple-500/40 text-purple-200 text-xs font-semibold transition-all shadow-lg"
+            >
+              {isGeneratingSamples ? (
+                <Loader2 className="w-4 h-4 animate-spin text-purple-300" />
+              ) : (
+                <Sparkles className="w-4 h-4 text-purple-400" />
+              )}
+              <span>Generate Sample Music</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Empty State if completely empty */}

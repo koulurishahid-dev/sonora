@@ -10,6 +10,8 @@ import {
   importDatabaseFromJson,
   exportFullLibraryZip,
   importFullLibraryZip,
+  resetGeneratedSampleSongs,
+  resetAllSongs,
 } from '@/lib/db';
 import { formatFileSize } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
@@ -177,6 +179,22 @@ export function SettingsView() {
     if (confirm('Clear entire listening history?')) {
       await db.listeningHistory.clear();
       showToast('History Cleared', 'Listening history has been wiped', 'info');
+    }
+  };
+
+  const handleResetSampleSongs = async () => {
+    if (confirm('Remove all generated sample songs from your library?')) {
+      const count = await resetGeneratedSampleSongs();
+      showToast('Sample Songs Reset', `Removed ${count} sample tracks.`, 'info');
+      getStorageEstimate().then(setStorage);
+    }
+  };
+
+  const handleClearAllSongs = async () => {
+    if (confirm('Delete all songs from your library? (Playlists and settings will be preserved)')) {
+      const count = await resetAllSongs();
+      showToast('Library Cleared', `Removed all ${count} songs from library.`, 'info');
+      getStorageEstimate().then(setStorage);
     }
   };
 
@@ -607,6 +625,20 @@ export function SettingsView() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleResetSampleSongs}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#19191F] hover:bg-[#25252D] text-amber-300 text-xs font-semibold border border-amber-800/60 transition-all"
+          >
+            <RotateCcw className="w-3.5 h-3.5" /> Remove Generated Sample Songs
+          </button>
+
+          <button
+            onClick={handleClearAllSongs}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#19191F] hover:bg-[#25252D] text-rose-300 text-xs font-semibold border border-rose-900/60 transition-all"
+          >
+            <Trash2 className="w-3.5 h-3.5" /> Clear All Songs
+          </button>
+
           <button
             onClick={handleClearHistory}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#19191F] hover:bg-[#25252D] text-rose-300 text-xs font-semibold border border-rose-900/60 transition-all"
