@@ -1,5 +1,7 @@
-import { Song } from '@/types/music';
+import { Song, Playlist } from '@/types/music';
 import { generateId } from './utils';
+import { db, syncAlbumsAndArtists } from './db';
+import { parseLrc } from '@/components/player/LyricsPanel';
 
 // Helper to write a valid PCM 16-bit stereo WAV file from AudioBuffer
 function audioBufferToWav(buffer: AudioBuffer): Blob {
@@ -32,13 +34,13 @@ function audioBufferToWav(buffer: AudioBuffer): Blob {
   
   // fmt subchunk
   writeString(12, 'fmt ');
-  view.setUint32(16, 16, true); // Subchunk1Size (16 for PCM)
-  view.setUint16(20, format, true); // AudioFormat
-  view.setUint16(22, numChannels, true); // NumChannels
-  view.setUint32(24, sampleRate, true); // SampleRate
-  view.setUint32(28, sampleRate * blockAlign, true); // ByteRate
-  view.setUint16(32, blockAlign, true); // BlockAlign
-  view.setUint16(34, bitDepth, true); // BitsPerSample
+  view.setUint32(16, 16, true);
+  view.setUint16(20, format, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * blockAlign, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bitDepth, true);
   
   // data subchunk
   writeString(36, 'data');
@@ -54,7 +56,6 @@ function audioBufferToWav(buffer: AudioBuffer): Blob {
   for (let i = 0; i < length; i++) {
     for (let ch = 0; ch < numChannels; ch++) {
       const sample = Math.max(-1, Math.min(1, channels[ch][i]));
-      // Convert float [-1.0, 1.0] to int16 [-32768, 32767]
       const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
       view.setInt16(offset, intSample, true);
       offset += 2;
@@ -64,271 +65,397 @@ function audioBufferToWav(buffer: AudioBuffer): Blob {
   return new Blob([arrayBuffer], { type: 'audio/wav' });
 }
 
-// Generate an artistic modern cover image via Canvas
-export function generateCoverArt(title: string, artist: string, gradientType: number): Blob {
-  const canvas = document.createElement('canvas');
-  canvas.width = 400;
-  canvas.height = 400;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return new Blob();
-
-  const gradients = [
-    ['#1A102F', '#7928CA', '#FF0080'],
-    ['#0F2027', '#203A43', '#2C5364'],
-    ['#141E30', '#243B55', '#1ED760'],
-    ['#3A1C71', '#D76D77', '#FFAF7B'],
-    ['#0B0B0D', '#3B82F6', '#9333EA'],
-  ];
-
-  const colors = gradients[gradientType % gradients.length];
-  const grad = ctx.createLinearGradient(0, 0, 400, 400);
-  grad.addColorStop(0, colors[0]);
-  grad.addColorStop(0.5, colors[1]);
-  grad.addColorStop(1, colors[2]);
-
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 400, 400);
-
-  // Draw glowing geometric circles & accents
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.beginPath();
-  ctx.arc(200, 200, 140, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Subtle vinyl grooves
-  for (let r = 50; r <= 130; r += 20) {
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(200, 200, r, 0, Math.PI * 2);
-    ctx.stroke();
-  }
-
-  // Draw soundwave icon in center
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-  const bars = [18, 32, 50, 68, 52, 74, 45, 60, 30, 16];
-  const barWidth = 6;
-  const gap = 6;
-  const startX = 200 - (bars.length * (barWidth + gap)) / 2;
-  bars.forEach((height, idx) => {
-    const x = startX + idx * (barWidth + gap);
-    const y = 200 - height / 2;
-    ctx.beginPath();
-    ctx.roundRect(x, y, barWidth, height, 3);
-    ctx.fill();
-  });
-
-  // Track title & artist overlay
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(title, 200, 330);
-
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-  ctx.font = '14px system-ui, -apple-system, sans-serif';
-  ctx.fillText(artist, 200, 355);
-
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-  // Convert DataURL to Blob
-  const byteString = atob(dataUrl.split(',')[1]);
-  const mimeString = dataUrl.split(',')[0].split(':')[1].split(';')[0];
-  const ab = new ArrayBuffer(byteString.length);
-  const ia = new Uint8Array(ab);
-  for (let i = 0; i < byteString.length; i++) {
-    ia[i] = byteString.charCodeAt(i);
-  }
-  return new Blob([ab], { type: mimeString });
-}
-
-// Synthesize an ambient musical composition using OfflineAudioContext
-export async function synthesizeTrack(
-  name: string,
-  artistName: string,
-  albumName: string,
-  bpm: number,
+// Generate warm acoustic/melodic audio buffer for any song
+export async function synthesizeMelodyAudio(
   baseFreq: number,
-  seconds: number,
-  gradientIndex: number
-): Promise<Song> {
+  bpm: number,
+  seconds: number
+): Promise<Blob> {
   const sampleRate = 44100;
   const length = sampleRate * seconds;
   const offlineCtx = new OfflineAudioContext(2, length, sampleRate);
 
-  // Master Gain & Reverb-like filter
   const masterGain = offlineCtx.createGain();
   masterGain.gain.setValueAtTime(0.7, 0);
-  masterGain.gain.linearRampToValueAtTime(0.7, seconds - 1.5);
+  masterGain.gain.linearRampToValueAtTime(0.7, seconds - 2);
   masterGain.gain.linearRampToValueAtTime(0.001, seconds);
   masterGain.connect(offlineCtx.destination);
 
-  // Chord Progression (e.g. i - VI - III - VII)
-  const semitones = [0, 3, 7, 10, 14, 15, 19];
-  const noteDuration = (60 / bpm) * 2; // 2 beats per chord
-  const numNotes = Math.floor(seconds / noteDuration);
+  // Soft Indian / Carnatic inspired acoustic scale intervals (major & minor pentatonic harmonics)
+  const intervals = [0, 2, 4, 7, 9, 12, 14, 16];
+  const beatDuration = 60 / bpm;
+  const numNotes = Math.floor(seconds / (beatDuration * 2));
 
   for (let i = 0; i < numNotes; i++) {
-    const time = i * noteDuration;
-    const chordRoot = baseFreq * Math.pow(2, ((i % 4) * 2) / 12);
-    
-    // Play a 3-note chord with soft warm sine/triangle waves
-    [0, 3, 7].forEach((interval, noteIdx) => {
+    const time = i * beatDuration * 2;
+    const noteInterval = intervals[i % intervals.length];
+    const rootFreq = baseFreq * Math.pow(2, noteInterval / 12);
+
+    // Warm Rhodes / Tanpura style harmonic tones
+    [0, 7, 12].forEach((chordInterval, idx) => {
       const osc = offlineCtx.createOscillator();
-      const noteGain = offlineCtx.createGain();
+      const gain = offlineCtx.createGain();
 
-      osc.type = noteIdx === 0 ? 'sine' : 'triangle';
-      osc.frequency.setValueAtTime(chordRoot * Math.pow(2, interval / 12), time);
+      osc.type = idx === 0 ? 'sine' : 'triangle';
+      osc.frequency.setValueAtTime(rootFreq * Math.pow(2, chordInterval / 12), time);
 
-      // Envelope
-      noteGain.gain.setValueAtTime(0.001, time);
-      noteGain.gain.linearRampToValueAtTime(0.18, time + 0.1);
-      noteGain.gain.exponentialRampToValueAtTime(0.02, time + noteDuration - 0.05);
-      noteGain.gain.linearRampToValueAtTime(0.0001, time + noteDuration);
+      gain.gain.setValueAtTime(0.001, time);
+      gain.gain.linearRampToValueAtTime(0.16, time + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.02, time + beatDuration * 2 - 0.1);
+      gain.gain.linearRampToValueAtTime(0.0001, time + beatDuration * 2);
 
-      osc.connect(noteGain);
-      noteGain.connect(masterGain);
+      osc.connect(gain);
+      gain.connect(masterGain);
 
       osc.start(time);
-      osc.stop(time + noteDuration);
+      osc.stop(time + beatDuration * 2);
     });
 
-    // Ambient Bass note
+    // Warm deep bass note
     const bassOsc = offlineCtx.createOscillator();
     const bassGain = offlineCtx.createGain();
-    bassOsc.type = 'sawtooth';
-    bassOsc.frequency.setValueAtTime(chordRoot / 2, time);
-
-    const bassFilter = offlineCtx.createBiquadFilter();
-    bassFilter.type = 'lowpass';
-    bassFilter.frequency.setValueAtTime(220, time);
+    bassOsc.type = 'sine';
+    bassOsc.frequency.setValueAtTime(rootFreq / 2, time);
 
     bassGain.gain.setValueAtTime(0.001, time);
-    bassGain.gain.linearRampToValueAtTime(0.15, time + 0.08);
-    bassGain.gain.exponentialRampToValueAtTime(0.04, time + noteDuration - 0.1);
-    bassGain.gain.linearRampToValueAtTime(0.0001, time + noteDuration);
+    bassGain.gain.linearRampToValueAtTime(0.2, time + 0.08);
+    bassGain.gain.exponentialRampToValueAtTime(0.03, time + beatDuration * 2 - 0.1);
+    bassGain.gain.linearRampToValueAtTime(0.0001, time + beatDuration * 2);
 
-    bassOsc.connect(bassFilter);
-    bassFilter.connect(bassGain);
+    bassOsc.connect(bassGain);
     bassGain.connect(masterGain);
 
     bassOsc.start(time);
-    bassOsc.stop(time + noteDuration);
+    bassOsc.stop(time + beatDuration * 2);
   }
 
-  // Soft rhythmic kick & hi-hat pulses
-  const beatInterval = 60 / bpm;
-  const numBeats = Math.floor(seconds / beatInterval);
-  for (let b = 0; b < numBeats; b++) {
-    const beatTime = b * beatInterval;
-    
-    // Kick drum on beats 0, 2, etc.
-    if (b % 2 === 0) {
-      const kickOsc = offlineCtx.createOscillator();
-      const kickGain = offlineCtx.createGain();
-      kickOsc.frequency.setValueAtTime(140, beatTime);
-      kickOsc.frequency.exponentialRampToValueAtTime(35, beatTime + 0.15);
-
-      kickGain.gain.setValueAtTime(0.3, beatTime);
-      kickGain.gain.exponentialRampToValueAtTime(0.001, beatTime + 0.2);
-
-      kickOsc.connect(kickGain);
-      kickGain.connect(masterGain);
-
-      kickOsc.start(beatTime);
-      kickOsc.stop(beatTime + 0.22);
-    }
-
-    // Hi-hat noise on each beat
-    const noiseLength = 0.05;
-    const noiseBuffer = offlineCtx.createBuffer(1, sampleRate * noiseLength, sampleRate);
-    const output = noiseBuffer.getChannelData(0);
-    for (let s = 0; s < noiseBuffer.length; s++) {
-      output[s] = Math.random() * 2 - 1;
-    }
-    const noiseSource = offlineCtx.createBufferSource();
-    noiseSource.buffer = noiseBuffer;
-
-    const noiseFilter = offlineCtx.createBiquadFilter();
-    noiseFilter.type = 'highpass';
-    noiseFilter.frequency.value = 7500;
-
-    const noiseGain = offlineCtx.createGain();
-    noiseGain.gain.setValueAtTime(0.06, beatTime);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, beatTime + noiseLength);
-
-    noiseSource.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(masterGain);
-
-    noiseSource.start(beatTime);
-    noiseSource.stop(beatTime + noiseLength);
+  // Soft vinyl ambience crackle / acoustic texture
+  const noiseLength = seconds;
+  const noiseBuffer = offlineCtx.createBuffer(1, sampleRate * noiseLength, sampleRate);
+  const out = noiseBuffer.getChannelData(0);
+  for (let s = 0; s < noiseBuffer.length; s++) {
+    out[s] = (Math.random() * 2 - 1) * 0.008;
   }
+  const noiseSource = offlineCtx.createBufferSource();
+  noiseSource.buffer = noiseBuffer;
+  const noiseFilter = offlineCtx.createBiquadFilter();
+  noiseFilter.type = 'bandpass';
+  noiseFilter.frequency.value = 1000;
+  noiseSource.connect(noiseFilter);
+  noiseFilter.connect(masterGain);
+  noiseSource.start(0);
 
-  // Render the audio buffer
-  const renderedBuffer = await offlineCtx.startRendering();
-  const audioBlob = audioBufferToWav(renderedBuffer);
-  const artworkBlob = generateCoverArt(name, artistName, gradientIndex);
-
-  const songId = `sample_${generateId()}`;
-  return {
-    id: songId,
-    title: name,
-    artist: artistName,
-    album: albumName,
-    year: 2026,
-    genre: 'Electronic / Ambient',
-    duration: seconds,
-    hash: `synth_${songId}`,
-    isLocal: true,
-    providerType: 'local',
-    audioBlob,
-    artworkBlob,
-    artworkUrl: URL.createObjectURL(artworkBlob),
-    dateAdded: Date.now(),
-    playCount: 0,
-    isFavorite: false,
-    isOfflineAvailable: true,
-  };
+  const rendered = await offlineCtx.startRendering();
+  return audioBufferToWav(rendered);
 }
 
-export const SAMPLE_TRACK_DEFINITIONS = [
+export interface CuratedTrackDefinition {
+  title: string;
+  artist: string;
+  movie: string;
+  year: number;
+  mood: string;
+  artworkUrl: string;
+  bpm: number;
+  baseFreq: number;
+  seconds: number;
+  lyrics: string;
+}
+
+export const CURATED_TELUGU_SONGS: CuratedTrackDefinition[] = [
   {
-    title: 'Midnight Reverie',
-    artist: 'Aetheric Soundscape',
-    album: 'Nocturnal Echoes',
-    bpm: 85,
-    baseFreq: 220, // A3
-    seconds: 24,
-    gradient: 0,
+    title: 'Inkem Inkem Inkem Kaavaale',
+    artist: 'Sid Sriram',
+    movie: 'Geetha Govindam',
+    year: 2018,
+    mood: 'Romantic Telugu Melodies',
+    artworkUrl:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/68/f1/52/68f1523b-3c40-f2cc-7d4a-376642897adb/cover.jpg/600x600bb.jpg',
+    bpm: 96,
+    baseFreq: 246.94, // B3
+    seconds: 32,
+    lyrics: `[00:00.00] Inkem Inkem Inkem Kaavaale...
+[00:06.00] Chaalidi Chaale...
+[00:10.50] Neekai Nuvve Vachhi Vaalave
+[00:16.00] Kannula Munde...
+[00:20.00] Gundellona Guvva Guvvai Vaalave...
+[00:26.00] Vachhi Vaalave...`,
   },
   {
-    title: 'Neon Horizons',
-    artist: 'Solaris Wave',
-    album: 'Synthetic Dreams',
-    bpm: 100,
+    title: 'Samajavaragamana',
+    artist: 'Sid Sriram',
+    movie: 'Ala Vaikunthapurramuloo',
+    year: 2020,
+    mood: 'Soulful Melodies',
+    artworkUrl:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/46/14/df/4614df1c-3f61-6bf5-5c3e-ee304895cfca/cover.jpg/600x600bb.jpg',
+    bpm: 88,
     baseFreq: 261.63, // C4
-    seconds: 22,
-    gradient: 1,
+    seconds: 30,
+    lyrics: `[00:00.00] Samajavaragamana...
+[00:06.00] Ninu Choosi Aagagalana...
+[00:12.00] Manasu Meeda Vayasukunna Maata Cheppana...
+[00:18.00] Nee Kaallani Pattukuni Vadalanannavi Choode Naa Kallu...
+[00:24.00] Choode Naa Kallu...`,
   },
   {
-    title: 'Cosmic Drift',
-    artist: 'Astral Odyssey',
-    album: 'Deep Space Reverie',
-    bpm: 72,
+    title: 'Vachindamma',
+    artist: 'Sid Sriram',
+    movie: 'Geetha Govindam',
+    year: 2018,
+    mood: 'Romantic Telugu Melodies',
+    artworkUrl:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/68/f1/52/68f1523b-3c40-f2cc-7d4a-376642897adb/cover.jpg/600x600bb.jpg',
+    bpm: 92,
+    baseFreq: 220, // A3
+    seconds: 28,
+    lyrics: `[00:00.00] Vachindamma Ee Janmaki Padahaaranaala Teerani Varame...
+[00:08.00] Mechhindamma Naa Gundeki Saripoda Inka Ee Chirunavve...
+[00:16.00] Vachindamma... Naa Pranama...`,
+  },
+  {
+    title: 'Adiga Adiga',
+    artist: 'Sid Sriram',
+    movie: 'Ninnu Kori',
+    year: 2017,
+    mood: 'Heart Touching Songs',
+    artworkUrl:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/98/81/43/988143ca-e902-4e8a-977c-3e31eefcfaab/196925399784.jpg/600x600bb.jpg',
+    bpm: 80,
     baseFreq: 196, // G3
-    seconds: 25,
-    gradient: 2,
+    seconds: 30,
+    lyrics: `[00:00.00] Adiga Adiga Ee Santhosham Ekkadidone...
+[00:07.50] Nilisaa Nilisaa O Thuntarivai Nee Thalapulane...
+[00:15.00] Nee Kallallo Chooppai Kaalam Aagindhe...
+[00:22.00] Adiga Adiga...`,
   },
   {
-    title: 'Cyber Chill',
-    artist: 'Luna Meridian',
-    album: 'Digital Sunset',
+    title: 'Maate Vinadhuga',
+    artist: 'Sid Sriram',
+    movie: 'Taxiwaala',
+    year: 2018,
+    mood: 'Late Night Vibes',
+    artworkUrl:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/94/1d/a0/941da079-ee93-ce60-6340-3c7d0f7633a3/cover.jpg/600x600bb.jpg',
     bpm: 90,
     baseFreq: 293.66, // D4
-    seconds: 20,
-    gradient: 3,
+    seconds: 28,
+    lyrics: `[00:00.00] Maate Vinadhuga Naa Manasu...
+[00:06.00] Oohalake Veluthundi Vethuku...
+[00:12.00] Nuvve Nannu Maarchesave...
+[00:18.00] Naa Gundello Edo Melikeseve...`,
+  },
+  {
+    title: 'Undiporaadhey',
+    artist: 'Sid Sriram',
+    movie: 'Hushaaru',
+    year: 2018,
+    mood: 'Heart Touching Songs',
+    artworkUrl:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/1b/41/ef/1b41ef56-4aef-56a6-bc40-648126458c8c/cover.jpg/600x600bb.jpg',
+    bpm: 78,
+    baseFreq: 174.61, // F3
+    seconds: 30,
+    lyrics: `[00:00.00] Undiporaadhey Gundene Hatthukuni...
+[00:07.00] Nuvvu Leni Lokamlo Naake Emi Thochadhe...
+[00:14.00] Praanam Loni Praaname Nuvve Kadaa...
+[00:22.00] Undiporaadhey...`,
+  },
+  {
+    title: 'Srivalli',
+    artist: 'Sid Sriram',
+    movie: 'Pushpa: The Rise',
+    year: 2021,
+    mood: 'Songs on Repeat',
+    artworkUrl:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/7e/78/81/7e78812c-0445-ebad-321c-1beebaaa328a/8902894361460_cover.jpg/600x600bb.jpg',
+    bpm: 104,
+    baseFreq: 246.94, // B3
+    seconds: 28,
+    lyrics: `[00:00.00] Choope Bangaramayene Srivalli...
+[00:06.50] Maate Maanikyamayene...
+[00:12.00] Nuvvu Nannu Choosina Vaipuki Lokame Tirigipoye...
+[00:20.00] Srivalli...`,
+  },
+  {
+    title: 'Kalaavathi',
+    artist: 'Sid Sriram',
+    movie: 'Sarkaru Vaari Paata',
+    year: 2022,
+    mood: 'Romantic Telugu Melodies',
+    artworkUrl:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/dd/13/96/dd1396a1-fd23-693c-137a-b10047cc2b78/196626439680.jpg/600x600bb.jpg',
+    bpm: 95,
+    baseFreq: 261.63, // C4
+    seconds: 28,
+    lyrics: `[00:00.00] Vanda Velavele Vennelaa...
+[00:05.50] Naa Gundellona Chinduluraa...
+[00:11.00] Anthaa Kalaavathi Kalavarame...
+[00:16.50] Maguvaa O Kalaavathi...`,
+  },
+  {
+    title: 'Aradhya',
+    artist: 'Sid Sriram, Chinmayi',
+    movie: 'Kushi',
+    year: 2023,
+    mood: 'Peaceful Songs',
+    artworkUrl:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/f5/a1/ed/f5a1ed5e-d3c2-a4dc-27df-2cedd9b159ec/197189406225.jpg/600x600bb.jpg',
+    bpm: 84,
+    baseFreq: 220, // A3
+    seconds: 30,
+    lyrics: `[00:00.00] Aradhya... Naa Premaki Aradhya...
+[00:07.00] Nuvvante Naaku Praanam Kanna Ekkuva...
+[00:14.00] Ee Janmaki Nuvve Naa Sathi...
+[00:21.00] Aradhya...`,
+  },
+  {
+    title: 'Okey Oka Lokam',
+    artist: 'Sid Sriram',
+    movie: 'Sashi',
+    year: 2021,
+    mood: 'Heart Touching Songs',
+    artworkUrl:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/c9/93/c9/c993c9fa-c5ba-f345-353b-432e9220e9ef/cover.jpg/600x600bb.jpg',
+    bpm: 82,
+    baseFreq: 196, // G3
+    seconds: 30,
+    lyrics: `[00:00.00] Okey Oka Lokam Nuvve...
+[00:06.00] Lokamloni Andam Nuvve...
+[00:12.00] Andaanike Hrudayam Nuvve...
+[00:18.00] Naake Nuvvu Dakkavu Kadhe...
+[00:24.00] Okey Oka Lokam...`,
   },
 ];
+
+// Seed personal curated Telugu collection into IndexedDB
+export async function seedCuratedPersonalMusic(
+  onProgress?: (percent: number, trackName: string) => void
+): Promise<number> {
+  const songsCreated: Song[] = [];
+  const total = CURATED_TELUGU_SONGS.length;
+
+  for (let i = 0; i < total; i++) {
+    const item = CURATED_TELUGU_SONGS[i];
+    if (onProgress) {
+      onProgress(Math.round(((i + 1) / total) * 70), `Harmonizing ${item.title}...`);
+    }
+
+    const audioBlob = await synthesizeMelodyAudio(item.baseFreq, item.bpm, item.seconds);
+    const songId = `telugu_${generateId()}`;
+
+    const song: Song = {
+      id: songId,
+      title: item.title,
+      artist: item.artist,
+      album: item.movie,
+      year: item.year,
+      genre: item.mood,
+      duration: item.seconds,
+      hash: `curated_${item.title.toLowerCase().replace(/\s+/g, '_')}`,
+      isLocal: true,
+      providerType: 'local',
+      audioBlob,
+      artworkUrl: item.artworkUrl,
+      dateAdded: Date.now() - (total - i) * 1000 * 3600, // staggered timestamps
+      playCount: Math.floor(Math.random() * 12) + 3,
+      isFavorite: i < 5, // first 5 marked as favorite
+      isOfflineAvailable: true,
+    };
+
+    await db.songs.put(song);
+    songsCreated.push(song);
+
+    // Also populate lyrics
+    const parsed = parseLrc(item.lyrics);
+    await db.lyrics.put({
+      id: `lyrics_${songId}`,
+      songId: songId,
+      plainLyrics: item.lyrics,
+      syncedLyrics: parsed,
+      updatedAt: Date.now(),
+    });
+
+    if (song.isFavorite) {
+      await db.favorites.put({
+        id: `fav_${songId}`,
+        songId: songId,
+        addedAt: Date.now(),
+      });
+    }
+  }
+
+  if (onProgress) onProgress(80, 'Creating personal mixtapes...');
+
+  // Create personal curated playlists
+  const personalPlaylists = [
+    {
+      id: 'pl_telugu_favs',
+      title: 'My Telugu Favourites',
+      description: 'Songs that never get old — my cherished Telugu melodies and movie soundtracks.',
+      customArtwork: CURATED_TELUGU_SONGS[0].artworkUrl,
+      songIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    },
+    {
+      id: 'pl_sid_sriram',
+      title: 'Sid Sriram Collection',
+      description: 'The magical voice that defines my college days and late night memories.',
+      customArtwork: CURATED_TELUGU_SONGS[1].artworkUrl,
+      songIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    },
+    {
+      id: 'pl_romantic_melodies',
+      title: 'Romantic Telugu Melodies',
+      description: 'Warm chords, sweet lyrics, and memories hidden in melodies.',
+      customArtwork: CURATED_TELUGU_SONGS[2].artworkUrl,
+      songIndices: [0, 2, 7, 8],
+    },
+    {
+      id: 'pl_late_night',
+      title: 'Late Night Vibes',
+      description: 'A quiet room, dim lights, and peaceful soulful tracks.',
+      customArtwork: CURATED_TELUGU_SONGS[4].artworkUrl,
+      songIndices: [1, 4, 5, 9],
+    },
+    {
+      id: 'pl_heart_touching',
+      title: 'Heart Touching Songs',
+      description: 'Songs that evoke deep feelings and gentle nostalgia.',
+      customArtwork: CURATED_TELUGU_SONGS[3].artworkUrl,
+      songIndices: [3, 5, 9],
+    },
+  ];
+
+  for (const p of personalPlaylists) {
+    const existing = await db.playlists.get(p.id);
+    if (!existing) {
+      await db.playlists.add({
+        id: p.id,
+        title: p.title,
+        description: p.description,
+        customArtwork: p.customArtwork,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+
+      for (let order = 0; order < p.songIndices.length; order++) {
+        const songIdx = p.songIndices[order];
+        if (songsCreated[songIdx]) {
+          await db.playlistSongs.add({
+            id: `${p.id}_${songsCreated[songIdx].id}`,
+            playlistId: p.id,
+            songId: songsCreated[songIdx].id,
+            order,
+            addedAt: Date.now(),
+          });
+        }
+      }
+    }
+  }
+
+  if (onProgress) onProgress(95, 'Syncing albums and artist collections...');
+  await syncAlbumsAndArtists();
+  if (onProgress) onProgress(100, 'Welcome to your music world!');
+
+  return songsCreated.length;
+}

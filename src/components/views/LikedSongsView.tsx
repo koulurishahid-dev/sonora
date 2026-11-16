@@ -36,6 +36,7 @@ export function LikedSongsView({
   }, []);
 
   const totalDuration = songs.reduce((acc, s) => acc + (s.duration || 0), 0);
+  const topArt = songs.length > 0 ? getArtworkObjectUrl(songs[0]) : null;
 
   const handlePlayAll = () => {
     if (songs.length > 0) {
@@ -54,18 +55,34 @@ export function LikedSongsView({
     <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto">
       {/* Hero Banner */}
       <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 pb-6 border-b border-[#303038]/60">
-        <div className="w-44 h-44 sm:w-52 sm:h-52 rounded-2xl bg-gradient-to-br from-rose-600 via-pink-600 to-indigo-700 shrink-0 shadow-2xl flex items-center justify-center">
-          <Heart className="w-20 h-20 fill-white text-white drop-shadow-md" />
+        <div className="w-44 h-44 sm:w-52 sm:h-52 rounded-2xl overflow-hidden shrink-0 shadow-2xl relative border border-white/10 group">
+          {topArt ? (
+            <>
+              <img src={topArt} alt="Top favorite" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-4">
+                <div className="w-10 h-10 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-lg backdrop-blur-md">
+                  <Heart className="w-5 h-5 fill-white" />
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-rose-600 via-pink-600 to-indigo-700 flex items-center justify-center">
+              <Heart className="w-20 h-20 fill-white text-white drop-shadow-md" />
+            </div>
+          )}
         </div>
 
         <div className="flex-1 text-center sm:text-left space-y-2">
           <span className="text-xs uppercase font-bold tracking-widest text-rose-400">
-            Collection
+            Personal Keepsakes
           </span>
           <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-            Liked Songs
+            Loved Songs
           </h1>
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs text-[#71717A] pt-2">
+          <p className="text-xs text-[#A1A1AA] italic">
+            Songs that stay with you forever • Memories hidden in melodies
+          </p>
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs text-[#71717A] pt-1">
             <span>{songs.length} {songs.length === 1 ? 'song' : 'songs'}</span>
             <span>•</span>
             <span>{formatDuration(totalDuration)} total duration</span>

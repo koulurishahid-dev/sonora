@@ -88,7 +88,7 @@ export function PlaylistDetailView({
   }
 
   const totalDuration = songs.reduce((acc, s) => acc + (s.duration || 0), 0);
-  const artworkUrl = getArtworkObjectUrl(playlist);
+  const artworkUrl = getArtworkObjectUrl(playlist) || (songs.length > 0 ? getArtworkObjectUrl(songs[0]) : null);
 
   const handlePlayAll = () => {
     if (songs.length > 0) {

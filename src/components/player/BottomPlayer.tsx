@@ -84,7 +84,11 @@ export function BottomPlayer() {
         <div className="flex items-center gap-3.5 w-1/4 min-w-[180px]">
           <div
             onClick={() => setIsNowPlayingOpen(true)}
-            className="w-13 h-13 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-[#19191F] shrink-0 relative group cursor-pointer border border-[#303038]/60 shadow-md"
+            className={`w-13 h-13 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-[#19191F] shrink-0 relative group cursor-pointer border transition-all duration-500 ${
+              isPlaying
+                ? 'shadow-[0_0_20px_rgba(var(--accent-rgb),0.35)] border-[var(--accent)]/50 animate-float'
+                : 'border-[#303038]/60 shadow-md'
+            }`}
             title="Expand Full Player"
           >
             {artworkUrl ? (
@@ -104,12 +108,21 @@ export function BottomPlayer() {
           </div>
 
           <div className="min-w-0">
-            <p
-              onClick={() => setIsNowPlayingOpen(true)}
-              className="text-sm font-semibold text-white truncate cursor-pointer hover:underline hover:text-[var(--accent)] transition-colors"
-            >
-              {currentSong.title}
-            </p>
+            <div className="flex items-center gap-2">
+              <p
+                onClick={() => setIsNowPlayingOpen(true)}
+                className="text-sm font-semibold text-white truncate cursor-pointer hover:underline hover:text-[var(--accent)] transition-colors"
+              >
+                {currentSong.title}
+              </p>
+              {isPlaying && (
+                <div className="flex items-end gap-0.5 h-3 shrink-0" title="Playing">
+                  <span className="w-0.5 bg-[var(--accent)] rounded-full animate-wave-1" />
+                  <span className="w-0.5 bg-[var(--accent)] rounded-full animate-wave-2" />
+                  <span className="w-0.5 bg-[var(--accent)] rounded-full animate-wave-3" />
+                </div>
+              )}
+            </div>
             <p className="text-xs text-[#A1A1AA] truncate mt-0.5">{currentSong.artist}</p>
           </div>
 

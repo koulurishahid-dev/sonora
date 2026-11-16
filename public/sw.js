@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sonora-cache-v1';
+const CACHE_NAME = 'sonora-cache-v3';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
@@ -26,7 +26,7 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Pass through audio streaming or chrome-extension or external URLs directly
+  // Pass through audio streaming, chrome-extension, or external URLs directly
   if (
     event.request.url.startsWith('blob:') ||
     event.request.url.startsWith('chrome-extension:') ||
@@ -35,13 +35,10 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Network-first strategy: always fetch latest from server, fallback to cache if offline
   event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then(response => {
-        // Cache successful local responses
+    fetch(event.request)
+      .then(response => {
         if (response && response.status === 200 && response.type === 'basic') {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then(cache => {
@@ -49,12 +46,16 @@ self.addEventListener('fetch', event => {
           });
         }
         return response;
-      }).catch(() => {
-        // Fallback to cached root for navigation requests
-        if (event.request.mode === 'navigate') {
-          return caches.match('/');
-        }
-      });
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request).then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          if (event.request.mode === 'navigate') {
+            return caches.match('/');
+          }
+        });
+      })
   );
 });

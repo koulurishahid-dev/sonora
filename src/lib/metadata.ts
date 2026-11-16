@@ -130,3 +130,33 @@ export function getAudioDurationFallback(file: File | Blob): Promise<number> {
     audio.src = url;
   });
 }
+
+export interface VerifiedArtworkResult {
+  title: string;
+  artist: string;
+  album: string;
+  artworkUrl: string;
+}
+
+// Search official verified album / movie soundtrack artwork from Apple Music CDN
+export async function searchVerifiedArtwork(query: string): Promise<VerifiedArtworkResult[]> {
+  try {
+    const res = await fetch(
+      `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=6`
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!data.results) return [];
+    return data.results
+      .map((r: any) => ({
+        title: r.trackName || '',
+        artist: r.artistName || '',
+        album: r.collectionName || '',
+        artworkUrl: r.artworkUrl100 ? r.artworkUrl100.replace('100x100bb', '600x600bb') : '',
+      }))
+      .filter((item: VerifiedArtworkResult) => item.artworkUrl);
+  } catch (err) {
+    console.warn('Failed to search verified artwork:', err);
+    return [];
+  }
+}

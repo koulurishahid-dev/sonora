@@ -51,9 +51,9 @@ export function RecentlyPlayedView({
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white">Recently Played</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white">Memory Lane</h1>
           <p className="text-xs text-[#A1A1AA] mt-1">
-            Tracks you have listened to recently in SONORA
+            Revisit the melodies and moments that accompanied you recently
           </p>
         </div>
 

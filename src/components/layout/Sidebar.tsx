@@ -4,12 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { ViewType, Playlist } from '@/types/music';
 import { db } from '@/lib/db';
 import {
-  Home,
-  Search,
-  Library,
+  Compass,
+  Music2,
   Heart,
   ListMusic,
-  Disc,
   User,
   Clock,
   WifiOff,
@@ -18,8 +16,9 @@ import {
   Radio,
   ChevronLeft,
   ChevronRight,
-  Music2,
   FolderPlus,
+  Search,
+  Sparkles,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -50,21 +49,19 @@ export function Sidebar({
     };
     loadPlaylists();
 
-    const interval = setInterval(loadPlaylists, 2000);
+    const interval = setInterval(loadPlaylists, 2500);
     return () => clearInterval(interval);
   }, []);
 
-  const navItems: { view: ViewType; label: string; icon: any; count?: number }[] = [
-    { view: 'home', label: 'Home', icon: Home },
-    { view: 'search', label: 'Search', icon: Search },
-    { view: 'library', label: 'My Library', icon: Library },
-    { view: 'all-songs', label: 'All Songs', icon: Music2 },
-    { view: 'liked', label: 'Liked Songs', icon: Heart },
+  const navItems: { view: ViewType; label: string; icon: any }[] = [
+    { view: 'home', label: 'My World', icon: Compass },
+    { view: 'all-songs', label: 'My Music', icon: Music2 },
     { view: 'playlists', label: 'Playlists', icon: ListMusic },
-    { view: 'albums', label: 'Albums', icon: Disc },
-    { view: 'artists', label: 'Artists', icon: User },
-    { view: 'recently-played', label: 'Recently Played', icon: Clock },
+    { view: 'liked', label: 'Favourite Songs', icon: Heart },
+    { view: 'artists', label: 'Artists I Love', icon: User },
+    { view: 'recently-played', label: 'Memory Lane', icon: Clock },
     { view: 'offline', label: 'Offline Music', icon: WifiOff },
+    { view: 'search', label: 'Search', icon: Search },
   ];
 
   return (
@@ -73,7 +70,7 @@ export function Sidebar({
         isCollapsed ? 'w-20' : 'w-64'
       } ${className}`}
     >
-      {/* Brand Header */}
+      {/* Personal Brand Header */}
       <div className="flex items-center justify-between px-5 py-5 border-b border-[#303038]/50">
         {!isCollapsed && (
           <div
@@ -81,12 +78,12 @@ export function Sidebar({
             className="flex items-center gap-2.5 cursor-pointer group"
           >
             <div className="w-8 h-8 rounded-xl bg-[var(--accent)] flex items-center justify-center text-black shadow-lg shadow-[var(--accent)]/20 group-hover:scale-105 transition-transform">
-              <Radio className="w-5 h-5 fill-black" />
+              <Radio className="w-4 h-4 fill-black" />
             </div>
             <div>
-              <span className="font-extrabold text-lg tracking-wider text-white">SONORA</span>
-              <span className="text-[9px] uppercase tracking-widest block text-[var(--accent)] font-semibold -mt-1">
-                Personal Hi-Fi
+              <span className="font-extrabold text-base tracking-wider text-white">SONORA</span>
+              <span className="text-[10px] block text-[#A1A1AA] italic font-serif -mt-0.5">
+                my music journal
               </span>
             </div>
           </div>
@@ -96,9 +93,9 @@ export function Sidebar({
           <div
             onClick={() => onNavigate('home')}
             className="w-10 h-10 rounded-xl bg-[var(--accent)] flex items-center justify-center text-black mx-auto cursor-pointer shadow-lg shadow-[var(--accent)]/20"
-            title="SONORA"
+            title="SONORA – My Music Journal"
           >
-            <Radio className="w-6 h-6 fill-black" />
+            <Radio className="w-5 h-5 fill-black" />
           </div>
         )}
 
@@ -111,19 +108,19 @@ export function Sidebar({
         </button>
       </div>
 
-      {/* Add Music CTA Button */}
+      {/* Add to Journal Button */}
       <div className="px-3 pt-4">
         <button
           onClick={onOpenUpload}
           className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md ${
             isCollapsed
               ? 'bg-[var(--accent)] text-black p-2.5 hover:scale-105'
-              : 'bg-[var(--accent)] text-black hover:opacity-95'
+              : 'bg-[#19191F] hover:bg-[#25252D] text-white border border-[#303038] hover:border-white/20'
           }`}
-          title="Add / Upload Music"
+          title="Add Music"
         >
-          <Plus className="w-4 h-4 stroke-[3]" />
-          {!isCollapsed && <span>Add Music</span>}
+          <Plus className="w-4 h-4 text-[var(--accent)] stroke-[3]" />
+          {!isCollapsed && <span>Add to Collection</span>}
         </button>
       </div>
 
@@ -145,7 +142,7 @@ export function Sidebar({
             >
               <Icon
                 className={`w-4 h-4 shrink-0 transition-transform ${
-                  isActive ? 'scale-110' : ''
+                  isActive ? 'scale-110 text-[var(--accent)]' : ''
                 }`}
               />
               {!isCollapsed && <span className="truncate">{item.label}</span>}
@@ -153,33 +150,36 @@ export function Sidebar({
           );
         })}
 
-        {/* Playlists Quick List */}
+        {/* Personal Mixtapes Quick List */}
         {!isCollapsed && (
           <div className="pt-5 border-t border-[#303038]/60 mt-4">
             <div className="flex items-center justify-between px-3 mb-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#71717A]">
-                Your Playlists
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#71717A]">
+                My Mixtapes
               </span>
               <button
                 onClick={onOpenCreatePlaylist}
                 className="p-1 rounded text-[#71717A] hover:text-white hover:bg-[#25252D] transition-colors"
-                title="New Playlist"
+                title="Create Mixtape"
               >
                 <FolderPlus className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            <div className="space-y-0.5">
+            <div className="space-y-0.5 max-h-48 overflow-y-auto pr-1">
               {playlists.length === 0 ? (
-                <p className="text-[11px] text-[#71717A] px-3 py-1">No playlists yet</p>
+                <p className="text-[11px] text-[#71717A] px-3 py-1 italic font-serif">
+                  No mixtapes yet
+                </p>
               ) : (
                 playlists.map(pl => (
                   <button
                     key={pl.id}
                     onClick={() => onNavigate('playlist-detail', pl.id)}
-                    className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-[#A1A1AA] hover:text-white hover:bg-[#19191F] truncate transition-colors"
+                    className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium text-[#A1A1AA] hover:text-white hover:bg-[#19191F] truncate transition-colors flex items-center gap-2"
                   >
-                    {pl.title}
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />
+                    <span className="truncate">{pl.title}</span>
                   </button>
                 ))
               )}
@@ -197,10 +197,10 @@ export function Sidebar({
               ? 'bg-[#25252D] text-[var(--accent)]'
               : 'text-[#A1A1AA] hover:text-white hover:bg-[#19191F]'
           }`}
-          title="Settings"
+          title="My Space / Settings"
         >
           <Settings className="w-4 h-4 shrink-0" />
-          {!isCollapsed && <span>Settings</span>}
+          {!isCollapsed && <span>My Space</span>}
         </button>
       </div>
     </aside>

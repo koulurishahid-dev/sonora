@@ -20,9 +20,9 @@ export function AlbumsView({ onNavigate }: AlbumsViewProps) {
   return (
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-white">Albums</h1>
+        <h1 className="text-2xl md:text-3xl font-extrabold text-white">Soundtracks & Albums</h1>
         <p className="text-xs text-[#A1A1AA] mt-1">
-          {albums.length} {albums.length === 1 ? 'album' : 'albums'} in your library
+          {albums.length} {albums.length === 1 ? 'soundtrack' : 'soundtracks'} preserved in your collection
         </p>
       </div>
 

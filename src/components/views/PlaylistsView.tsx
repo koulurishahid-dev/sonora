@@ -20,16 +20,35 @@ export function PlaylistsView({
   const { showToast } = useToast();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [songCounts, setSongCounts] = useState<Record<string, number>>({});
+  const [playlistArtworks, setPlaylistArtworks] = useState<Record<string, string>>({});
 
   const loadData = async () => {
     const list = await db.playlists.toArray();
     setPlaylists(list);
 
     const counts: Record<string, number> = {};
+    const arts: Record<string, string> = {};
+
     for (const pl of list) {
       counts[pl.id] = await db.playlistSongs.where('playlistId').equals(pl.id).count();
+
+      // If no custom artwork, grab the artwork from the first song in the playlist
+      const customUrl = getArtworkObjectUrl(pl);
+      if (customUrl) {
+        arts[pl.id] = customUrl;
+      } else {
+        const firstPs = await db.playlistSongs.where('playlistId').equals(pl.id).first();
+        if (firstPs) {
+          const song = await db.songs.get(firstPs.songId);
+          if (song) {
+            const songArt = getArtworkObjectUrl(song);
+            if (songArt) arts[pl.id] = songArt;
+          }
+        }
+      }
     }
     setSongCounts(counts);
+    setPlaylistArtworks(arts);
   };
 
   useEffect(() => {
@@ -50,9 +69,9 @@ export function PlaylistsView({
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white">Your Playlists</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white">Personal Mixtapes & Playlists</h1>
           <p className="text-xs text-[#A1A1AA] mt-1">
-            Organize your library into custom themes and moods
+            Handcrafted collections of memories, moods, and repeat favourites
           </p>
         </div>
 
@@ -60,7 +79,7 @@ export function PlaylistsView({
           onClick={onOpenCreatePlaylist}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--accent)] text-black text-xs font-bold hover:scale-105 transition-all shadow-md"
         >
-          <Plus className="w-4 h-4" /> Create Playlist
+          <Plus className="w-4 h-4" /> Create Mixtape
         </button>
       </div>
 
@@ -73,13 +92,13 @@ export function PlaylistsView({
           <div className="w-12 h-12 rounded-full bg-[#25252D] group-hover:bg-[var(--accent)] text-[#A1A1AA] group-hover:text-black flex items-center justify-center mb-2.5 transition-colors">
             <Plus className="w-6 h-6" />
           </div>
-          <p className="text-sm font-semibold text-white">New Playlist</p>
+          <p className="text-sm font-semibold text-white">New Mixtape</p>
           <p className="text-xs text-[#71717A] mt-1">Create custom mix</p>
         </div>
 
         {/* Existing Playlists */}
         {playlists.map(pl => {
-          const artUrl = getArtworkObjectUrl(pl);
+          const artUrl = playlistArtworks[pl.id] || getArtworkObjectUrl(pl);
           const count = songCounts[pl.id] || 0;
 
           return (

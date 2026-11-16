@@ -69,9 +69,9 @@ export function OfflineView({ onNavigate, onSongContextMenu }: OfflineViewProps)
     <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-white">Offline Music</h1>
+        <h1 className="text-2xl md:text-3xl font-extrabold text-white">Offline Sanctuary</h1>
         <p className="text-xs text-[#A1A1AA] mt-1">
-          Songs stored securely in local browser IndexedDB, accessible without an internet connection
+          Songs stored securely on this device, always ready to play without internet or cellular data
         </p>
       </div>
 

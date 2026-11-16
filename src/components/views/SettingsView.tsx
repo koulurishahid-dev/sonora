@@ -33,11 +33,20 @@ import {
   Loader2,
   Info,
   CheckCircle2,
+  User,
+  Sparkles,
+  Heart,
+  Smile,
+  Music,
 } from 'lucide-react';
 
 export function SettingsView() {
   const { settings, updateSettings } = useTheme();
   const { showToast } = useToast();
+
+  const [listenerName, setListenerName] = useState(settings.listenerName || '');
+  const [listenerBio, setListenerBio] = useState(settings.listenerBio || '');
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   const [storage, setStorage] = useState<{ usage: number; quota: number; percent: number }>({
     usage: 0,
@@ -67,6 +76,29 @@ export function SettingsView() {
       navigator.storage.persisted().then(setIsPersisted);
     }
   }, []);
+
+  useEffect(() => {
+    if (settings.listenerName !== undefined) setListenerName(settings.listenerName);
+    if (settings.listenerBio !== undefined) setListenerBio(settings.listenerBio);
+  }, [settings.listenerName, settings.listenerBio]);
+
+  const handleSaveProfile = async () => {
+    setIsSavingProfile(true);
+    try {
+      await updateSettings({
+        listenerName: listenerName.trim(),
+        listenerBio: listenerBio.trim(),
+      });
+      showToast('Profile Saved', 'Your personal listener space has been updated ✨', 'success');
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handleSelectAvatar = async (avatar: string) => {
+    await updateSettings({ listenerAvatar: avatar });
+    showToast('Avatar Updated', 'New listener avatar set', 'info');
+  };
 
   // Export Metadata JSON only
   const handleExportMetadata = async () => {
@@ -236,11 +268,90 @@ export function SettingsView() {
     <div className="p-6 md:p-8 space-y-10 max-w-4xl mx-auto">
       {/* Title */}
       <div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-white">Settings</h1>
+        <div className="flex items-center gap-2 text-xs font-semibold text-[var(--accent)] tracking-wider mb-1">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span className="uppercase tracking-widest text-[10px]">Private Journal Space</span>
+        </div>
+        <h1 className="text-2xl md:text-3xl font-extrabold text-white">My Space & Settings</h1>
         <p className="text-xs text-[#A1A1AA] mt-1">
-          Customize audio behavior, visual theme, privacy protection, and full library backups
+          Personalize your music diary, customize audio transitions, and manage your private offline library
         </p>
       </div>
+
+      {/* Personal Profile & Diary Customization */}
+      <section className="p-6 rounded-2xl bg-[#19191F] border border-[#303038] space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5 text-white">
+            <User className="w-5 h-5 text-[var(--accent)]" />
+            <div>
+              <h2 className="text-base font-bold">Listener Profile</h2>
+              <p className="text-[11px] text-[#A1A1AA]">The name and aesthetic that welcomes you to your music diary</p>
+            </div>
+          </div>
+          <span className="text-xs px-2.5 py-1 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/30 font-medium">
+            Personal Corner
+          </span>
+        </div>
+
+        {/* Avatar Selection */}
+        <div>
+          <label className="text-xs font-semibold text-[#A1A1AA] block mb-2">Listener Avatar</label>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {['🎧', '🌙', '✨', '☕', '🌸', '🎸', '🌊', '🌿', '📻', '🕯️'].map(emoji => {
+              const isSelected = (settings.listenerAvatar || '🎧') === emoji;
+              return (
+                <button
+                  key={emoji}
+                  type="button"
+                  onClick={() => handleSelectAvatar(emoji)}
+                  className={`w-11 h-11 rounded-2xl text-xl flex items-center justify-center transition-all ${
+                    isSelected
+                      ? 'bg-[var(--accent)]/20 border-2 border-[var(--accent)] scale-110 shadow-lg'
+                      : 'bg-[#121216] border border-[#303038] hover:border-white/30 hover:scale-105'
+                  }`}
+                >
+                  {emoji}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Name and Bio Inputs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-semibold text-[#A1A1AA] block mb-1.5">Your Name / Alias</label>
+            <input
+              type="text"
+              placeholder="e.g. Shahid"
+              value={listenerName}
+              onChange={e => setListenerName(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-[#121216] border border-[#303038] text-white text-xs focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] outline-none transition-colors"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-[#A1A1AA] block mb-1.5">Journal Note / Bio</label>
+            <input
+              type="text"
+              placeholder="e.g. Lost in Telugu melodies & late night rhythms"
+              value={listenerBio}
+              onChange={e => setListenerBio(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-[#121216] border border-[#303038] text-white text-xs focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] outline-none transition-colors"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-2">
+          <button
+            onClick={handleSaveProfile}
+            disabled={isSavingProfile}
+            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[var(--accent)] text-black text-xs font-bold hover:opacity-95 transition-all shadow-md disabled:opacity-50"
+          >
+            {isSavingProfile ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+            <span>Save Profile</span>
+          </button>
+        </div>
+      </section>
 
       {/* Appearance Section */}
       <section className="p-6 rounded-2xl bg-[#19191F] border border-[#303038] space-y-6">

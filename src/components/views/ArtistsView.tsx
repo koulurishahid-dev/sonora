@@ -19,9 +19,9 @@ export function ArtistsView({ onNavigate }: ArtistsViewProps) {
   return (
     <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-white">Artists</h1>
+        <h1 className="text-2xl md:text-3xl font-extrabold text-white">Artists I Love</h1>
         <p className="text-xs text-[#A1A1AA] mt-1">
-          {artists.length} {artists.length === 1 ? 'artist' : 'artists'} in your library
+          {artists.length} {artists.length === 1 ? 'artist' : 'artists'} whose voices and compositions fill your world
         </p>
       </div>
 

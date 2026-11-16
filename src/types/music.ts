@@ -105,6 +105,9 @@ export interface AppSettings {
   privacyLockEnabled?: boolean;
   privacyPasscode?: string;
   deviceSyncNoticeDismissed?: boolean;
+  listenerName?: string;
+  listenerAvatar?: string;
+  listenerBio?: string;
 }
 
 export interface DownloadItem {

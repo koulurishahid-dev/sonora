@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'SONORA – Premium Personal Music Library & Player',
-  description: 'Your private, high-fidelity personal music sanctuary with local IndexedDB storage and offline playback.',
+  title: 'SONORA – Personal Music Diary',
+  description: 'My private music collection, Telugu melodies, and cozy listening sanctuary.',
   manifest: '/manifest.json',
   icons: {
     icon: '/icon.svg',
