@@ -2,7 +2,13 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { Song, Playlist, Album, Artist, ViewType } from '@/types/music';
-import { db, getArtworkObjectUrl, syncAlbumsAndArtists, resetGeneratedSampleSongs } from '@/lib/db';
+import {
+  db,
+  getArtworkObjectUrl,
+  syncAlbumsAndArtists,
+  resetGeneratedSampleSongs,
+  repairLibraryArtworkAndTitles,
+} from '@/lib/db';
 import { usePlayer } from '@/context/PlayerContext';
 import { useToast } from '@/context/ToastContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -38,6 +44,28 @@ interface HomeViewProps {
   onNavigate: (view: ViewType, param?: string) => void;
   onOpenUpload: () => void;
   onSongContextMenu: (e: React.MouseEvent, song: Song) => void;
+}
+
+// Resilient cover image with instant fallback preventing broken image icons
+function SongCardImage({ song, className = '' }: { song: Song; className?: string }) {
+  const [hasError, setHasError] = useState(false);
+  const art = getArtworkObjectUrl(song);
+
+  return (
+    <div className="w-full h-full relative flex items-center justify-center overflow-hidden bg-[#202028]">
+      {art && !hasError ? (
+        <img
+          src={art}
+          alt=""
+          onError={() => setHasError(true)}
+          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 relative z-10 ${className}`}
+        />
+      ) : null}
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#1E1E26] to-[#121216] text-[#71717A] z-0">
+        <Music2 className="w-10 h-10 text-[#404052]" />
+      </div>
+    </div>
+  );
 }
 
 export function HomeView({ onNavigate, onOpenUpload, onSongContextMenu }: HomeViewProps) {
@@ -98,11 +126,40 @@ export function HomeView({ onNavigate, onOpenUpload, onSongContextMenu }: HomeVi
     setAlbums(alb);
   };
 
+  const [isFixingCovers, setIsFixingCovers] = useState(false);
+  const [fixStatus, setFixStatus] = useState('');
+
   useEffect(() => {
     loadData();
+    // Auto-repair missing artwork and clean junk tags in background once on mount
+    repairLibraryArtworkAndTitles().then(count => {
+      if (count > 0) loadData();
+    });
     const interval = setInterval(loadData, 4000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleFixCovers = async () => {
+    setIsFixingCovers(true);
+    try {
+      const fixed = await repairLibraryArtworkAndTitles((msg, pct) => {
+        setFixStatus(`${msg} (${pct}%)`);
+      });
+      await loadData();
+      showToast(
+        'Covers Updated',
+        fixed > 0
+          ? `Fixed and fetched verified movie covers for ${fixed} songs!`
+          : 'All song covers in your library are valid.',
+        'success'
+      );
+    } catch (err: any) {
+      showToast('Error', err?.message || 'Failed to update covers', 'error');
+    } finally {
+      setIsFixingCovers(false);
+      setFixStatus('');
+    }
+  };
 
   const handleSeedTeluguCollection = async () => {
     setIsSeeding(true);
@@ -209,13 +266,29 @@ export function HomeView({ onNavigate, onOpenUpload, onSongContextMenu }: HomeVi
               <span>Fill My Music Journal (Telugu Favourites)</span>
             </button>
           ) : (
-            <button
-              onClick={onOpenUpload}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#19191F] hover:bg-[#25252D] border border-[#303038] text-white text-xs font-semibold transition-all shadow-sm"
-            >
-              <Upload className="w-3.5 h-3.5 text-[var(--accent)]" />
-              <span>Add to Collection</span>
-            </button>
+            <>
+              <button
+                onClick={handleFixCovers}
+                disabled={isFixingCovers}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#19191F] hover:bg-[#25252D] border border-[#303038] text-[#D4D4D8] hover:text-white text-xs font-semibold transition-all shadow-sm disabled:opacity-50"
+                title="Auto-fetch official verified movie covers from Apple Music for your songs"
+              >
+                {isFixingCovers ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--accent)]" />
+                ) : (
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                )}
+                <span>{isFixingCovers ? (fixStatus || 'Fetching...') : 'Auto-Fetch Missing Covers'}</span>
+              </button>
+
+              <button
+                onClick={onOpenUpload}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#19191F] hover:bg-[#25252D] border border-[#303038] text-white text-xs font-semibold transition-all shadow-sm"
+              >
+                <Upload className="w-3.5 h-3.5 text-[var(--accent)]" />
+                <span>Add to Collection</span>
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -476,18 +549,10 @@ export function HomeView({ onNavigate, onOpenUpload, onSongContextMenu }: HomeVi
                   }`}
                 >
                   <div className="aspect-square rounded-xl overflow-hidden bg-[#25252D] relative mb-3 flex items-center justify-center">
-                    {art ? (
-                      <img
-                        src={art}
-                        alt={song.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <Music2 className="w-10 h-10 text-[#71717A]" />
-                    )}
+                    <SongCardImage song={song} />
 
                     <div
-                      className={`absolute bottom-2.5 right-2.5 w-10 h-10 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shadow-xl transition-all duration-300 transform ${
+                      className={`absolute bottom-2.5 right-2.5 w-10 h-10 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shadow-xl transition-all duration-300 transform z-20 ${
                         isCur
                           ? 'opacity-100 scale-100'
                           : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
@@ -636,18 +701,10 @@ export function HomeView({ onNavigate, onOpenUpload, onSongContextMenu }: HomeVi
                   }`}
                 >
                   <div className="aspect-square rounded-xl overflow-hidden bg-[#25252D] relative mb-3 flex items-center justify-center">
-                    {art ? (
-                      <img
-                        src={art}
-                        alt={song.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <Music2 className="w-10 h-10 text-[#71717A]" />
-                    )}
+                    <SongCardImage song={song} />
 
                     <div
-                      className={`absolute bottom-2.5 right-2.5 w-10 h-10 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shadow-xl transition-all duration-300 transform ${
+                      className={`absolute bottom-2.5 right-2.5 w-10 h-10 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shadow-xl transition-all duration-300 transform z-20 ${
                         isCur
                           ? 'opacity-100 scale-100'
                           : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
@@ -770,13 +827,9 @@ export function HomeView({ onNavigate, onOpenUpload, onSongContextMenu }: HomeVi
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#25252D] shrink-0 relative flex items-center justify-center">
-                      {art ? (
-                        <img src={art} alt={song.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <Music2 className="w-5 h-5 text-[#71717A]" />
-                      )}
+                      <SongCardImage song={song} />
                       <div
-                        className={`absolute inset-0 bg-black/40 flex items-center justify-center ${
+                        className={`absolute inset-0 bg-black/40 flex items-center justify-center z-20 ${
                           isCur ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                         }`}
                       >

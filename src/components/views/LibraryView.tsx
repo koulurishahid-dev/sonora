@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Song, ViewType, Playlist } from '@/types/music';
-import { db, getArtworkObjectUrl, syncAlbumsAndArtists } from '@/lib/db';
+import { db, getArtworkObjectUrl, syncAlbumsAndArtists, repairLibraryArtworkAndTitles } from '@/lib/db';
 import { usePlayer } from '@/context/PlayerContext';
 import { useToast } from '@/context/ToastContext';
 import { formatDuration, formatDate } from '@/lib/utils';
@@ -384,12 +384,20 @@ export function LibraryView({
                     {/* Artwork, Title & Artist */}
                     <td className="py-2.5 px-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg overflow-hidden bg-[#25252D] shrink-0 flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-lg overflow-hidden bg-[#25252D] shrink-0 relative flex items-center justify-center">
                           {artworkUrl ? (
-                            <img src={artworkUrl} alt={song.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <Music2 className="w-4 h-4 text-[#71717A]" />
-                          )}
+                            <img
+                              src={artworkUrl}
+                              alt=""
+                              onError={e => {
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
+                              className="w-full h-full object-cover relative z-10"
+                            />
+                          ) : null}
+                          <div className="absolute inset-0 flex items-center justify-center bg-[#25252D] text-[#71717A] z-0">
+                            <Music2 className="w-4 h-4" />
+                          </div>
                         </div>
                         <div className="min-w-0">
                           <p
@@ -468,12 +476,16 @@ export function LibraryView({
                   {artworkUrl ? (
                     <img
                       src={artworkUrl}
-                      alt={song.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      alt=""
+                      onError={e => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 relative z-10"
                     />
-                  ) : (
-                    <Music2 className="w-10 h-10 text-[#71717A]" />
-                  )}
+                  ) : null}
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#25252D] text-[#71717A] z-0">
+                    <Music2 className="w-10 h-10" />
+                  </div>
 
                   <div
                     className={`absolute bottom-2.5 right-2.5 w-10 h-10 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shadow-xl transition-all duration-200 transform ${

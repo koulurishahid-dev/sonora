@@ -23,6 +23,8 @@ export function VinylCover({
   showBadge = true,
   className = '',
 }: VinylCoverProps) {
+  const [imgError, setImgError] = React.useState(false);
+
   // Dimensions per size
   const dimensions = {
     sm: { container: 'w-24 h-24', sleeve: 'w-20 h-20', vinyl: 'w-20 h-20', center: 'w-7 h-7' },
@@ -61,8 +63,13 @@ export function VinylCover({
         <div
           className={`${dimensions.center} rounded-full overflow-hidden border-2 border-[var(--accent)]/40 relative shadow-inner bg-[#1A1A22] flex items-center justify-center`}
         >
-          {artworkUrl ? (
-            <img src={artworkUrl} alt={title} className="w-full h-full object-cover" />
+          {artworkUrl && !imgError ? (
+            <img
+              src={artworkUrl}
+              alt=""
+              onError={() => setImgError(true)}
+              className="w-full h-full object-cover"
+            />
           ) : (
             <Disc className="w-3.5 h-3.5 text-[var(--accent)]" />
           )}
@@ -75,10 +82,11 @@ export function VinylCover({
       <div
         className={`relative z-10 ${dimensions.sleeve} rounded-2xl overflow-hidden bg-[#181820] border border-white/10 shadow-2xl transition-all duration-300 group-hover:shadow-[0_15px_35px_-5px_rgba(0,0,0,0.9)]`}
       >
-        {artworkUrl ? (
+        {artworkUrl && !imgError ? (
           <img
             src={artworkUrl}
-            alt={title}
+            alt=""
+            onError={() => setImgError(true)}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (

@@ -137,7 +137,10 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
         providerType: 'local',
         audioBlob: item.file,
         artworkBlob: item.metadata.artworkBlob,
-        artworkUrl: item.metadata.artworkUrl,
+        artworkUrl:
+          item.metadata.artworkUrl && !item.metadata.artworkUrl.startsWith('blob:')
+            ? item.metadata.artworkUrl
+            : undefined,
         dateAdded: Date.now(),
         playCount: 0,
         isFavorite: false,

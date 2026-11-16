@@ -33,6 +33,27 @@ export async function computeFileHash(file: File | Blob): Promise<string> {
   }
 }
 
+// Clean junk website domains, bitrates, and track numbers from titles and artist tags
+export function cleanMusicTag(str: string): string {
+  if (!str) return '';
+  return str
+    // Remove common download site tags
+    .replace(/::\s*sensongsmp3(\.com|\.co)?/gi, '')
+    .replace(/\(?www\.sensongsmp3(\.com|\.co)?\)?/gi, '')
+    .replace(/\[\s*sensongsmp3(\.com|\.co)?\s*\]/gi, '')
+    .replace(/sensongsmp3(\.com|\.co)?/gi, '')
+    .replace(/\(?www\.[a-z0-9-]+\.[a-z]{2,}\)?/gi, '')
+    .replace(/\[[a-z0-9-]+\.[a-z]{2,}\]/gi, '')
+    // Remove bitrates e.g. "- 320Kbps", "(128Kbps)"
+    .replace(/-\s*(320|128|256)\s*kbps/gi, '')
+    .replace(/\((320|128|256)\s*kbps\)/gi, '')
+    // Remove leading track numbers e.g. "01 - ", "01. ", "1 - "
+    .replace(/^\d+[\s.-]+/, '')
+    // Remove trailing dashes or colons
+    .replace(/[\s:-]+$/, '')
+    .trim();
+}
+
 // Clean filename to extract plausible title & artist if ID3 tags are missing
 export function parseFilename(filename: string): { title: string; artist: string } {
   // Strip extension
@@ -41,13 +62,13 @@ export function parseFilename(filename: string): { title: string; artist: string
   // Look for "Artist - Title" pattern
   if (base.includes(' - ')) {
     const parts = base.split(' - ');
-    const artist = parts[0].replace(/^\d+[\s.-]+/, '').trim();
-    const title = parts.slice(1).join(' - ').trim();
+    const artist = cleanMusicTag(parts[0]);
+    const title = cleanMusicTag(parts.slice(1).join(' - '));
     return { title: title || base, artist: artist || 'Unknown Artist' };
   }
 
-  // Strip leading track numbers like "01. Song", "01 - Song", "1 - Song"
-  const cleanTitle = base.replace(/^\d+[\s.-]+/, '').trim();
+  // Strip leading track numbers and junk
+  const cleanTitle = cleanMusicTag(base);
   return {
     title: cleanTitle || base || 'Untitled Track',
     artist: 'Unknown Artist',
@@ -67,16 +88,36 @@ export async function extractAudioMetadata(file: File): Promise<ExtractedMetadat
     let artworkBlob: Blob | undefined = undefined;
     let artworkUrl: string | undefined = undefined;
 
+    // Extract embedded ID3 picture as permanent binary Blob
     if (common.picture && common.picture.length > 0) {
       const pic = common.picture[0];
       const mimeType = pic.format || 'image/jpeg';
       artworkBlob = new Blob([pic.data as unknown as BlobPart], { type: mimeType });
-      artworkUrl = URL.createObjectURL(artworkBlob);
+      // IMPORTANT: Do NOT store temporary blob: URL in DB!
+      // The artworkBlob is stored permanently in IndexedDB.
     }
 
-    const title = (common.title && common.title.trim()) || fallback.title;
-    const artist = (common.artist && common.artist.trim()) || fallback.artist;
-    const album = (common.album && common.album.trim()) || 'Single';
+    const rawTitle = (common.title && common.title.trim()) || fallback.title;
+    const rawArtist = (common.artist && common.artist.trim()) || fallback.artist;
+    const rawAlbum = (common.album && common.album.trim()) || 'Single';
+
+    const title = cleanMusicTag(rawTitle);
+    const artist = cleanMusicTag(rawArtist);
+    const album = cleanMusicTag(rawAlbum);
+
+    // If file has no embedded artwork, attempt automatic movie poster lookup from Apple Music
+    if (!artworkBlob) {
+      try {
+        const query = album && album !== 'Single' && album !== 'Unknown Album' ? `${title} ${album}` : title;
+        const verified = await searchVerifiedArtwork(query);
+        if (verified.length > 0 && verified[0].artworkUrl) {
+          artworkUrl = verified[0].artworkUrl;
+        }
+      } catch {
+        // Non-blocking
+      }
+    }
+
     const year = common.year || undefined;
     const genre = (common.genre && common.genre[0]) || undefined;
     const duration = Math.round(format.duration || 0);

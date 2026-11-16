@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie';
 import JSZip from 'jszip';
+import { cleanMusicTag, searchVerifiedArtwork } from './metadata';
 import {
   Song,
   Album,
@@ -71,22 +72,29 @@ export function getArtworkObjectUrl(songOrArtwork: Song | Album | Artist | Playl
     return url;
   }
 
-  if ('artworkUrl' in songOrArtwork && songOrArtwork.artworkUrl) {
-    return songOrArtwork.artworkUrl;
-  }
-
-  if ('customArtwork' in songOrArtwork && songOrArtwork.customArtwork) {
-    return songOrArtwork.customArtwork;
-  }
-
-  if ('artworkBlob' in songOrArtwork && songOrArtwork.artworkBlob) {
-    const cacheKey = `art_${(songOrArtwork as any).id}`;
+  // 1. Prioritize permanent artworkBlob by generating a live, valid Object URL!
+  if ('artworkBlob' in songOrArtwork && songOrArtwork.artworkBlob instanceof Blob) {
+    const cacheKey = `art_${(songOrArtwork as any).id || (songOrArtwork as any).title}`;
     if (objectUrlCache.has(cacheKey)) {
       return objectUrlCache.get(cacheKey)!;
     }
     const url = URL.createObjectURL(songOrArtwork.artworkBlob);
     objectUrlCache.set(cacheKey, url);
     return url;
+  }
+
+  // 2. Only use artworkUrl if it is a valid remote (http/https) or data: URL.
+  // Stale 'blob:' URLs from previous sessions MUST be ignored because they are dead on page reload!
+  if ('artworkUrl' in songOrArtwork && songOrArtwork.artworkUrl) {
+    if (!songOrArtwork.artworkUrl.startsWith('blob:')) {
+      return songOrArtwork.artworkUrl;
+    }
+  }
+
+  if ('customArtwork' in songOrArtwork && songOrArtwork.customArtwork) {
+    if (!songOrArtwork.customArtwork.startsWith('blob:')) {
+      return songOrArtwork.customArtwork;
+    }
   }
 
   return undefined;
@@ -182,6 +190,78 @@ export async function syncAlbumsAndArtists(): Promise<void> {
   if (newArtists.length > 0) {
     await db.artists.bulkAdd(newArtists);
   }
+}
+
+// Auto-repairs missing/broken artwork, clears dead blob: URLs, and cleans junk tags from titles
+export async function repairLibraryArtworkAndTitles(
+  onProgress?: (msg: string, percent: number) => void
+): Promise<number> {
+  const songs = await db.songs.toArray();
+  let updatedCount = 0;
+  const total = songs.length;
+
+  for (let i = 0; i < total; i++) {
+    const song = songs[i];
+    let needsUpdate = false;
+    let newArtworkUrl = song.artworkUrl;
+    const newTitle = cleanMusicTag(song.title);
+    const newArtist = cleanMusicTag(song.artist);
+    const newAlbum = cleanMusicTag(song.album);
+
+    if (newTitle !== song.title || newArtist !== song.artist || newAlbum !== song.album) {
+      needsUpdate = true;
+    }
+
+    // Clear stale blob: URLs so permanent artworkBlob or verified artwork is used
+    if (newArtworkUrl && newArtworkUrl.startsWith('blob:')) {
+      newArtworkUrl = undefined;
+      needsUpdate = true;
+    }
+
+    // If no artworkBlob and no valid artworkUrl, search verified movie artwork!
+    if (!song.artworkBlob && !newArtworkUrl) {
+      if (onProgress) {
+        onProgress(`Searching cover for ${newTitle}...`, Math.round(((i + 1) / total) * 100));
+      }
+      try {
+        const query = `${newTitle} ${
+          newAlbum && newAlbum !== 'Single' && newAlbum !== 'Unknown Album' ? newAlbum : ''
+        }`.trim();
+        const results = await searchVerifiedArtwork(query);
+        if (results.length > 0 && results[0].artworkUrl) {
+          newArtworkUrl = results[0].artworkUrl;
+          needsUpdate = true;
+        } else {
+          // Try searching just album or title
+          const subQuery =
+            newAlbum && newAlbum !== 'Single' && newAlbum !== 'Unknown Album' ? newAlbum : newTitle;
+          const subResults = await searchVerifiedArtwork(subQuery);
+          if (subResults.length > 0 && subResults[0].artworkUrl) {
+            newArtworkUrl = subResults[0].artworkUrl;
+            needsUpdate = true;
+          }
+        }
+      } catch {
+        // Non-blocking
+      }
+    }
+
+    if (needsUpdate) {
+      await db.songs.update(song.id, {
+        title: newTitle,
+        artist: newArtist,
+        album: newAlbum,
+        artworkUrl: newArtworkUrl,
+      });
+      updatedCount++;
+    }
+  }
+
+  if (updatedCount > 0) {
+    await syncAlbumsAndArtists();
+  }
+
+  return updatedCount;
 }
 
 // Storage space calculation

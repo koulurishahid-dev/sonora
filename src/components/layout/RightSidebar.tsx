@@ -96,15 +96,17 @@ export function RightSidebar({ onOpenLyrics, onOpenQueue, isOpen = true, onToggl
             {artworkUrl ? (
               <img
                 src={artworkUrl}
-                alt={activeSong.title}
+                alt=""
+                onError={e => {
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1E1E26] to-[#121216] text-[#71717A]">
-                <Music2 className="w-12 h-12 mb-2 text-[#3E3E4C]" />
-                <span className="text-xs uppercase font-mono tracking-widest text-[#525260]">Sonora Hi-Fi</span>
-              </div>
-            )}
+            ) : null}
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#1E1E26] to-[#121216] text-[#71717A] -z-0">
+              <Music2 className="w-12 h-12 mb-2 text-[#3E3E4C]" />
+              <span className="text-xs uppercase font-mono tracking-widest text-[#525260]">Sonora Hi-Fi</span>
+            </div>
 
             {/* Play Overlay Button */}
             <div
@@ -189,7 +191,14 @@ export function RightSidebar({ onOpenLyrics, onOpenQueue, isOpen = true, onToggl
                             <span className="w-0.5 bg-[var(--accent)] rounded-full animate-wave-3 h-4" />
                           </div>
                         ) : sArt ? (
-                          <img src={sArt} alt={s.title} className="w-full h-full object-cover" />
+                          <img
+                            src={sArt}
+                            alt=""
+                            onError={e => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
                           <span className="text-[11px] font-mono text-[#71717A]">{idx + 1}</span>
                         )}
