@@ -148,3 +148,49 @@ input[type="range"]::-moz-range-thumb {
 .animate-float {
   animation: gentle-float 3.5s ease-in-out infinite;
 }
+
+/* Aurora Ambient Mesh Animations (Reference Image 1) */
+@keyframes aurora-pulse {
+  0%, 100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.45;
+  }
+  33% {
+    transform: scale(1.18) translate(4%, -6%);
+    opacity: 0.65;
+  }
+  66% {
+    transform: scale(0.92) translate(-5%, 4%);
+    opacity: 0.5;
+  }
+}
+
+.animate-aurora {
+  animation: aurora-pulse 10s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 10s linear infinite;
+}
+
+/* Glass Pill & Frosted Cards */
+.glass-pill {
+  background: rgba(25, 25, 31, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-pill:hover {
+  background: rgba(37, 37, 45, 0.85);
+  border-color: rgba(255, 255, 255, 0.16);
+}

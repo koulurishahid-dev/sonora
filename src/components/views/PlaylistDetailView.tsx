@@ -5,6 +5,7 @@ import { Playlist, Song, ViewType } from '@/types/music';
 import { db, getArtworkObjectUrl } from '@/lib/db';
 import { usePlayer } from '@/context/PlayerContext';
 import { useToast } from '@/context/ToastContext';
+import { VinylCover } from '@/components/common/VinylCover';
 import { formatDuration, formatDate } from '@/lib/utils';
 import {
   Play,
@@ -142,12 +143,15 @@ export function PlaylistDetailView({
 
       {/* Playlist Hero Header */}
       <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 pb-6 border-b border-[#303038]/60">
-        <div className="w-44 h-44 sm:w-52 sm:h-52 rounded-2xl overflow-hidden bg-[#19191F] shrink-0 shadow-2xl border border-white/10 flex items-center justify-center relative group">
-          {artworkUrl ? (
-            <img src={artworkUrl} alt={playlist.title} className="w-full h-full object-cover" />
-          ) : (
-            <ListMusic className="w-16 h-16 text-[#71717A]" />
-          )}
+        <div className="shrink-0 cursor-pointer" onClick={handlePlayAll}>
+          <VinylCover
+            artworkUrl={artworkUrl}
+            title={playlist.title}
+            artist="Curated Mixtape"
+            isPlaying={isPlaying && songs.some(s => s.id === currentSong?.id)}
+            size="lg"
+            showBadge={true}
+          />
         </div>
 
         <div className="flex-1 text-center sm:text-left space-y-2">

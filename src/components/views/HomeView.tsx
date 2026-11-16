@@ -7,6 +7,7 @@ import { usePlayer } from '@/context/PlayerContext';
 import { useToast } from '@/context/ToastContext';
 import { useTheme } from '@/context/ThemeContext';
 import { seedCuratedPersonalMusic, CURATED_TELUGU_SONGS } from '@/lib/audioSynthesis';
+import { VinylCover } from '@/components/common/VinylCover';
 import { formatDuration } from '@/lib/utils';
 import {
   Play,
@@ -268,100 +269,162 @@ export function HomeView({ onNavigate, onOpenUpload, onSongContextMenu }: HomeVi
         </div>
       )}
 
-      {/* Spotlight Hero Card (Personal Highlight) */}
+      {/* Spotlight Hero Card (Image 1 & 4 Style: Aurora Mesh + Spinning Vinyl Sleeve) */}
       {spotlightSong && (
-        <div className="relative rounded-3xl p-6 sm:p-8 overflow-hidden border border-[#303038] bg-gradient-to-r from-[#16161D] via-[#121216] to-[#1A1A24] shadow-2xl">
-          {/* Subtle blurred ambient backdrop */}
-          {spotlightArt && (
+        <div className="relative rounded-3xl p-6 sm:p-10 overflow-hidden border border-white/10 bg-[#121216]/90 shadow-2xl">
+          {/* Animated Aurora Fluid Mesh Glow (Image 1 style) */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-45">
             <div
-              className="absolute -right-20 -top-20 w-96 h-96 rounded-full filter blur-[100px] opacity-25 pointer-events-none"
-              style={{ backgroundImage: `url(${spotlightArt})`, backgroundSize: 'cover' }}
+              className="absolute -top-24 -left-24 w-96 h-96 rounded-full filter blur-[110px] animate-aurora pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle, rgba(var(--accent-rgb), 0.55) 0%, rgba(6, 182, 212, 0.3) 50%, transparent 75%)',
+              }}
             />
-          )}
-
-          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
             <div
-              onClick={() => (currentSong?.id === spotlightSong.id ? togglePlay() : playSong(spotlightSong, allSongs))}
-              className="w-44 h-44 sm:w-52 sm:h-52 rounded-2xl overflow-hidden bg-[#25252D] shrink-0 shadow-2xl border border-white/10 group cursor-pointer relative"
+              className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full filter blur-[120px] animate-aurora pointer-events-none"
+              style={{
+                animationDelay: '-5s',
+                background: 'radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, rgba(var(--accent-rgb), 0.25) 50%, transparent 75%)',
+              }}
+            />
+          </div>
+
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 lg:gap-12">
+            {/* Vinyl Cover with Sliding & Spinning Record */}
+            <div
+              onClick={() =>
+                currentSong?.id === spotlightSong.id ? togglePlay() : playSong(spotlightSong, allSongs)
+              }
+              className="shrink-0"
+              title={isPlaying && currentSong?.id === spotlightSong.id ? 'Pause' : 'Play'}
             >
-              {spotlightArt ? (
-                <img
-                  src={spotlightArt}
-                  alt={spotlightSong.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              ) : (
-                <Music2 className="w-16 h-16 text-[#71717A] mx-auto my-auto" />
-              )}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                {currentSong?.id === spotlightSong.id && isPlaying ? (
-                  <Pause className="w-8 h-8 fill-white text-white" />
-                ) : (
-                  <Play className="w-8 h-8 fill-white text-white ml-1" />
-                )}
-              </div>
+              <VinylCover
+                artworkUrl={spotlightArt}
+                title={spotlightSong.title}
+                artist={spotlightSong.artist}
+                isPlaying={isPlaying && currentSong?.id === spotlightSong.id}
+                size="lg"
+                showBadge={true}
+              />
             </div>
 
-            <div className="flex-1 text-center sm:text-left space-y-3 min-w-0">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent)] text-[11px] font-bold uppercase tracking-wider">
-                <Heart className="w-3.5 h-3.5 fill-[var(--accent)]" /> Spotlight Track
+            <div className="flex-1 text-center md:text-left space-y-3.5 min-w-0">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[var(--accent)] text-[11px] font-bold uppercase tracking-wider shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 fill-[var(--accent)]" /> Your Wave • Spotlight Track
               </div>
 
               <div>
-                <h2 className="text-2xl sm:text-4xl font-extrabold text-white truncate tracking-tight">
+                <h2 className="text-3xl sm:text-5xl font-black text-white truncate tracking-tight">
                   {spotlightSong.title}
                 </h2>
-                <p className="text-sm sm:text-base text-[#D4D4D8] font-medium mt-1">
-                  {spotlightSong.artist} • <span className="text-[#A1A1AA]">{spotlightSong.album}</span>
+                <p className="text-base sm:text-lg text-[#D4D4D8] font-semibold mt-1">
+                  {spotlightSong.artist} • <span className="text-[#A1A1AA] font-normal">{spotlightSong.album}</span>
                 </p>
               </div>
 
-              <p className="text-xs text-[#A1A1AA] max-w-md italic font-serif">
-                &quot;Memories wrapped in melody — one of the songs on endless repeat.&quot;
+              <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-lg italic font-serif leading-relaxed">
+                &quot;Memories wrapped in melody — songs that never get old on endless repeat.&quot;
               </p>
 
-              <div className="flex items-center justify-center sm:justify-start gap-3 pt-2">
+              <div className="flex items-center justify-center md:justify-start gap-3.5 pt-2 flex-wrap">
                 <button
                   onClick={() =>
                     currentSong?.id === spotlightSong.id
                       ? togglePlay()
                       : playSong(spotlightSong, allSongs)
                   }
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[var(--accent)] text-black text-xs font-bold hover:scale-105 active:scale-95 transition-all shadow-xl"
+                  className="flex items-center gap-2.5 px-7 py-3 rounded-full bg-[var(--accent)] text-black text-xs font-bold hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[var(--accent)]/20"
                 >
                   {currentSong?.id === spotlightSong.id && isPlaying ? (
                     <>
-                      <Pause className="w-4 h-4 fill-black" /> Pause
+                      <Pause className="w-4 h-4 fill-black" /> Pause Wave
                     </>
                   ) : (
                     <>
-                      <Play className="w-4 h-4 fill-black ml-0.5" /> Listen Now
+                      <Play className="w-4 h-4 fill-black ml-0.5" /> Play Your Wave
                     </>
                   )}
                 </button>
 
                 <button
                   onClick={() => toggleFavorite(spotlightSong.id)}
-                  className="p-2.5 rounded-full bg-[#19191F] hover:bg-[#25252D] text-white border border-[#303038] transition-colors"
+                  className="p-3 rounded-full bg-[#181820] hover:bg-[#25252D] text-white border border-[#303038] hover:border-white/20 transition-all shadow-md"
+                  title="Save to Favourites"
                 >
                   <Heart
-                    className={`w-4 h-4 ${
-                      spotlightSong.isFavorite ? 'fill-rose-500 text-rose-500' : 'text-[#A1A1AA]'
+                    className={`w-4 h-4 transition-colors ${
+                      spotlightSong.isFavorite ? 'fill-rose-500 text-rose-500 scale-110' : 'text-[#A1A1AA]'
                     }`}
                   />
                 </button>
 
                 <button
                   onClick={() => setIsNowPlayingOpen(true)}
-                  className="px-4 py-2.5 rounded-full bg-[#19191F] hover:bg-[#25252D] text-xs font-semibold text-[#A1A1AA] hover:text-white border border-[#303038] transition-colors"
+                  className="px-5 py-3 rounded-full bg-[#181820] hover:bg-[#25252D] text-xs font-semibold text-[#A1A1AA] hover:text-white border border-[#303038] transition-all shadow-sm"
                 >
-                  Open Full Player
+                  Immersive Player
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Explore Vibes & Curations Pill Cards (Reference Image 1) */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-[#A1A1AA]">
+              Explore Vibes & Composers
+            </h2>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          {[
+            {
+              name: 'Sid Sriram',
+              subtitle: 'Soulful Vocals',
+              gradient: 'from-emerald-950/40 to-teal-900/20 border-emerald-800/40 text-emerald-300',
+            },
+            {
+              name: 'Devi Sri Prasad',
+              subtitle: 'Energetic Beats',
+              gradient: 'from-amber-950/40 to-yellow-900/20 border-amber-800/40 text-amber-300',
+            },
+            {
+              name: 'Anirudh',
+              subtitle: 'Electric Waves',
+              gradient: 'from-purple-950/40 to-indigo-900/20 border-purple-800/40 text-purple-300',
+            },
+            {
+              name: 'Thaman S',
+              subtitle: 'Melody & Bass',
+              gradient: 'from-rose-950/40 to-pink-900/20 border-rose-800/40 text-rose-300',
+            },
+            {
+              name: 'A.R. Rahman',
+              subtitle: 'Timeless Masterpieces',
+              gradient: 'from-blue-950/40 to-cyan-900/20 border-blue-800/40 text-blue-300',
+            },
+          ].map(artist => (
+            <div
+              key={artist.name}
+              onClick={() => onNavigate('artist-detail', artist.name)}
+              className={`p-3.5 rounded-2xl bg-gradient-to-br ${artist.gradient} border hover:border-white/40 cursor-pointer transition-all duration-300 shadow-md group hover:-translate-y-0.5`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider opacity-75">
+                  Artist Spotlight
+                </span>
+                <Radio className="w-3.5 h-3.5 opacity-60 group-hover:scale-110 transition-transform" />
+              </div>
+              <p className="text-sm font-black text-white truncate">{artist.name}</p>
+              <p className="text-[11px] opacity-75 truncate">{artist.subtitle}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Section 1: My Favourite Songs (Horizontal Carousel) */}
       {favoriteSongs.length > 0 && (

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Song, ViewType } from '@/types/music';
 import { db, getArtworkObjectUrl } from '@/lib/db';
 import { usePlayer } from '@/context/PlayerContext';
+import { VinylCover } from '@/components/common/VinylCover';
 import { formatDuration } from '@/lib/utils';
 import { Play, Shuffle, ChevronLeft, Disc, Music2, Heart, MoreVertical, Pause } from 'lucide-react';
 
@@ -55,12 +56,15 @@ export function AlbumDetailView({
 
       {/* Album Header */}
       <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 pb-6 border-b border-[#303038]/60">
-        <div className="w-44 h-44 sm:w-52 sm:h-52 rounded-2xl overflow-hidden bg-[#19191F] shrink-0 shadow-2xl border border-white/10 flex items-center justify-center">
-          {artworkUrl ? (
-            <img src={artworkUrl} alt={albumTitle} className="w-full h-full object-cover" />
-          ) : (
-            <Disc className="w-16 h-16 text-[#71717A]" />
-          )}
+        <div className="shrink-0 cursor-pointer" onClick={() => songs.length > 0 && playSong(songs[0], songs)}>
+          <VinylCover
+            artworkUrl={artworkUrl}
+            title={albumTitle}
+            artist={artistName}
+            isPlaying={isPlaying && songs.some(s => s.id === currentSong?.id)}
+            size="lg"
+            showBadge={true}
+          />
         </div>
 
         <div className="flex-1 text-center sm:text-left space-y-2">

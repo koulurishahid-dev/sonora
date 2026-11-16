@@ -3,6 +3,7 @@
 import React from 'react';
 import { usePlayer } from '@/context/PlayerContext';
 import { getArtworkObjectUrl } from '@/lib/db';
+import { VinylCover } from '@/components/common/VinylCover';
 import { formatDuration } from '@/lib/utils';
 import {
   Play,
@@ -80,38 +81,27 @@ export function BottomPlayer() {
 
       {/* Main Row */}
       <div className="flex items-center justify-between gap-4 h-full">
-        {/* Left: Track Information */}
-        <div className="flex items-center gap-3.5 w-1/4 min-w-[180px]">
+        {/* Left: Track Information with Mini Vinyl Cover (Image 1 & 4 style) */}
+        <div className="flex items-center gap-3.5 w-1/4 min-w-[200px]">
           <div
             onClick={() => setIsNowPlayingOpen(true)}
-            className={`w-13 h-13 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-[#19191F] shrink-0 relative group cursor-pointer border transition-all duration-500 ${
-              isPlaying
-                ? 'shadow-[0_0_20px_rgba(var(--accent-rgb),0.35)] border-[var(--accent)]/50 animate-float'
-                : 'border-[#303038]/60 shadow-md'
-            }`}
-            title="Expand Full Player"
+            className="cursor-pointer shrink-0"
+            title="Expand Immersive Player"
           >
-            {artworkUrl ? (
-              <img
-                src={artworkUrl}
-                alt={currentSong.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Music2 className="w-6 h-6 text-[#A1A1AA]" />
-              </div>
-            )}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-              <Maximize2 className="w-4 h-4 text-white" />
-            </div>
+            <VinylCover
+              artworkUrl={artworkUrl}
+              title={currentSong.title}
+              isPlaying={isPlaying}
+              size="sm"
+              showBadge={false}
+            />
           </div>
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <p
                 onClick={() => setIsNowPlayingOpen(true)}
-                className="text-sm font-semibold text-white truncate cursor-pointer hover:underline hover:text-[var(--accent)] transition-colors"
+                className="text-sm font-bold text-white truncate cursor-pointer hover:underline hover:text-[var(--accent)] transition-colors tracking-tight"
               >
                 {currentSong.title}
               </p>
@@ -123,7 +113,7 @@ export function BottomPlayer() {
                 </div>
               )}
             </div>
-            <p className="text-xs text-[#A1A1AA] truncate mt-0.5">{currentSong.artist}</p>
+            <p className="text-xs text-[#A1A1AA] truncate mt-0.5 font-medium">{currentSong.artist}</p>
           </div>
 
           <button

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ViewType, Song, Playlist } from '@/types/music';
 import { Sidebar } from './Sidebar';
 import { HeaderBar } from './HeaderBar';
+import { RightSidebar } from './RightSidebar';
 import { MobileNavBar } from './MobileNavBar';
 import { BottomPlayer } from '../player/BottomPlayer';
 import { NowPlayingModal } from '../player/NowPlayingModal';
@@ -64,6 +65,7 @@ export function AppLayout() {
   const [contextMenu, setContextMenu] = useState<{ song: Song; x: number; y: number } | null>(
     null
   );
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
 
   const currentRoute = history[historyIndex] || { view: 'home' };
 
@@ -200,21 +202,23 @@ export function AppLayout() {
         </div>
       )}
 
-      {/* Main Content Column */}
-      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden relative">
-        {/* Header Bar */}
-        <HeaderBar
-          currentView={currentRoute.view}
-          onNavigate={handleNavigate}
-          canGoBack={historyIndex > 0}
-          canGoForward={historyIndex < history.length - 1}
-          onGoBack={handleGoBack}
-          onGoForward={handleGoForward}
-          onOpenUpload={() => setIsUploadOpen(true)}
-          onOpenAddLink={() => setIsAddLinkOpen(true)}
-          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
-          onOpenSearch={() => handleNavigate('search')}
-        />
+      {/* Center + Right Layout Container */}
+      <div className="flex-1 flex h-full min-w-0 overflow-hidden relative">
+        {/* Main Content Column */}
+        <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden relative">
+          {/* Header Bar */}
+          <HeaderBar
+            currentView={currentRoute.view}
+            onNavigate={handleNavigate}
+            canGoBack={historyIndex > 0}
+            canGoForward={historyIndex < history.length - 1}
+            onGoBack={handleGoBack}
+            onGoForward={handleGoForward}
+            onOpenUpload={() => setIsUploadOpen(true)}
+            onOpenAddLink={() => setIsAddLinkOpen(true)}
+            onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+            onOpenSearch={() => handleNavigate('search')}
+          />
 
         {/* Dynamic View Body */}
         <main className="flex-1 overflow-y-auto relative pb-36 md:pb-28">
@@ -339,8 +343,16 @@ export function AppLayout() {
           </div>
         )}
 
+        </div>
+
+        {/* Curated Right Panel (Image 1 style) */}
+        <RightSidebar
+          isOpen={isRightSidebarOpen}
+          onToggle={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+        />
+
         {/* Persistent Bottom Controls Container */}
-        <div className="absolute bottom-0 left-0 right-0 z-30 flex flex-col">
+        <div className="absolute bottom-0 left-0 right-0 z-30 flex flex-col pointer-events-auto">
           <MobileNavBar currentView={currentRoute.view} onNavigate={handleNavigate} />
           <BottomPlayer />
         </div>

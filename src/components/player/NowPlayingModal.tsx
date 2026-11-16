@@ -7,6 +7,7 @@ import { getArtworkObjectUrl } from '@/lib/db';
 import { formatDuration } from '@/lib/utils';
 import { AudioVisualizer } from './AudioVisualizer';
 import { LyricsPanel } from './LyricsPanel';
+import { VinylCover } from '@/components/common/VinylCover';
 import {
   ChevronDown,
   Play,
@@ -165,21 +166,11 @@ export function NowPlayingModal() {
 
         {/* Main Content Area */}
         <main className="relative z-10 flex-1 flex flex-col md:flex-row items-center justify-center p-6 md:p-12 overflow-hidden gap-8 max-w-6xl mx-auto w-full">
-          {/* Left Column: Artwork & Info */}
+          {/* Left Column: Artwork & Info (Reference Image 2 & 4 style) */}
           <div className="flex flex-col items-center max-w-md w-full shrink-0">
-            {/* Album Artwork or YouTube Embed */}
-            <motion.div
-              animate={{
-                scale: isPlaying && currentSong.providerType !== 'youtube' ? [1, 1.02, 1] : 1,
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-              className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#19191F] flex items-center justify-center group"
-            >
-              {currentSong.providerType === 'youtube' && currentSong.youtubeId ? (
+            {/* Album Artwork with Spinning Vinyl or YouTube Embed */}
+            {currentSong.providerType === 'youtube' && currentSong.youtubeId ? (
+              <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#19191F]">
                 <iframe
                   src={`https://www.youtube-nocookie.com/embed/${currentSong.youtubeId}?autoplay=1`}
                   title={currentSong.title}
@@ -187,24 +178,24 @@ export function NowPlayingModal() {
                   allowFullScreen
                   className="w-full h-full border-0"
                 />
-              ) : artworkUrl ? (
-                <img
-                  src={artworkUrl}
-                  alt={currentSong.title}
-                  className="w-full h-full object-cover"
+              </div>
+            ) : (
+              <div className="flex items-center justify-center p-2">
+                <VinylCover
+                  artworkUrl={artworkUrl}
+                  title={currentSong.title}
+                  artist={currentSong.artist}
+                  isPlaying={isPlaying}
+                  size="xl"
+                  showBadge={true}
                 />
-              ) : (
-                <div className="flex flex-col items-center justify-center text-[#71717A]">
-                  <Music2 className="w-20 h-20 mb-2 stroke-[1]" />
-                  <span className="text-xs">No Artwork</span>
-                </div>
-              )}
-            </motion.div>
+              </div>
+            )}
 
             {/* Song Meta */}
             <div className="mt-6 text-center w-full px-4">
               <div className="flex items-center justify-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-bold text-white truncate max-w-[280px] sm:max-w-xs">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-white truncate max-w-[280px] sm:max-w-xs tracking-tight">
                   {currentSong.title}
                 </h1>
                 <button
@@ -212,7 +203,7 @@ export function NowPlayingModal() {
                   className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
                 >
                   <Heart
-                    className={`w-6 h-6 transition-all ${
+                    className={`w-5 h-5 transition-all ${
                       currentSong.isFavorite
                         ? 'fill-rose-500 text-rose-500 scale-110'
                         : 'text-[#A1A1AA] hover:text-white'
@@ -220,12 +211,21 @@ export function NowPlayingModal() {
                   />
                 </button>
               </div>
-              <p className="text-base sm:text-lg text-[#A1A1AA] mt-1 font-medium truncate">
-                {currentSong.artist}
-              </p>
-              <p className="text-xs text-[#71717A] mt-0.5 truncate">
-                {currentSong.album} {currentSong.year ? `• ${currentSong.year}` : ''}
-              </p>
+
+              {/* Format & Genre Pill (Reference Image 2 style) */}
+              <div className="flex items-center justify-center gap-2 mt-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-white/10 border border-white/15 text-[11px] font-medium text-[#D4D4D8]">
+                  {currentSong.artist}
+                </span>
+                {currentSong.album && (
+                  <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px] text-[#A1A1AA]">
+                    {currentSong.album}
+                  </span>
+                )}
+                <span className="px-2 py-0.5 rounded bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[9px] font-mono font-bold text-[var(--accent)]">
+                  {currentSong.codec?.toUpperCase() || (currentSong.isLocal ? 'LOSSLESS' : 'WEB AUDIO')}
+                </span>
+              </div>
 
               {/* Open External Source button if external or YouTube */}
               {currentSong.sourceUrl && !currentSong.isLocal && (
