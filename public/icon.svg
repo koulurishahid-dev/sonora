@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#121216"/>
+      <stop offset="100%" stop-color="#0B0B0D"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1ED760"/>
+      <stop offset="100%" stop-color="#00FFA3"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#25252D" stroke-width="8"/>
+  <circle cx="256" cy="256" r="140" fill="none" stroke="#303038" stroke-width="4"/>
+  <circle cx="256" cy="256" r="100" fill="none" stroke="#25252D" stroke-width="4"/>
+  <circle cx="256" cy="256" r="60" fill="url(#accent)"/>
+  <polygon points="244,236 244,276 278,256" fill="#0B0B0D"/>
+  <rect x="96" y="226" width="12" height="60" rx="6" fill="url(#accent)"/>
+  <rect x="120" y="196" width="12" height="120" rx="6" fill="url(#accent)"/>
+  <rect x="144" y="216" width="12" height="80" rx="6" fill="url(#accent)"/>
+  <rect x="356" y="216" width="12" height="80" rx="6" fill="url(#accent)"/>
+  <rect x="380" y="196" width="12" height="120" rx="6" fill="url(#accent)"/>
+  <rect x="404" y="226" width="12" height="60" rx="6" fill="url(#accent)"/>
+</svg>
