@@ -14,6 +14,7 @@ import {
   Loader2,
   Globe,
   Radio,
+  Tv,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -31,7 +32,8 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
   const [album, setAlbum] = useState('');
   const [artworkUrl, setArtworkUrl] = useState('');
   const [genre, setGenre] = useState('');
-  const [providerType, setProviderType] = useState<'stream' | 'external'>('stream');
+  const [providerType, setProviderType] = useState<'stream' | 'youtube' | 'external'>('stream');
+  const [youtubeId, setYoutubeId] = useState<string | undefined>();
 
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<'success' | 'failed' | null>(null);
@@ -40,8 +42,39 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
 
   if (!isOpen) return null;
 
+  const extractYouTubeId = (url: string): string | null => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  const handleUrlChange = (url: string) => {
+    setSourceUrl(url);
+    setTestResult(null);
+
+    const ytId = extractYouTubeId(url);
+    if (ytId) {
+      setProviderType('youtube');
+      setYoutubeId(ytId);
+      if (!artworkUrl) {
+        setArtworkUrl(`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`);
+      }
+      if (!album) {
+        setAlbum('YouTube Music');
+      }
+      setTestResult('success');
+    }
+  };
+
   const testStreamPlayback = async () => {
     if (!sourceUrl.trim()) return;
+
+    if (providerType === 'youtube') {
+      showToast('Verified', 'Official YouTube embed playback enabled.', 'success');
+      setTestResult('success');
+      return;
+    }
+
     setTesting(true);
     setTestResult(null);
 
@@ -99,13 +132,14 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
         id: songId,
         title: title.trim(),
         artist: (artist.trim()) || 'Unknown Artist',
-        album: (album.trim()) || 'Web Stream',
+        album: (album.trim()) || (providerType === 'youtube' ? 'YouTube' : 'Web Stream'),
         genre: genre.trim() || 'Online Audio',
-        duration: testDuration > 0 ? testDuration : 180, // estimated if live stream
+        duration: testDuration > 0 ? testDuration : 200,
         hash: `link_${sourceUrl.trim()}`,
         isLocal: false,
         sourceUrl: sourceUrl.trim(),
         providerType,
+        youtubeId: providerType === 'youtube' ? (youtubeId || extractYouTubeId(sourceUrl.trim()) || undefined) : undefined,
         artworkUrl: artworkUrl.trim() || undefined,
         dateAdded: Date.now(),
         playCount: 0,
@@ -127,6 +161,7 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
       setArtworkUrl('');
       setGenre('');
       setTestResult(null);
+      setYoutubeId(undefined);
     } catch (err: any) {
       showToast('Error', err?.message || 'Failed to save external link.', 'error');
     } finally {
@@ -157,7 +192,7 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
           <div className="flex items-center justify-between px-6 py-4 border-b border-[#303038]">
             <div className="flex items-center gap-2.5">
               <Link2 className="w-5 h-5 text-[var(--accent)]" />
-              <h2 className="text-lg font-bold text-white">Add Music Link</h2>
+              <h2 className="text-lg font-bold text-white">Add Music Link & Embed</h2>
             </div>
             <button
               onClick={onClose}
@@ -171,18 +206,15 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             <div>
               <label className="text-xs font-semibold text-white block mb-1.5">
-                Direct Audio / Stream URL <span className="text-rose-400">*</span>
+                Audio Stream or YouTube URL <span className="text-rose-400">*</span>
               </label>
               <div className="flex gap-2">
                 <input
                   type="url"
                   required
-                  placeholder="https://example.com/audio.mp3 or radio stream"
+                  placeholder="https://... direct audio or youtube.com/watch?v=..."
                   value={sourceUrl}
-                  onChange={e => {
-                    setSourceUrl(e.target.value);
-                    setTestResult(null);
-                  }}
+                  onChange={e => handleUrlChange(e.target.value)}
                   className="flex-1 px-3.5 py-2 rounded-xl bg-[#19191F] border border-[#303038] text-white text-xs focus:border-[var(--accent)] outline-none"
                 />
                 <button
@@ -190,7 +222,7 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
                   onClick={testStreamPlayback}
                   disabled={!sourceUrl.trim() || testing}
                   className="px-3.5 py-2 rounded-xl bg-[#25252D] hover:bg-[#303038] border border-[#303038] text-xs font-semibold text-white flex items-center gap-1.5 disabled:opacity-40 transition-all"
-                  title="Verify stream playback in browser"
+                  title="Verify stream or embed playback"
                 >
                   {testing ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -205,7 +237,7 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
                 </button>
               </div>
               <p className="text-[11px] text-[#A1A1AA] mt-1">
-                Enter a direct MP3/AAC/OGG URL or internet broadcast. Must permit CORS playback.
+                Enter a direct playable audio URL or official YouTube video link for in-app embed.
               </p>
             </div>
 
@@ -217,7 +249,7 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Ambient Rain Stream"
+                  placeholder="e.g. Moonlight Sonata"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-[#19191F] border border-[#303038] text-white text-xs focus:border-[var(--accent)] outline-none"
@@ -228,7 +260,7 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
                 <label className="text-xs font-semibold text-white block mb-1">Artist</label>
                 <input
                   type="text"
-                  placeholder="e.g. Lofi Girl / Station"
+                  placeholder="e.g. Ludwig van Beethoven"
                   value={artist}
                   onChange={e => setArtist(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-[#19191F] border border-[#303038] text-white text-xs focus:border-[var(--accent)] outline-none"
@@ -241,7 +273,7 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
                 <label className="text-xs font-semibold text-white block mb-1">Album</label>
                 <input
                   type="text"
-                  placeholder="e.g. Chill Radio"
+                  placeholder="e.g. Classical Masterpieces"
                   value={album}
                   onChange={e => setAlbum(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-[#19191F] border border-[#303038] text-white text-xs focus:border-[var(--accent)] outline-none"
@@ -252,7 +284,7 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
                 <label className="text-xs font-semibold text-white block mb-1">Genre</label>
                 <input
                   type="text"
-                  placeholder="e.g. Lo-Fi / Jazz / Podcast"
+                  placeholder="e.g. Classical / Ambient"
                   value={genre}
                   onChange={e => setGenre(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-[#19191F] border border-[#303038] text-white text-xs focus:border-[var(--accent)] outline-none"
@@ -264,38 +296,49 @@ export function AddLinkModal({ isOpen, onClose, onSuccess }: AddLinkModalProps) 
               <label className="text-xs font-semibold text-white block mb-1">Cover Artwork URL</label>
               <input
                 type="url"
-                placeholder="https://example.com/artwork.jpg (optional)"
+                placeholder="https://example.com/artwork.jpg"
                 value={artworkUrl}
                 onChange={e => setArtworkUrl(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl bg-[#19191F] border border-[#303038] text-white text-xs focus:border-[var(--accent)] outline-none"
               />
             </div>
 
-            {/* Provider Type */}
+            {/* Provider Type Selection */}
             <div>
-              <label className="text-xs font-semibold text-white block mb-1">Link Category</label>
-              <div className="flex gap-2">
+              <label className="text-xs font-semibold text-white block mb-1">Provider Mode</label>
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setProviderType('stream')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-medium border transition-all ${
+                  className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-medium border transition-all ${
                     providerType === 'stream'
-                      ? 'bg-[var(--accent)]/15 border-[var(--accent)] text-[var(--accent)]'
+                      ? 'bg-[var(--accent)]/15 border-[var(--accent)] text-[var(--accent)] font-semibold'
                       : 'bg-[#19191F] border-[#303038] text-[#A1A1AA] hover:text-white'
                   }`}
                 >
-                  <Radio className="w-4 h-4" /> Live Audio Stream
+                  <Radio className="w-3.5 h-3.5" /> Audio Stream
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProviderType('youtube')}
+                  className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-medium border transition-all ${
+                    providerType === 'youtube'
+                      ? 'bg-rose-500/15 border-rose-500 text-rose-400 font-semibold'
+                      : 'bg-[#19191F] border-[#303038] text-[#A1A1AA] hover:text-white'
+                  }`}
+                >
+                  <Tv className="w-3.5 h-3.5" /> YouTube Embed
                 </button>
                 <button
                   type="button"
                   onClick={() => setProviderType('external')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-medium border transition-all ${
+                  className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-medium border transition-all ${
                     providerType === 'external'
-                      ? 'bg-[var(--accent)]/15 border-[var(--accent)] text-[var(--accent)]'
+                      ? 'bg-[var(--accent)]/15 border-[var(--accent)] text-[var(--accent)] font-semibold'
                       : 'bg-[#19191F] border-[#303038] text-[#A1A1AA] hover:text-white'
                   }`}
                 >
-                  <Globe className="w-4 h-4" /> Web Reference / Podcast
+                  <Globe className="w-3.5 h-3.5" /> Web Reference
                 </button>
               </div>
             </div>

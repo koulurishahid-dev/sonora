@@ -58,6 +58,7 @@ export function Sidebar({
     { view: 'home', label: 'Home', icon: Home },
     { view: 'search', label: 'Search', icon: Search },
     { view: 'library', label: 'My Library', icon: Library },
+    { view: 'all-songs', label: 'All Songs', icon: Music2 },
     { view: 'liked', label: 'Liked Songs', icon: Heart },
     { view: 'playlists', label: 'Playlists', icon: ListMusic },
     { view: 'albums', label: 'Albums', icon: Disc },

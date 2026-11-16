@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ViewType, Song, Playlist } from '@/types/music';
 import { Sidebar } from './Sidebar';
 import { HeaderBar } from './HeaderBar';
+import { MobileNavBar } from './MobileNavBar';
 import { BottomPlayer } from '../player/BottomPlayer';
 import { NowPlayingModal } from '../player/NowPlayingModal';
 import { QueueDrawer } from '../player/QueueDrawer';
@@ -14,9 +15,12 @@ import { EditSongModal } from '../modals/EditSongModal';
 import { SongContextMenu } from '../modals/SongContextMenu';
 import { LyricsPanel } from '../player/LyricsPanel';
 import { usePlayer } from '@/context/PlayerContext';
+import { useTheme } from '@/context/ThemeContext';
+import { Lock, Radio } from 'lucide-react';
 
 // Views
 import { HomeView } from '../views/HomeView';
+import { MyLibraryHubView } from '../views/MyLibraryHubView';
 import { LibraryView } from '../views/LibraryView';
 import { PlaylistsView } from '../views/PlaylistsView';
 import { PlaylistDetailView } from '../views/PlaylistDetailView';
@@ -31,7 +35,9 @@ import { SearchView } from '../views/SearchView';
 import { SettingsView } from '../views/SettingsView';
 
 export function AppLayout() {
-  const { isLyricsOpen, setIsLyricsOpen, currentSong, currentTime, seek } = usePlayer();
+  const { isLyricsOpen, setIsLyricsOpen, currentSong, currentTime, seek, setIsNowPlayingOpen } =
+    usePlayer();
+  const { settings } = useTheme();
 
   // Navigation History
   const [history, setHistory] = useState<{ view: ViewType; param?: string }[]>([
@@ -39,9 +45,14 @@ export function AppLayout() {
   ]);
   const [historyIndex, setHistoryIndex] = useState(0);
 
-  // Sidebar collapse
+  // Sidebar collapse & Mobile drawer
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Passcode Lock State
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [enteredPin, setEnteredPin] = useState('');
+  const [pinError, setPinError] = useState(false);
 
   // Modals
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -57,7 +68,10 @@ export function AppLayout() {
   const currentRoute = history[historyIndex] || { view: 'home' };
 
   const handleNavigate = (view: ViewType, param?: string) => {
-    // Truncate any forward history and append new route
+    if (view === 'now-playing') {
+      setIsNowPlayingOpen(true);
+      return;
+    }
     const nextHistory = history.slice(0, historyIndex + 1);
     nextHistory.push({ view, param });
     setHistory(nextHistory);
@@ -86,6 +100,63 @@ export function AppLayout() {
       y: e.clientY,
     });
   };
+
+  const handleUnlockPin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (enteredPin === settings.privacyPasscode) {
+      setIsUnlocked(true);
+      setPinError(false);
+    } else {
+      setPinError(true);
+      setEnteredPin('');
+    }
+  };
+
+  // If privacy lock is enabled and user hasn't entered passcode yet
+  if (settings.privacyLockEnabled && !isUnlocked) {
+    return (
+      <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#0B0B0D] text-white p-6 select-none">
+        <div className="w-full max-w-sm p-8 rounded-3xl bg-[#121216] border border-[#303038] shadow-2xl text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--accent)] text-black flex items-center justify-center mx-auto shadow-xl">
+            <Lock className="w-8 h-8" />
+          </div>
+
+          <div>
+            <h1 className="text-xl font-extrabold text-white">SONORA Vault</h1>
+            <p className="text-xs text-[#A1A1AA] mt-1.5 leading-relaxed">
+              This personal library is protected with a passcode.
+            </p>
+          </div>
+
+          <form onSubmit={handleUnlockPin} className="space-y-4">
+            <input
+              type="password"
+              autoFocus
+              maxLength={8}
+              placeholder="Enter PIN"
+              value={enteredPin}
+              onChange={e => {
+                setEnteredPin(e.target.value);
+                setPinError(false);
+              }}
+              className="w-full text-center text-xl tracking-widest py-3 px-4 rounded-xl bg-[#19191F] border border-[#303038] text-white focus:border-[var(--accent)] outline-none font-mono"
+            />
+
+            {pinError && (
+              <p className="text-xs text-rose-400 font-medium">Incorrect PIN. Try again.</p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-3 rounded-xl bg-[var(--accent)] text-black text-xs font-bold hover:opacity-95 transition-all shadow-md"
+            >
+              Unlock Library
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#0B0B0D] text-white">
@@ -146,7 +217,7 @@ export function AppLayout() {
         />
 
         {/* Dynamic View Body */}
-        <main className="flex-1 overflow-y-auto relative pb-28">
+        <main className="flex-1 overflow-y-auto relative pb-36 md:pb-28">
           {currentRoute.view === 'home' && (
             <HomeView
               onNavigate={handleNavigate}
@@ -156,6 +227,15 @@ export function AppLayout() {
           )}
 
           {currentRoute.view === 'library' && (
+            <MyLibraryHubView
+              onNavigate={handleNavigate}
+              onOpenUpload={() => setIsUploadOpen(true)}
+              onOpenAddLink={() => setIsAddLinkOpen(true)}
+              onSongContextMenu={handleSongContextMenu}
+            />
+          )}
+
+          {currentRoute.view === 'all-songs' && (
             <LibraryView
               onNavigate={handleNavigate}
               onSongContextMenu={handleSongContextMenu}
@@ -259,8 +339,9 @@ export function AppLayout() {
           </div>
         )}
 
-        {/* Persistent Bottom Music Player */}
-        <div className="absolute bottom-0 left-0 right-0 z-30">
+        {/* Persistent Bottom Controls Container */}
+        <div className="absolute bottom-0 left-0 right-0 z-30 flex flex-col">
+          <MobileNavBar currentView={currentRoute.view} onNavigate={handleNavigate} />
           <BottomPlayer />
         </div>
       </div>

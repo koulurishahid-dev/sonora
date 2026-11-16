@@ -290,6 +290,29 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     setCurrentSong(song);
     setDuration(song.duration || 0);
 
+    // If official YouTube embed, handle separately without HTML5 Audio tag conflict
+    if (song.providerType === 'youtube') {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+      setIsPlaying(true);
+      setCurrentTime(0);
+      setIsNowPlayingOpen(true);
+      await db.songs.update(song.id, {
+        playCount: (song.playCount || 0) + 1,
+        lastPlayedAt: Date.now(),
+      });
+      await db.listeningHistory.add({
+        id: `${Date.now()}_${song.id}`,
+        songId: song.id,
+        playedAt: Date.now(),
+        completed: false,
+        durationPlayed: 0,
+      });
+      return;
+    }
+
     const audioUrl = getAudioObjectUrl(song);
     if (!audioUrl) {
       setAudioError('Audio source is missing or unavailable.');

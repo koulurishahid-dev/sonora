@@ -24,6 +24,7 @@ import {
   Sliders,
   Music2,
   Activity,
+  ExternalLink,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -166,10 +167,10 @@ export function NowPlayingModal() {
         <main className="relative z-10 flex-1 flex flex-col md:flex-row items-center justify-center p-6 md:p-12 overflow-hidden gap-8 max-w-6xl mx-auto w-full">
           {/* Left Column: Artwork & Info */}
           <div className="flex flex-col items-center max-w-md w-full shrink-0">
-            {/* Album Artwork with subtle pulse */}
+            {/* Album Artwork or YouTube Embed */}
             <motion.div
               animate={{
-                scale: isPlaying ? [1, 1.02, 1] : 1,
+                scale: isPlaying && currentSong.providerType !== 'youtube' ? [1, 1.02, 1] : 1,
               }}
               transition={{
                 duration: 4,
@@ -178,7 +179,15 @@ export function NowPlayingModal() {
               }}
               className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#19191F] flex items-center justify-center group"
             >
-              {artworkUrl ? (
+              {currentSong.providerType === 'youtube' && currentSong.youtubeId ? (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${currentSong.youtubeId}?autoplay=1`}
+                  title={currentSong.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full border-0"
+                />
+              ) : artworkUrl ? (
                 <img
                   src={artworkUrl}
                   alt={currentSong.title}
@@ -217,6 +226,20 @@ export function NowPlayingModal() {
               <p className="text-xs text-[#71717A] mt-0.5 truncate">
                 {currentSong.album} {currentSong.year ? `• ${currentSong.year}` : ''}
               </p>
+
+              {/* Open External Source button if external or YouTube */}
+              {currentSong.sourceUrl && !currentSong.isLocal && (
+                <div className="pt-2">
+                  <a
+                    href={currentSong.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#19191F] hover:bg-[#25252D] border border-[#303038] text-[11px] font-semibold text-[#A1A1AA] hover:text-white transition-colors"
+                  >
+                    <ExternalLink className="w-3 h-3 text-sky-400" /> Open External Source
+                  </a>
+                </div>
+              )}
             </div>
           </div>
 

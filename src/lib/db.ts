@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie';
+import JSZip from 'jszip';
 import {
   Song,
   Album,
@@ -297,5 +298,181 @@ export async function importDatabaseFromJson(jsonString: string): Promise<{ succ
     return { success: true, importedCount: count, message: `Successfully restored ${count} songs and metadata.` };
   } catch (err: any) {
     return { success: false, importedCount: 0, message: err?.message || 'Failed to parse backup JSON.' };
+  }
+}
+
+// Complete Full Backup (Audio Files + Artwork + Metadata) in compressed ZIP
+export async function exportFullLibraryZip(
+  onProgress?: (percent: number, message: string) => void
+): Promise<Blob> {
+  const zip = new JSZip();
+  const songs = await db.songs.toArray();
+  const playlists = await db.playlists.toArray();
+  const playlistSongs = await db.playlistSongs.toArray();
+  const favorites = await db.favorites.toArray();
+  const listeningHistory = await db.listeningHistory.toArray();
+  const lyrics = await db.lyrics.toArray();
+  const settings = await db.settings.toArray();
+
+  if (onProgress) onProgress(10, 'Packing library metadata...');
+
+  const metadataSongs = songs.map(s => {
+    const { audioBlob, artworkBlob, ...rest } = s;
+    return {
+      ...rest,
+      hasAudio: !!audioBlob,
+      hasArtwork: !!artworkBlob,
+    };
+  });
+
+  zip.file(
+    'metadata.json',
+    JSON.stringify(
+      {
+        version: 1,
+        exportedAt: Date.now(),
+        type: 'sonora-full-archive',
+        data: {
+          songs: metadataSongs,
+          playlists,
+          playlistSongs,
+          favorites,
+          listeningHistory,
+          lyrics,
+          settings,
+        },
+      },
+      null,
+      2
+    )
+  );
+
+  const audioFolder = zip.folder('audio');
+  const artworkFolder = zip.folder('artwork');
+
+  let processed = 0;
+  const total = Math.max(1, songs.length);
+
+  for (let i = 0; i < songs.length; i++) {
+    const song = songs[i];
+    if (song.audioBlob && audioFolder) {
+      audioFolder.file(`${song.id}.bin`, song.audioBlob);
+    }
+    if (song.artworkBlob && artworkFolder) {
+      artworkFolder.file(`${song.id}.bin`, song.artworkBlob);
+    }
+    processed++;
+    if (onProgress) {
+      onProgress(10 + Math.round((processed / total) * 50), `Adding ${song.title}...`);
+    }
+  }
+
+  if (onProgress) onProgress(65, 'Compressing audio archive...');
+
+  const content = await zip.generateAsync(
+    {
+      type: 'blob',
+      compression: 'DEFLATE',
+      compressionOptions: { level: 6 },
+    },
+    metadata => {
+      if (onProgress) {
+        onProgress(65 + Math.round(metadata.percent * 0.35), `Finalizing ZIP (${Math.round(metadata.percent)}%)`);
+      }
+    }
+  );
+
+  return content;
+}
+
+export async function importFullLibraryZip(
+  file: File,
+  onProgress?: (percent: number, message: string) => void
+): Promise<{ success: boolean; importedCount: number; message: string }> {
+  try {
+    if (onProgress) onProgress(10, 'Reading archive...');
+    const zip = await JSZip.loadAsync(file);
+
+    const metaFile = zip.file('metadata.json');
+    if (!metaFile) {
+      return { success: false, importedCount: 0, message: 'Invalid backup archive: metadata.json missing.' };
+    }
+
+    if (onProgress) onProgress(30, 'Parsing library metadata...');
+    const metaText = await metaFile.async('text');
+    const backup = JSON.parse(metaText);
+
+    const { songs = [], playlists = [], playlistSongs = [], favorites = [], lyrics = [], settings = [] } =
+      backup.data || {};
+
+    let count = 0;
+    const total = Math.max(1, songs.length);
+
+    for (let i = 0; i < songs.length; i++) {
+      const s = songs[i];
+      let audioBlob: Blob | undefined;
+      let artworkBlob: Blob | undefined;
+
+      const audioInZip = zip.file(`audio/${s.id}.bin`);
+      if (audioInZip) {
+        audioBlob = await audioInZip.async('blob');
+      }
+
+      const artInZip = zip.file(`artwork/${s.id}.bin`);
+      if (artInZip) {
+        artworkBlob = await artInZip.async('blob');
+      }
+
+      const songToSave: Song = {
+        ...s,
+        audioBlob: audioBlob || s.audioBlob,
+        artworkBlob: artworkBlob || s.artworkBlob,
+        artworkUrl: artworkBlob ? URL.createObjectURL(artworkBlob) : s.artworkUrl,
+      };
+
+      const exists = await db.songs.get(s.id);
+      if (!exists) {
+        await db.songs.add(songToSave);
+        count++;
+      } else {
+        await db.songs.update(s.id, songToSave);
+      }
+
+      if (onProgress) {
+        onProgress(30 + Math.round(((i + 1) / total) * 60), `Restoring ${s.title}...`);
+      }
+    }
+
+    for (const pl of playlists) {
+      const exists = await db.playlists.get(pl.id);
+      if (!exists) await db.playlists.add(pl);
+    }
+    for (const ps of playlistSongs) {
+      const exists = await db.playlistSongs.get(ps.id);
+      if (!exists) await db.playlistSongs.add(ps);
+    }
+    for (const fav of favorites) {
+      const exists = await db.favorites.get(fav.id);
+      if (!exists) await db.favorites.add(fav);
+    }
+    for (const lyr of lyrics) {
+      const exists = await db.lyrics.get(lyr.id);
+      if (!exists) await db.lyrics.add(lyr);
+    }
+    for (const st of settings) {
+      await db.settings.put(st);
+    }
+
+    if (onProgress) onProgress(95, 'Rebuilding albums and artists...');
+    await syncAlbumsAndArtists();
+    if (onProgress) onProgress(100, 'Restore complete!');
+
+    return {
+      success: true,
+      importedCount: count,
+      message: `Successfully restored ${count} songs with complete audio files & artwork!`,
+    };
+  } catch (err: any) {
+    return { success: false, importedCount: 0, message: err?.message || 'Failed to extract backup archive.' };
   }
 }

@@ -13,7 +13,8 @@ export interface Song {
   hash: string; // for duplicate detection
   isLocal: boolean;
   sourceUrl?: string; // for stream/external links or object URLs
-  providerType?: 'local' | 'stream' | 'external';
+  providerType?: 'local' | 'stream' | 'external' | 'youtube';
+  youtubeId?: string; // extracted YouTube video ID for official embed
   artworkUrl?: string; // base64 or blob URL
   artworkBlob?: Blob;
   audioBlob?: Blob;
@@ -101,6 +102,9 @@ export interface AppSettings {
   eqPreset: 'flat' | 'bass-boost' | 'electronic' | 'vocal' | 'rock';
   bassGain: number; // -10 to +10 dB
   trebleGain: number; // -10 to +10 dB
+  privacyLockEnabled?: boolean;
+  privacyPasscode?: string;
+  deviceSyncNoticeDismissed?: boolean;
 }
 
 export interface DownloadItem {
@@ -115,6 +119,7 @@ export type ViewType =
   | 'home'
   | 'search'
   | 'library'
+  | 'all-songs'
   | 'playlists'
   | 'playlist-detail'
   | 'liked'
@@ -124,6 +129,7 @@ export type ViewType =
   | 'artist-detail'
   | 'recently-played'
   | 'offline'
+  | 'now-playing'
   | 'settings';
 
 export type VisualizerMode = 'bars' | 'wave' | 'circle' | 'pulse';

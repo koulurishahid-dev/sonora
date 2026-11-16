@@ -2,7 +2,15 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme, ACCENT_COLORS } from '@/context/ThemeContext';
-import { db, getStorageEstimate, requestPersistentStorage, exportDatabaseToJson, importDatabaseFromJson, syncAlbumsAndArtists } from '@/lib/db';
+import {
+  db,
+  getStorageEstimate,
+  requestPersistentStorage,
+  exportDatabaseToJson,
+  importDatabaseFromJson,
+  exportFullLibraryZip,
+  importFullLibraryZip,
+} from '@/lib/db';
 import { formatFileSize } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 import {
@@ -17,11 +25,16 @@ import {
   AlertTriangle,
   RotateCcw,
   ShieldCheck,
-  CheckCircle,
+  Lock,
+  Archive,
+  FileCode,
+  Loader2,
+  Info,
+  CheckCircle2,
 } from 'lucide-react';
 
 export function SettingsView() {
-  const { settings, updateSettings, resetSettings } = useTheme();
+  const { settings, updateSettings } = useTheme();
   const { showToast } = useToast();
 
   const [storage, setStorage] = useState<{ usage: number; quota: number; percent: number }>({
@@ -30,8 +43,20 @@ export function SettingsView() {
     percent: 0,
   });
   const [isPersisted, setIsPersisted] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const [isImporting, setIsImporting] = useState(false);
+
+  // Backup & Restore states
+  const [isExportingMetadata, setIsExportingMetadata] = useState(false);
+  const [isExportingFullZip, setIsExportingFullZip] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [restoreProgress, setRestoreProgress] = useState<{ percent: number; status: string }>({
+    percent: 0,
+    status: '',
+  });
+
+  // Privacy lock
+  const [pinInput, setPinInput] = useState('');
+  const [isSettingPin, setIsSettingPin] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -41,45 +66,111 @@ export function SettingsView() {
     }
   }, []);
 
-  const handleExportBackup = async () => {
-    setIsExporting(true);
+  // Export Metadata JSON only
+  const handleExportMetadata = async () => {
+    setIsExportingMetadata(true);
     try {
       const json = await exportDatabaseToJson();
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `sonora-library-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `sonora-metadata-backup-${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast('Export Successful', 'Metadata and playlist backup saved to disk', 'success');
+      showToast('Export Complete', 'Metadata & playlists JSON saved to disk', 'success');
     } catch (err: any) {
-      showToast('Export Failed', err?.message || 'Failed to export backup', 'error');
+      showToast('Export Failed', err?.message || 'Failed to export metadata', 'error');
     } finally {
-      setIsExporting(false);
+      setIsExportingMetadata(false);
     }
   };
 
-  const handleImportBackup = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Export Full ZIP Archive (Audio Files + Artwork + Metadata)
+  const handleExportFullArchive = async () => {
+    setIsExportingFullZip(true);
+    setRestoreProgress({ percent: 5, status: 'Initializing archive...' });
+
+    try {
+      const zipBlob = await exportFullLibraryZip((percent, status) => {
+        setRestoreProgress({ percent, status });
+      });
+
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sonora-full-library-archive-${new Date().toISOString().slice(0, 10)}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      showToast('Archive Complete', 'Full audio archive successfully downloaded!', 'success');
+    } catch (err: any) {
+      showToast('Archive Error', err?.message || 'Failed to create archive', 'error');
+    } finally {
+      setIsExportingFullZip(false);
+      setRestoreProgress({ percent: 0, status: '' });
+    }
+  };
+
+  // Import Backup (JSON or ZIP)
+  const handleRestoreFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsImporting(true);
+    setIsRestoring(true);
+    setRestoreProgress({ percent: 5, status: 'Reading backup file...' });
+
     try {
-      const text = await file.text();
-      const result = await importDatabaseFromJson(text);
-      if (result.success) {
-        showToast('Restore Complete', result.message, 'success');
-        getStorageEstimate().then(setStorage);
+      const isZip = file.name.endsWith('.zip');
+      if (isZip) {
+        const result = await importFullLibraryZip(file, (percent, status) => {
+          setRestoreProgress({ percent, status });
+        });
+        if (result.success) {
+          showToast('Restore Successful', result.message, 'success');
+          getStorageEstimate().then(setStorage);
+        } else {
+          showToast('Restore Failed', result.message, 'error');
+        }
       } else {
-        showToast('Restore Failed', result.message, 'error');
+        const text = await file.text();
+        const result = await importDatabaseFromJson(text);
+        if (result.success) {
+          showToast('Restore Successful', result.message, 'success');
+          getStorageEstimate().then(setStorage);
+        } else {
+          showToast('Restore Failed', result.message, 'error');
+        }
       }
     } catch (err: any) {
-      showToast('Import Error', err?.message || 'Could not read backup file', 'error');
+      showToast('Restore Failed', err?.message || 'Error processing backup', 'error');
     } finally {
-      setIsImporting(false);
+      setIsRestoring(false);
+      setRestoreProgress({ percent: 0, status: '' });
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
+  };
+
+  const handleSavePin = async () => {
+    if (!pinInput.trim() || pinInput.length < 4) {
+      showToast('PIN Too Short', 'PIN must be at least 4 digits', 'error');
+      return;
+    }
+    await updateSettings({
+      privacyLockEnabled: true,
+      privacyPasscode: pinInput.trim(),
+    });
+    setPinInput('');
+    setIsSettingPin(false);
+    showToast('Privacy Lock Enabled', 'Your library is now protected with a passcode.', 'success');
+  };
+
+  const handleDisablePin = async () => {
+    await updateSettings({
+      privacyLockEnabled: false,
+      privacyPasscode: undefined,
+    });
+    showToast('Privacy Lock Disabled', 'Passcode protection removed.', 'info');
   };
 
   const handleClearHistory = async () => {
@@ -129,7 +220,7 @@ export function SettingsView() {
       <div>
         <h1 className="text-2xl md:text-3xl font-extrabold text-white">Settings</h1>
         <p className="text-xs text-[#A1A1AA] mt-1">
-          Customize audio behavior, visual theme, backup and storage preferences
+          Customize audio behavior, visual theme, privacy protection, and full library backups
         </p>
       </div>
 
@@ -265,6 +356,216 @@ export function SettingsView() {
         </div>
       </section>
 
+      {/* Privacy & Device-Local Protection */}
+      <section className="p-6 rounded-2xl bg-[#19191F] border border-[#303038] space-y-4">
+        <div className="flex items-center gap-2.5 text-white">
+          <Lock className="w-5 h-5 text-[var(--accent)]" />
+          <h2 className="text-base font-bold">Privacy & Security</h2>
+        </div>
+
+        <div className="p-4 rounded-xl bg-[#121216] border border-[#303038]/60 flex items-start gap-3">
+          <Info className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+          <p className="text-xs text-[#A1A1AA] leading-relaxed">
+            <strong className="text-white">Strict Single-User Local Storage:</strong> SONORA stores
+            your songs and metadata exclusively inside this browser instance (IndexedDB). Your files
+            never sync to external servers or public clouds. To transfer music to another device,
+            use the complete ZIP backup feature below.
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between pt-3 border-t border-[#303038]/60">
+          <div>
+            <p className="text-xs font-semibold text-white">Passcode Lock Protection</p>
+            <p className="text-[11px] text-[#A1A1AA]">
+              Require a private PIN code to access the personal music library
+            </p>
+          </div>
+          {settings.privacyLockEnabled ? (
+            <button
+              onClick={handleDisablePin}
+              className="px-3 py-1.5 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs font-semibold hover:bg-rose-900/80 transition-colors"
+            >
+              Disable Lock
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsSettingPin(true)}
+              className="px-3 py-1.5 rounded-lg bg-[#25252D] hover:bg-[#303038] border border-[#303038] text-white text-xs font-semibold transition-colors"
+            >
+              Set Passcode
+            </button>
+          )}
+        </div>
+
+        {isSettingPin && (
+          <div className="p-3.5 rounded-xl bg-[#121216] border border-[var(--accent)]/40 flex items-center gap-3">
+            <input
+              type="password"
+              placeholder="Enter 4-digit PIN..."
+              maxLength={6}
+              value={pinInput}
+              onChange={e => setPinInput(e.target.value)}
+              className="px-3 py-1.5 rounded-lg bg-[#19191F] border border-[#303038] text-white text-xs font-mono focus:border-[var(--accent)] outline-none w-36"
+            />
+            <button
+              onClick={handleSavePin}
+              className="px-3 py-1.5 rounded-lg bg-[var(--accent)] text-black text-xs font-bold hover:opacity-95"
+            >
+              Save PIN
+            </button>
+            <button
+              onClick={() => {
+                setIsSettingPin(false);
+                setPinInput('');
+              }}
+              className="text-xs text-[#A1A1AA] hover:text-white"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </section>
+
+      {/* Complete Backup & Restore (Distinguishing Metadata vs Full Archive) */}
+      <section className="p-6 rounded-2xl bg-[#19191F] border border-[#303038] space-y-6">
+        <div className="flex items-center gap-2.5 text-white">
+          <Download className="w-5 h-5 text-[var(--accent)]" />
+          <h2 className="text-base font-bold">Library Backup & Restore</h2>
+        </div>
+
+        {/* Progress indicator if exporting or restoring */}
+        {(isExportingFullZip || isRestoring) && (
+          <div className="p-4 rounded-xl bg-[#121216] border border-[var(--accent)]/40 space-y-2 animate-pulse">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-white font-semibold flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--accent)]" />
+                {restoreProgress.status || 'Processing archive...'}
+              </span>
+              <span className="font-mono text-[var(--accent)]">{restoreProgress.percent}%</span>
+            </div>
+            <div className="w-full bg-[#19191F] h-2 rounded-full overflow-hidden">
+              <div
+                className="bg-[var(--accent)] h-full transition-all duration-300"
+                style={{ width: `${restoreProgress.percent}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Card 1: Full ZIP Archive Backup */}
+          <div className="p-4 rounded-xl bg-[#121216] border border-[#303038] flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center gap-2 text-white font-bold text-sm">
+                <Archive className="w-4 h-4 text-purple-400" />
+                <span>Full Music Archive (ZIP)</span>
+              </div>
+              <p className="text-xs text-[#A1A1AA] mt-1 leading-relaxed">
+                Contains complete audio files, artwork images, playlists, lyrics, and metadata
+                bundled into a compressed ZIP file.
+              </p>
+            </div>
+            <button
+              onClick={handleExportFullArchive}
+              disabled={isExportingFullZip || isRestoring}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/40 text-purple-200 text-xs font-semibold transition-all disabled:opacity-50"
+            >
+              {isExportingFullZip ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Archive className="w-3.5 h-3.5" />
+              )}
+              <span>Download Full ZIP Archive</span>
+            </button>
+          </div>
+
+          {/* Card 2: Lightweight Metadata JSON */}
+          <div className="p-4 rounded-xl bg-[#121216] border border-[#303038] flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center gap-2 text-white font-bold text-sm">
+                <FileCode className="w-4 h-4 text-[var(--accent)]" />
+                <span>Metadata Only (JSON)</span>
+              </div>
+              <p className="text-xs text-[#A1A1AA] mt-1 leading-relaxed">
+                Fast, tiny backup containing song tags, playlists, and settings. Does{' '}
+                <em>not</em> include the heavy audio binary files.
+              </p>
+            </div>
+            <button
+              onClick={handleExportMetadata}
+              disabled={isExportingMetadata}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#25252D] hover:bg-[#303038] border border-[#303038] text-white text-xs font-semibold transition-all"
+            >
+              <Download className="w-3.5 h-3.5 text-[var(--accent)]" />
+              <span>Export Metadata JSON</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Restore Section */}
+        <div className="pt-2 border-t border-[#303038]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold text-white">Restore from Backup</p>
+            <p className="text-[11px] text-[#A1A1AA]">
+              Accepts both full <code className="text-purple-400">.zip</code> archives and{' '}
+              <code className="text-emerald-400">.json</code> metadata files with automatic
+              validation and duplicate prevention.
+            </p>
+          </div>
+
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isRestoring || isExportingFullZip}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--accent)] text-black text-xs font-bold hover:opacity-95 transition-all shadow-md shrink-0 disabled:opacity-50"
+          >
+            <Upload className="w-4 h-4" />
+            <span>Select Backup to Restore</span>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,.zip"
+            onChange={handleRestoreFile}
+            className="hidden"
+          />
+        </div>
+      </section>
+
+      {/* Storage Management */}
+      <section className="p-6 rounded-2xl bg-[#19191F] border border-[#303038] space-y-4">
+        <div className="flex items-center gap-2.5 text-white">
+          <HardDrive className="w-5 h-5 text-[var(--accent)]" />
+          <h2 className="text-base font-bold">Storage Management</h2>
+        </div>
+
+        <div className="p-4 rounded-xl bg-[#121216] border border-[#303038] space-y-3">
+          <div className="flex justify-between text-xs text-white">
+            <span>IndexedDB Audio & Metadata</span>
+            <span className="font-mono text-[var(--accent)] font-semibold">
+              {formatFileSize(storage.usage)}
+            </span>
+          </div>
+          <div className="w-full bg-[#19191F] h-2 rounded-full overflow-hidden">
+            <div
+              className="bg-[var(--accent)] h-full transition-all duration-300"
+              style={{ width: `${Math.max(1, storage.percent)}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[11px] text-[#71717A]">
+            <span>{storage.percent}% of browser quota</span>
+            <span>Total space: {formatFileSize(storage.quota)}</span>
+          </div>
+        </div>
+
+        <button
+          onClick={handleRequestPersistence}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#25252D] hover:bg-[#303038] text-white text-xs font-semibold border border-[#303038] transition-all"
+        >
+          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <span>{isPersisted ? 'Storage is Persistent' : 'Request Persistent Storage'}</span>
+        </button>
+      </section>
+
       {/* Keyboard Shortcuts Reference */}
       <section className="p-6 rounded-2xl bg-[#19191F] border border-[#303038] space-y-4">
         <div className="flex items-center gap-2.5 text-white">
@@ -296,78 +597,6 @@ export function SettingsView() {
             </div>
           ))}
         </div>
-      </section>
-
-      {/* Backup and Restore */}
-      <section className="p-6 rounded-2xl bg-[#19191F] border border-[#303038] space-y-4">
-        <div className="flex items-center gap-2.5 text-white">
-          <Download className="w-5 h-5 text-[var(--accent)]" />
-          <h2 className="text-base font-bold">Backup & Restore</h2>
-        </div>
-        <p className="text-xs text-[#A1A1AA] leading-relaxed">
-          Export your library metadata, playlists, favorites, and settings as a clean JSON backup file.
-          You can restore this backup anytime on any device.
-        </p>
-
-        <div className="flex flex-wrap items-center gap-3 pt-2">
-          <button
-            onClick={handleExportBackup}
-            disabled={isExporting}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#25252D] hover:bg-[#303038] text-white text-xs font-semibold border border-[#303038] transition-all"
-          >
-            <Download className="w-4 h-4 text-[var(--accent)]" />
-            <span>Export Metadata Backup</span>
-          </button>
-
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isImporting}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#25252D] hover:bg-[#303038] text-white text-xs font-semibold border border-[#303038] transition-all"
-          >
-            <Upload className="w-4 h-4 text-sky-400" />
-            <span>{isImporting ? 'Restoring...' : 'Restore from Backup'}</span>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            onChange={handleImportBackup}
-            className="hidden"
-          />
-        </div>
-      </section>
-
-      {/* Storage Management */}
-      <section className="p-6 rounded-2xl bg-[#19191F] border border-[#303038] space-y-4">
-        <div className="flex items-center gap-2.5 text-white">
-          <HardDrive className="w-5 h-5 text-[var(--accent)]" />
-          <h2 className="text-base font-bold">Storage Management</h2>
-        </div>
-
-        <div className="p-4 rounded-xl bg-[#121216] border border-[#303038] space-y-3">
-          <div className="flex justify-between text-xs text-white">
-            <span>IndexedDB Audio & Metadata</span>
-            <span className="font-mono text-[var(--accent)] font-semibold">{formatFileSize(storage.usage)}</span>
-          </div>
-          <div className="w-full bg-[#19191F] h-2 rounded-full overflow-hidden">
-            <div
-              className="bg-[var(--accent)] h-full transition-all duration-300"
-              style={{ width: `${Math.max(1, storage.percent)}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-[11px] text-[#71717A]">
-            <span>{storage.percent}% of browser quota</span>
-            <span>Total space: {formatFileSize(storage.quota)}</span>
-          </div>
-        </div>
-
-        <button
-          onClick={handleRequestPersistence}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#25252D] hover:bg-[#303038] text-white text-xs font-semibold border border-[#303038] transition-all"
-        >
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>{isPersisted ? 'Storage is Persistent' : 'Request Persistent Storage'}</span>
-        </button>
       </section>
 
       {/* Danger Zone */}
