@@ -90,15 +90,29 @@ export function AppLayout() {
     async function initCollection() {
       if (isAutoSeedingInProgress) return;
       try {
+        const seededSpotify = localStorage.getItem('sonora_telugu_v5_500clean_no_devotional_folk');
+        const count = await db.songs.count();
+
+        // Purge old Devotional & Folk songs from local DB if upgrading
+        if (!seededSpotify) {
+          try {
+            await db.songs.where('category').anyOf(['Devotional', 'Folk & Beats']).delete();
+            await db.songs.where('genre').anyOf(['Devotional', 'Folk & Beats']).delete();
+            await db.playlists.delete('pl_spotify_folk_beats');
+            await db.playlists.delete('pl_spotify_devotional');
+            await db.playlistSongs.where('playlistId').anyOf(['pl_spotify_folk_beats', 'pl_spotify_devotional']).delete();
+          } catch {
+            // Ignore if indices don't match
+          }
+        }
+
         // First run automatic deduplication on any pre-existing database rows
         await deduplicateSongsInLibrary();
 
-        const count = await db.songs.count();
-        const seededSpotify = localStorage.getItem('sonora_telugu_v4_sidsriram_spotify');
-        if (!seededSpotify || count < 580) {
+        if (!seededSpotify || count < 480) {
           isAutoSeedingInProgress = true;
           await importAllSpotifyTeluguCategories();
-          localStorage.setItem('sonora_telugu_v4_sidsriram_spotify', 'true');
+          localStorage.setItem('sonora_telugu_v5_500clean_no_devotional_folk', 'true');
         }
       } catch (e) {
         console.warn('Initial seeding error:', e);

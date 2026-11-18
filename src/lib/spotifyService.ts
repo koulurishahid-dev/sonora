@@ -602,6 +602,17 @@ export async function importAllSpotifyTeluguCategories(
 ): Promise<{ totalImported: number; categoriesCount: number }> {
   if (onProgress) onProgress(5, 'Connecting to Spotify Telugu Master Catalog...');
 
+  // Clean up removed categories (Devotional, Folk & Beats) from database
+  try {
+    await db.songs.where('category').anyOf(['Devotional', 'Folk & Beats']).delete();
+    await db.songs.where('genre').anyOf(['Devotional', 'Folk & Beats']).delete();
+    await db.playlists.delete('pl_spotify_folk_beats');
+    await db.playlists.delete('pl_spotify_devotional');
+    await db.playlistSongs.where('playlistId').anyOf(['pl_spotify_folk_beats', 'pl_spotify_devotional']).delete();
+  } catch {
+    // continue
+  }
+
   const allSongsToImport: Song[] = [];
 
   // 1. Process Core Telugu songs from CURATED_TELUGU_SONGS
@@ -712,7 +723,8 @@ export async function importAllSpotifyTeluguCategories(
 
   for (let m = 0; m < TELUGU_500_SONGS.length; m++) {
     const item = TELUGU_500_SONGS[m];
-    const key = `${item.title.toLowerCase().trim()}_${(item.movie || item.album).toLowerCase().trim()}`;
+    const albumName = item.movie || item.album || item.title || 'Telugu Master Recording';
+    const key = `${item.title.toLowerCase().trim()}_${albumName.toLowerCase().trim()}`;
     if (existingKeys.has(key)) continue;
     existingKeys.add(key);
 
@@ -721,7 +733,7 @@ export async function importAllSpotifyTeluguCategories(
       id: songId,
       title: item.title,
       artist: item.artist,
-      album: item.movie || item.album,
+      album: albumName,
       year: item.year,
       genre: item.category,
       category: item.category,

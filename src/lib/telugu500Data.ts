@@ -1,11 +1,11 @@
-// Auto-generated Telugu Songs Dataset — 500 songs across 8 Categories
-export interface TeluguSongRecord {
+// Auto-generated 500 Telugu Master Songs across 8 genres (Verified 320kbps audio)
+export interface TeluguSongItem {
   id: string;
   title: string;
   artist: string;
-  movie: string;
-  album: string;
-  year: number;
+  movie?: string;
+  album?: string;
+  year?: number;
   category: string;
   genre: string;
   duration: number;
@@ -13,7 +13,7 @@ export interface TeluguSongRecord {
   artworkUrl: string;
 }
 
-export const TELUGU_500_SONGS: TeluguSongRecord[] = [
+export const TELUGU_500_SONGS: TeluguSongItem[] = [
   {
     "id": "telugu_1_peelings",
     "title": "Peelings (From \"Pushpa 2 The Rule\")",
@@ -3265,199 +3265,199 @@ export const TELUGU_500_SONGS: TeluguSongRecord[] = [
     "artworkUrl": "https://c.saavncdn.com/470/Musical-Hits-Of-M-M-Keeravani-Telugu-2019-20190702210401-500x500.jpg"
   },
   {
-    "id": "telugu_391_shivashivashankara",
-    "title": "Shiva Shiva Shankara",
-    "artist": "Devi Sri Prasad, Shankar Mahadevan",
-    "movie": "Damarukam",
-    "album": "Damarukam",
-    "year": 2012,
+    "id": "telugu_90s_0_priyatama",
+    "title": "Priyatama",
+    "artist": "S. Janaki, S.P. Balasubrahmanyam",
+    "movie": "Jagadekaveerudu Athiloka Sundari",
+    "album": "Jagadekaveerudu Athiloka Sundari",
+    "year": 1990,
     "category": "90s Classics",
     "genre": "90s Classics",
-    "duration": 295,
-    "sourceUrl": "https://aac.saavncdn.com/865/dd682539407f43480ef74ad57929b31a_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/865/Damarukam-2012-500x500.jpg"
+    "duration": 359,
+    "sourceUrl": "https://aac.saavncdn.com/414/b39e6de382cb4268779215ea38659b76_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/414/Jagadekaveerudu-Athiloka-Sundari-2000-500x500.jpg"
   },
   {
-    "id": "telugu_392_shivaratripaata",
-    "title": "Shivaratri Paata",
-    "artist": "Nallagonda Gaddaar",
-    "movie": "Shivaratri Paata",
-    "album": "Shivaratri Paata",
-    "year": 2025,
+    "id": "telugu_90s_1_yamahanagarifro",
+    "title": "Yamaha Nagari (From \"Choodalani Vundi\")",
+    "artist": "Hariharan",
+    "movie": "Mani Sharma All Time Hits",
+    "album": "Mani Sharma All Time Hits",
+    "year": 2018,
     "category": "90s Classics",
     "genre": "90s Classics",
-    "duration": 261,
-    "sourceUrl": "https://aac.saavncdn.com/115/c91ee252b1701b3adf6960407e2adef5_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/115/Shivaratri-Paata-Telugu-2025-20250317161218-500x500.jpg"
+    "duration": 379,
+    "sourceUrl": "https://aac.saavncdn.com/224/3e8e8be5e25103ec0691c8f3399d3a7c_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/224/Mani-Sharma-All-Time-Hits-Telugu-2018-20180622-500x500.jpg"
   },
   {
-    "id": "telugu_393_shivashivashankaraa",
-    "title": "Shiva Shiva Shankaraa (From \"Kannappa\")",
-    "artist": "Vijay Prakash, Stephen Devassy, Ramajogayya Sastry",
-    "movie": "Blockbuster Tollywood Ugadi",
-    "album": "Blockbuster Tollywood Ugadi",
+    "id": "telugu_90s_2_greekuveerudu",
+    "title": "Greeku Veerudu",
+    "artist": "Sowmya",
+    "movie": "Ninne Pelladatha",
+    "album": "Ninne Pelladatha",
+    "year": 1996,
+    "category": "90s Classics",
+    "genre": "90s Classics",
+    "duration": 273,
+    "sourceUrl": "https://aac.saavncdn.com/468/ea51774e832c5ddccfa3b8691c9ed489_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/468/Ninne-Pelladatha-Telugu-1996-20240430181004-500x500.jpg"
+  },
+  {
+    "id": "telugu_90s_3_kannulloneeroop",
+    "title": "Kannullo Nee Roopame",
+    "artist": "Hariharan, Chitra",
+    "movie": "Ninne Pelladatha",
+    "album": "Ninne Pelladatha",
+    "year": 1996,
+    "category": "90s Classics",
+    "genre": "90s Classics",
+    "duration": 321,
+    "sourceUrl": "https://aac.saavncdn.com/468/7f03034ed95961a299080200fa8a8885_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/468/Ninne-Pelladatha-Telugu-1996-20240430181004-500x500.jpg"
+  },
+  {
+    "id": "telugu_90s_4_eevelaloneevu",
+    "title": "Ee Velalo Neevu",
+    "artist": "Sunitha Upadrasta",
+    "movie": "Gulabi",
+    "album": "Gulabi",
+    "year": 1995,
+    "category": "90s Classics",
+    "genre": "90s Classics",
+    "duration": 260,
+    "sourceUrl": "https://aac.saavncdn.com/210/061f842df995339c40d2fc71e93b386a_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/210/Gulabi-Telugu-1995-20180518-500x500.jpg"
+  },
+  {
+    "id": "telugu_90s_5_meghaletakindi",
+    "title": "Meghale Takindi",
+    "artist": "S. P. Balasubramaniyam, K. S. Chitra",
+    "movie": "Preminchukundam Raa",
+    "album": "Preminchukundam Raa",
+    "year": 1997,
+    "category": "90s Classics",
+    "genre": "90s Classics",
+    "duration": 264,
+    "sourceUrl": "https://aac.saavncdn.com/432/43a993e74f00c4890ae31ba04e72b390_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/432/Preminchukundam-Raa-Telugu-1997-20230808011736-500x500.jpg"
+  },
+  {
+    "id": "telugu_90s_6_pellikalavachhe",
+    "title": "Pelli Kala Vachhesindhi",
+    "artist": "Mano, K. S. Chitra, Swarnalatha",
+    "movie": "Preminchukundam Raa",
+    "album": "Preminchukundam Raa",
+    "year": 1997,
+    "category": "90s Classics",
+    "genre": "90s Classics",
+    "duration": 255,
+    "sourceUrl": "https://aac.saavncdn.com/432/6c56e2be7378761cba900413b32ef5f7_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/432/Preminchukundam-Raa-Telugu-1997-20230808011736-500x500.jpg"
+  },
+  {
+    "id": "telugu_90s_7_botany",
+    "title": "Botany",
+    "artist": "S. P. Balasubrahmanyam, S.P. Sailaja",
+    "movie": "Shiva",
+    "album": "Shiva",
+    "year": 1989,
+    "category": "90s Classics",
+    "genre": "90s Classics",
+    "duration": 266,
+    "sourceUrl": "https://aac.saavncdn.com/654/8344a8aab50025b7f5f68850e7c94b63_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/654/Shiva-Telugu-1989-20171129-500x500.jpg"
+  },
+  {
+    "id": "telugu_90s_8_soundaryalahari",
+    "title": "Soundarya Lahari",
+    "artist": "S.P. Balasubrahmanyam, K. S. Chithra",
+    "movie": "Pelli Sandadi",
+    "album": "Pelli Sandadi",
+    "year": 1996,
+    "category": "90s Classics",
+    "genre": "90s Classics",
+    "duration": 272,
+    "sourceUrl": "https://aac.saavncdn.com/639/ac0d255ecf10406a1739ae4b811a8a0e_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/639/Pelli-Sandadi-Telugu-2014-20251014155228-500x500.jpg"
+  },
+  {
+    "id": "telugu_90s_9_hrudayamane",
+    "title": "Hrudayamane",
+    "artist": "S.P. Balasubrahmanyam, K. S. Chithra",
+    "movie": "Pelli Sandadi",
+    "album": "Pelli Sandadi",
+    "year": 1996,
+    "category": "90s Classics",
+    "genre": "90s Classics",
+    "duration": 289,
+    "sourceUrl": "https://aac.saavncdn.com/639/0a0bd07f36b1e66ea0ef3934385d4466_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/639/Pelli-Sandadi-Telugu-2014-20251014155228-500x500.jpg"
+  },
+  {
+    "id": "telugu_90s_10_chinnachinnaaas",
+    "title": "Chinna Chinna Aasha",
+    "artist": "Minmini",
+    "movie": "Roja (Telugu)",
+    "album": "Roja (Telugu)",
+    "year": 2014,
+    "category": "90s Classics",
+    "genre": "90s Classics",
+    "duration": 293,
+    "sourceUrl": "https://aac.saavncdn.com/468/033947e72c37f91aaa67fbbf46721f1e_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/468/Roja-Telugu-2014-20251012071631-500x500.jpg"
+  },
+  {
+    "id": "telugu_90s_11_ekkadavunna",
+    "title": "Ekkada Vunna",
+    "artist": "Monu Music India",
+    "movie": "Ekkada Vunna",
+    "album": "Ekkada Vunna",
     "year": 2026,
     "category": "90s Classics",
     "genre": "90s Classics",
-    "duration": 342,
-    "sourceUrl": "https://aac.saavncdn.com/154/79b5346b3cc6da866bd6b41223165741_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/154/Blockbuster-Tollywood-Ugadi-Telugu-2026-20260318161228-500x500.jpg"
+    "duration": 330,
+    "sourceUrl": "https://aac.saavncdn.com/867/aaafae2e54c92901ad57260950a4e712_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/867/Ekkada-Vunna-Telugu-2026-20261007100112-500x500.jpg"
   },
   {
-    "id": "telugu_394_shivashivashankaraa",
-    "title": "Shiva Shiva Shankaraa (From \"Kannappa\")",
-    "artist": "Vijay Prakash, Stephen Devassy, Ramajogayya Sastry",
-    "movie": "Tollywood Divine & Spiritual Melodies",
-    "album": "Tollywood Divine & Spiritual Melodies",
+    "id": "telugu_90s_12_aanatidevadasu",
+    "title": "Aanati Devadasu",
+    "artist": "Shalmali, Sunny M.R.",
+    "movie": "Dohchay",
+    "album": "Dohchay",
+    "year": 2015,
+    "category": "90s Classics",
+    "genre": "90s Classics",
+    "duration": 234,
+    "sourceUrl": "https://aac.saavncdn.com/915/38c5414ceac812d078bb1facb2374bfd_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/915/Dohchay-Telugu-2015-20251012070233-500x500.jpg"
+  },
+  {
+    "id": "telugu_90s_13_rukurukurukmini",
+    "title": "Ruku Ruku Rukmini (From \"Alias Rukmini\")",
+    "artist": "Vijai Bulganin, Anurag Kulkarni, Purna Chary Challury",
+    "movie": "Ruku Ruku Rukmini (From \"Alias Rukmini\")",
+    "album": "Ruku Ruku Rukmini (From \"Alias Rukmini\")",
     "year": 2026,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 342,
-    "sourceUrl": "https://aac.saavncdn.com/026/d0af76887e9a9902a3d9349887695481_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/026/Tollywood-Divine-Spiritual-Melodies-Telugu-2026-20260813171124-500x500.jpg"
-  },
-  {
-    "id": "telugu_395_shivashivashankaraat",
-    "title": "Shiva Shiva Shankaraa - Telugu",
-    "artist": "Vijay Prakash, Stephen Devassy, Ramajogayya Sastry",
-    "movie": "Kannappa (Telugu)",
-    "album": "Kannappa (Telugu)",
-    "year": 2025,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 342,
-    "sourceUrl": "https://aac.saavncdn.com/161/0252292353d78148b69b39630816fb46_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/161/Kannappa-Telugu-Telugu-2025-20250628001120-500x500.jpg"
-  },
-  {
-    "id": "telugu_396_shivashivashankaraa",
-    "title": "Shiva Shiva Shankaraa (From \"Kannappa\")",
-    "artist": "Vijay Prakash, Stephen Devassy, Ramajogayya Sastry",
-    "movie": "Om Namah Shivaya - Mahashivrathri Songs",
-    "album": "Om Namah Shivaya - Mahashivrathri Songs",
-    "year": 2026,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 342,
-    "sourceUrl": "https://aac.saavncdn.com/315/dd33e592ba01d429a30e22939161a1b0_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/315/Om-Namah-Shivaya-Mahashivrathri-Songs-Telugu-2026-20260211161052-500x500.jpg"
-  },
-  {
-    "id": "telugu_397_shivashivashankaraa",
-    "title": "Shiva Shiva Shankaraa (From \"Kannappa\")",
-    "artist": "Vijay Prakash",
-    "movie": "Tollywood Diwali Celebrations",
-    "album": "Tollywood Diwali Celebrations",
-    "year": 2025,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 342,
-    "sourceUrl": "https://aac.saavncdn.com/245/59668de690e687bcb00a22229331d945_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/245/Tollywood-Diwali-Celebrations-Telugu-2025-20251017161156-500x500.jpg"
-  },
-  {
-    "id": "telugu_398_shivaratrisong2020",
-    "title": "Shivaratri Song 2020",
-    "artist": "Mangli",
-    "movie": "Shivaratri Song 2020",
-    "album": "Shivaratri Song 2020",
-    "year": 2021,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 292,
-    "sourceUrl": "https://aac.saavncdn.com/844/ad65d575425417934098086915e571df_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/844/Shivaratri-Song-2020-Telugu-2021-20211113092815-500x500.jpg"
-  },
-  {
-    "id": "telugu_399_shivathandavame",
-    "title": "Shiva Thandavame",
-    "artist": "Jakes Bejoy, Sanapati Bharadwaj Patrudu",
-    "movie": "Saripodhaa Sanivaaram",
-    "album": "Saripodhaa Sanivaaram",
-    "year": 2024,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 192,
-    "sourceUrl": "https://aac.saavncdn.com/536/4de3b7fe59d8d42c49fc4595b242fbc2_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/536/Saripodhaa-Sanivaaram-Original-Motion-Picture-Soundtrack-Telugu-2024-20240828160005-500x500.jpg"
-  },
-  {
-    "id": "telugu_400_shivaratrisong2019",
-    "title": "Shivaratri Song 2019",
-    "artist": "Mangli",
-    "movie": "Shivaratri Song 2019",
-    "album": "Shivaratri Song 2019",
-    "year": 2021,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 296,
-    "sourceUrl": "https://aac.saavncdn.com/329/2bb38e9eac0f49a3699c84f7651cd647_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/329/Shivaratri-Song-2019-Telugu-2021-20211215104304-500x500.jpg"
-  },
-  {
-    "id": "telugu_401_shivashambothedspmix",
-    "title": "Shiva Shambo (The Dsp Mix)",
-    "artist": "Devi Sri Prasad",
-    "movie": "Adhurs",
-    "album": "Adhurs",
-    "year": 2009,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 244,
-    "sourceUrl": "https://aac.saavncdn.com/492/667251f9b3b32d8aff3d7f161b318472_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/492/Adhurs-2009-500x500.jpg"
-  },
-  {
-    "id": "telugu_402_shivashambothodasapy",
-    "title": "Shiva Shambo (Thodasa Pyar)",
-    "artist": "Devi Sri Prasad",
-    "movie": "Adhurs",
-    "album": "Adhurs",
-    "year": 2009,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 281,
-    "sourceUrl": "https://aac.saavncdn.com/492/7533d18d187573c84c22a52c5a024ffb_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/492/Adhurs-2009-500x500.jpg"
-  },
-  {
-    "id": "telugu_403_shivastakam",
-    "title": "Shivastakam",
-    "artist": "Ramu",
-    "movie": "Shiva Stuthi",
-    "album": "Shiva Stuthi",
-    "year": 2024,
     "category": "90s Classics",
     "genre": "90s Classics",
     "duration": 227,
-    "sourceUrl": "https://aac.saavncdn.com/513/8d2bfb2b5062c69bc26acea2642f88a8_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/513/Shiva-Stuthi-Telugu-2024-20240613013115-500x500.jpg"
+    "sourceUrl": "https://aac.saavncdn.com/573/24aca30b12d9484aadf879f43380f66d_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/573/Ruku-Ruku-Rukmini-From-Alias-Rukmini-Telugu-2026-20261027174004-500x500.jpg"
   },
   {
-    "id": "telugu_404_shivastakam",
-    "title": "Shivastakam",
-    "artist": "Ramu",
-    "movie": "Divine Ragas - Monday Devotional Songs",
-    "album": "Divine Ragas - Monday Devotional Songs",
-    "year": 2026,
+    "id": "telugu_90s_14_priyathamanaa",
+    "title": "Priyathama Naa",
+    "artist": "Sri Krishna, Sumangali",
+    "movie": "Mooga Manasulu",
+    "album": "Mooga Manasulu",
+    "year": 2013,
     "category": "90s Classics",
     "genre": "90s Classics",
-    "duration": 227,
-    "sourceUrl": "https://aac.saavncdn.com/363/016e00f90ce6c8f6c742c33048fd6c2e_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/363/Divine-Ragas-Monday-Devotional-Songs-Telugu-2026-20260413144521-500x500.jpg"
-  },
-  {
-    "id": "telugu_405_shivathandavam",
-    "title": "Shiva Thandavam",
-    "artist": "Bhole Shavali, Srikanth Meka",
-    "movie": "Om Namo Shiva Rudraya",
-    "album": "Om Namo Shiva Rudraya",
-    "year": 2011,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 317,
-    "sourceUrl": "https://aac.saavncdn.com/495/1a46adffafc6ecc8d55bc4a78b05714c_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/495/Om-Namo-Shiva-Rudraya-2011-500x500.jpg"
+    "duration": 275,
+    "sourceUrl": "https://aac.saavncdn.com/324/6cce894bfc95a5e5b8e02d04009f58c8_320.mp4",
+    "artworkUrl": "https://c.saavncdn.com/324/Mooga-Manasulu-2013-500x500.jpg"
   },
   {
     "id": "telugu_406_omnamaha",
