@@ -17,7 +17,7 @@ export interface SpotifyCategoryDef {
 export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   {
     id: 'pl_spotify_hot_hits',
-    title: 'Spotify: Hot Hits Telugu (Trending Chartbusters)',
+    title: 'Hot Hits Telugu (Trending Chartbusters)',
     shortTitle: 'Hot Hits Telugu',
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX5cO1uWkF6vN',
     description: 'The hottest trending chartbusters from Pushpa 2, Devara, Guntur Kaaram, Kalki 2898 AD & Tillu Square.',
@@ -26,7 +26,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   },
   {
     id: 'pl_spotify_romance',
-    title: 'Spotify: Telugu Romance & Love Songs',
+    title: 'Telugu Romance & Love Songs',
     shortTitle: 'Telugu Romance',
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX6XceWc06h19',
     description: 'Heart-touching Telugu love anthems, soul-stirring duets and sweet melodies.',
@@ -35,7 +35,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   },
   {
     id: 'pl_spotify_melodies',
-    title: 'Spotify: Soulful Melodies & Acoustic',
+    title: 'Soulful Melodies & Acoustic',
     shortTitle: 'Soulful Melodies',
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX8g9f76aYdYJ',
     description: 'Acoustic guitar strings, soothing vocals and peaceful Telugu melodies for late nights.',
@@ -44,7 +44,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   },
   {
     id: 'pl_spotify_mass_beats',
-    title: 'Spotify: Telugu Mass & Dance Beats',
+    title: 'Telugu Mass & Dance Beats',
     shortTitle: 'Mass Masala Beats',
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX143p2W54hBv',
     description: 'High-energy chartbusters, energetic drums, party anthems and Telugu mass numbers.',
@@ -53,7 +53,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   },
   {
     id: 'pl_spotify_golden_classics',
-    title: 'Spotify: 2000s Nostalgia & Golden Classics',
+    title: '2000s Nostalgia & Golden Classics',
     shortTitle: '2000s Nostalgia',
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DWWvG80jTq5Z7',
     description: 'Timeless Telugu nostalgic gems from Okkadu, Varsham, Arya, Jalsa, Ye Maya Chesave & more.',
@@ -62,7 +62,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   },
   {
     id: 'pl_spotify_sid_sriram',
-    title: 'Spotify: Sid Sriram Essentials',
+    title: 'Sid Sriram Essentials',
     shortTitle: 'Sid Sriram Hits',
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DXdgn5uXkM2Nn',
     description: 'Every iconic Sid Sriram Telugu chartbuster in one uninterrupted collection.',
@@ -71,7 +71,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   },
   {
     id: 'pl_spotify_blockbusters',
-    title: 'Spotify: DSP, Thaman & Anirudh Hits',
+    title: 'DSP, Thaman & Anirudh Hits',
     shortTitle: 'Composer Blockbusters',
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX7F6jFh4k3uF',
     description: 'Electrifying blockbusters and viral hits composed by DSP, Thaman S, and Anirudh.',
@@ -80,7 +80,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   },
   {
     id: 'pl_spotify_folk_beats',
-    title: 'Spotify: Telugu Folk, Teenmaar & Village Beats',
+    title: 'Telugu Folk, Teenmaar & Village Beats',
     shortTitle: 'Folk & Teenmaar',
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DXa2hu5i2qHqE',
     description: 'High-energy Telangana folk, energetic Dappu, Teenmaar beats and rural chartbusters.',
@@ -89,7 +89,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   },
   {
     id: 'pl_spotify_90s_classics',
-    title: 'Spotify: 90s Telugu Golden Era & Vintage Gems',
+    title: '90s Telugu Golden Era & Vintage Gems',
     shortTitle: '90s Golden Era',
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DXcKq84G1W11B',
     description: 'Nostalgic 90s Telugu masterpieces featuring SP Balasubrahmanyam, Chithra, Ilaiyaraaja.',
@@ -98,7 +98,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   },
   {
     id: 'pl_spotify_devotional',
-    title: 'Spotify: Telugu Devotional & Spiritual Classics',
+    title: 'Telugu Devotional & Spiritual Classics',
     shortTitle: 'Sacred Devotional',
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX5c31g5s0D5F',
     description: 'Timeless spiritual and classical chants from Annamayya, Sri Ramadasu and sacred lore.',

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Song } from '@/types/music';
 import { getArtworkObjectUrl } from '@/lib/db';
 import { formatDuration } from '@/lib/utils';
@@ -28,6 +28,20 @@ export function InteractiveSongCard({
   const { playSong, currentSong, isPlaying, togglePlay, toggleFavorite } = usePlayer();
   const { settings } = useTheme();
 
+  const cat = (song.category || song.genre || '').toLowerCase();
+  const fallback =
+    cat.includes('love') || cat.includes('romance')
+      ? '/covers/telugu_romance.jpg'
+      : cat.includes('mass') || cat.includes('beat')
+      ? '/covers/mass_party_beats.jpg'
+      : cat.includes('classic') || cat.includes('nostalgia')
+      ? '/covers/golden_classics.jpg'
+      : cat.includes('melod')
+      ? '/covers/soulful_melodies.jpg'
+      : '/covers/hot_hits_telugu.jpg';
+
+  const artUrl = getArtworkObjectUrl(song) || fallback;
+  const [imgSrc, setImgSrc] = useState<string>(artUrl);
   const [hasError, setHasError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showHeartBurst, setShowHeartBurst] = useState(false);
@@ -40,7 +54,20 @@ export function InteractiveSongCard({
 
   const isCurrent = currentSong?.id === song.id;
   const isFav = song.isFavorite;
-  const artUrl = getArtworkObjectUrl(song);
+
+  useEffect(() => {
+    const freshArt = getArtworkObjectUrl(song) || fallback;
+    setImgSrc(freshArt);
+    setHasError(false);
+  }, [song.id, song.artworkUrl]);
+
+  const handleImageError = () => {
+    if (imgSrc !== fallback) {
+      setImgSrc(fallback);
+    } else {
+      setHasError(true);
+    }
+  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -115,29 +142,13 @@ export function InteractiveSongCard({
 
       {/* 1. ARTWORK CONTAINER WITH ZOOM, WAVEFORM BADGE & PLAY BUTTON */}
       <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#171A24] border border-white/10 mb-2.5 flex items-center justify-center">
-        {artUrl && !hasError ? (
+        {!hasError ? (
           <img
-            src={artUrl}
-            alt={song.title}
-            onError={(e) => {
-              const target = e.currentTarget;
-              const cat = (song.category || song.genre || '').toLowerCase();
-              const fallback =
-                cat.includes('love') || cat.includes('romance')
-                  ? '/covers/telugu_romance.jpg'
-                  : cat.includes('mass') || cat.includes('beat')
-                  ? '/covers/mass_party_beats.jpg'
-                  : cat.includes('classic') || cat.includes('nostalgia')
-                  ? '/covers/golden_classics.jpg'
-                  : cat.includes('melod')
-                  ? '/covers/soulful_melodies.jpg'
-                  : '/covers/hot_hits_telugu.jpg';
-              if (!target.src.endsWith(fallback)) {
-                target.src = fallback;
-              } else {
-                setHasError(true);
-              }
-            }}
+            src={imgSrc}
+            alt=""
+            referrerPolicy="no-referrer"
+            crossOrigin="anonymous"
+            onError={handleImageError}
             className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108 group-hover:brightness-105"
           />
         ) : (

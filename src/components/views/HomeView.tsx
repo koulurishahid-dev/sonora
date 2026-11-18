@@ -41,6 +41,120 @@ interface HomeViewProps {
   onSongContextMenu: (e: React.MouseEvent, song: Song) => void;
 }
 
+// Dedicated Shelf Song Card with isolated state and rock-solid image fallback
+function ShelfSongCard({
+  song,
+  songs,
+  isThisCurrent,
+  isThisPlaying,
+  onPlaySong,
+  onTogglePlay,
+  onSongContextMenu,
+}: {
+  song: Song;
+  songs: Song[];
+  isThisCurrent: boolean;
+  isThisPlaying: boolean;
+  onPlaySong: (song: Song, queue: Song[]) => void;
+  onTogglePlay: () => void;
+  onSongContextMenu: (e: React.MouseEvent, song: Song) => void;
+}) {
+  const cat = (song.category || song.genre || '').toLowerCase();
+  const fallback =
+    cat.includes('love') || cat.includes('romance')
+      ? '/covers/telugu_romance.jpg'
+      : cat.includes('mass') || cat.includes('beat')
+      ? '/covers/mass_party_beats.jpg'
+      : cat.includes('classic') || cat.includes('nostalgia')
+      ? '/covers/golden_classics.jpg'
+      : cat.includes('melod')
+      ? '/covers/soulful_melodies.jpg'
+      : '/covers/hot_hits_telugu.jpg';
+
+  const [currentSrc, setCurrentSrc] = useState<string>(() => getArtworkObjectUrl(song) || fallback);
+  const [hasFailed, setHasFailed] = useState(false);
+
+  useEffect(() => {
+    const freshArt = getArtworkObjectUrl(song) || fallback;
+    setCurrentSrc(freshArt);
+    setHasFailed(false);
+  }, [song.id, song.artworkUrl]);
+
+  const handleImgError = () => {
+    if (currentSrc !== fallback) {
+      setCurrentSrc(fallback);
+    } else {
+      setHasFailed(true);
+    }
+  };
+
+  return (
+    <div
+      onClick={() => (isThisCurrent ? onTogglePlay() : onPlaySong(song, songs))}
+      onContextMenu={e => onSongContextMenu(e, song)}
+      className="w-40 sm:w-46 shrink-0 p-3 rounded-2xl bg-[#12141C]/90 hover:bg-[#181B26] border border-white/[0.07] hover:border-[#1ED760]/40 cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1 group flex flex-col select-none"
+    >
+      <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 relative mb-3 flex items-center justify-center border border-white/[0.08]">
+        {!hasFailed ? (
+          <img
+            src={currentSrc}
+            alt=""
+            referrerPolicy="no-referrer"
+            crossOrigin="anonymous"
+            onError={handleImgError}
+            className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500 ease-out"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1A1D27] to-[#10121A] text-zinc-500">
+            <Music2 className="w-8 h-8 text-zinc-600 mb-1" />
+            <span className="text-[9px] font-bold tracking-wider text-zinc-600 uppercase">Sonora</span>
+          </div>
+        )}
+
+        {/* Spotify Green Play Circle that rises on hover */}
+        <div
+          className={`absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full bg-[#1ED760] text-black flex items-center justify-center shadow-2xl transition-all duration-300 ${
+            isThisPlaying
+              ? 'opacity-100 scale-100'
+              : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-105 active:scale-95'
+          }`}
+        >
+          {isThisPlaying ? (
+            <Pause className="w-5 h-5 fill-black" />
+          ) : (
+            <Play className="w-5 h-5 fill-black ml-0.5" />
+          )}
+        </div>
+
+        {/* Genre Tag */}
+        {song.category && (
+          <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider bg-black/70 backdrop-blur-md border border-white/10 text-amber-300">
+            {song.category}
+          </div>
+        )}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <h3
+          className={`text-xs sm:text-sm font-bold truncate transition-colors ${
+            isThisCurrent ? 'text-[#1ED760]' : 'text-white group-hover:text-white'
+          }`}
+        >
+          {song.title}
+        </h3>
+        <p className="text-[11px] text-white/50 truncate mt-0.5 font-medium">
+          {song.artist}
+        </p>
+        {song.album && (
+          <p className="text-[10px] text-white/30 truncate mt-0.5 font-mono">
+            {song.album}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Spotify Horizontal Scrolling Shelf
 function SpotifyShelf({
   title,
@@ -105,89 +219,18 @@ function SpotifyShelf({
         ref={scrollRef}
         className="flex gap-4 overflow-x-auto pb-2 scrollbar-none scroll-smooth -mx-1 px-1"
       >
-        {songs.map(song => {
-          const isThisCurrent = currentSongId === song.id;
-          const isThisPlaying = isThisCurrent && isPlaying;
-          const art = getArtworkObjectUrl(song);
-
-          return (
-            <div
-              key={song.id}
-              onClick={() => (isThisCurrent ? onTogglePlay() : onPlaySong(song, songs))}
-              onContextMenu={e => onSongContextMenu(e, song)}
-              className="w-40 sm:w-46 shrink-0 p-3 rounded-2xl bg-[#12141C]/90 hover:bg-[#181B26] border border-white/[0.07] hover:border-[#1ED760]/40 cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1 group flex flex-col"
-            >
-              <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 relative mb-3 flex items-center justify-center border border-white/[0.08]">
-                {art ? (
-                  <img
-                    src={art}
-                    alt={song.title}
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      const cat = (song.category || song.genre || '').toLowerCase();
-                      const fallback =
-                        cat.includes('love') || cat.includes('romance')
-                          ? '/covers/telugu_romance.jpg'
-                          : cat.includes('mass') || cat.includes('beat')
-                          ? '/covers/mass_party_beats.jpg'
-                          : cat.includes('classic') || cat.includes('nostalgia')
-                          ? '/covers/golden_classics.jpg'
-                          : cat.includes('melod')
-                          ? '/covers/soulful_melodies.jpg'
-                          : '/covers/hot_hits_telugu.jpg';
-                      if (!target.src.endsWith(fallback)) {
-                        target.src = fallback;
-                      }
-                    }}
-                    className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500 ease-out"
-                  />
-                ) : (
-                  <Music2 className="w-10 h-10 text-zinc-600" />
-                )}
-
-                {/* Spotify Green Play Circle that rises on hover */}
-                <div
-                  className={`absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full bg-[#1ED760] text-black flex items-center justify-center shadow-2xl transition-all duration-300 ${
-                    isThisPlaying
-                      ? 'opacity-100 scale-100'
-                      : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-105 active:scale-95'
-                  }`}
-                >
-                  {isThisPlaying ? (
-                    <Pause className="w-5 h-5 fill-black" />
-                  ) : (
-                    <Play className="w-5 h-5 fill-black ml-0.5" />
-                  )}
-                </div>
-
-                {/* Genre Tag */}
-                {song.category && (
-                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider bg-black/70 backdrop-blur-md border border-white/10 text-amber-300">
-                    {song.category}
-                  </div>
-                )}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <h3
-                  className={`text-xs sm:text-sm font-bold truncate transition-colors ${
-                    isThisCurrent ? 'text-[#1ED760]' : 'text-white group-hover:text-white'
-                  }`}
-                >
-                  {song.title}
-                </h3>
-                <p className="text-[11px] text-white/50 truncate mt-0.5 font-medium">
-                  {song.artist}
-                </p>
-                {song.album && (
-                  <p className="text-[10px] text-white/30 truncate mt-0.5 font-mono">
-                    {song.album}
-                  </p>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {songs.map(song => (
+          <ShelfSongCard
+            key={song.id}
+            song={song}
+            songs={songs}
+            isThisCurrent={currentSongId === song.id}
+            isThisPlaying={currentSongId === song.id && isPlaying}
+            onPlaySong={onPlaySong}
+            onTogglePlay={onTogglePlay}
+            onSongContextMenu={onSongContextMenu}
+          />
+        ))}
       </div>
     </section>
   );

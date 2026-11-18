@@ -47,7 +47,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           setSettings(prev => ({ ...prev, ...stored.value }));
         }
       } catch (err) {
-        console.error('Failed to load settings:', err);
+        console.warn('Notice: Failed to load settings:', err);
       } finally {
         setIsLoaded(true);
       }
@@ -83,7 +83,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     try {
       await db.settings.put({ key: 'app_settings', value: updated });
     } catch (err) {
-      console.error('Failed to save settings:', err);
+      console.warn('Notice: Failed to save settings:', err);
     }
   };
 
@@ -92,7 +92,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     try {
       await db.settings.put({ key: 'app_settings', value: DEFAULT_SETTINGS });
     } catch (err) {
-      console.error('Failed to reset settings:', err);
+      console.warn('Notice: Failed to reset settings:', err);
     }
   };
 
