@@ -656,7 +656,7 @@ export function HomeView({
               </span>
             </h2>
             <p className="text-xs text-white/50 mt-0.5">
-              Browse 600 verified Telugu studio master tracks across all 9 genres in 320kbps audio
+              Browse {allSongs.length} verified unique Telugu studio master recordings across all 9 genres in 320kbps audio
             </p>
           </div>
 

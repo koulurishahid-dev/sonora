@@ -661,21 +661,45 @@ export async function resetAllSongs(): Promise<number> {
   return count;
 }
 
+// Normalizes song title for strict deduplication
+export function normalizeSongTitle(title: string): string {
+  return (title || '')
+    .toLowerCase()
+    .replace(/\s*\(from\s+"[^"]*"\)\s*/gi, '')
+    .replace(/\s*\(from\s+[^)]*\)\s*/gi, '')
+    .replace(/\s*-\s*from\s+"[^"]*"\s*/gi, '')
+    .replace(/\s*-\s*from\s+[^)]*\s*/gi, '')
+    .replace(/\s*\(telugu\)\s*/gi, '')
+    .replace(/\s*-\s*telugu\s*/gi, '')
+    .replace(/\s*-\s*male\s*/gi, '')
+    .replace(/\s*-\s*female\s*/gi, '')
+    .replace(/\s*\(male\s*version\)\s*/gi, '')
+    .replace(/\s*\(female\s*version\)\s*/gi, '')
+    .replace(/\s*-\s*duet\s*/gi, '')
+    .replace(/\s*\(duet\)\s*/gi, '')
+    .replace(/\s*\(remastered\)\s*/gi, '')
+    .replace(/\s*\(wedding\s*song\)\s*/gi, '')
+    .replace(/\s*\(tittle\s*song\)\s*/gi, '')
+    .replace(/\s*\(title\s*song\)\s*/gi, '')
+    .replace(/[^a-z0-9]/g, '');
+}
+
 // Scans the library, identifies any duplicate song entries by title or audio URL, and deletes redundant copies
 export async function deduplicateSongsInLibrary(): Promise<number> {
   const all = await db.songs.toArray();
-  const seenKeys = new Map<string, Song>();
+  const seenTitles = new Map<string, Song>();
+  const seenSources = new Set<string>();
   const duplicateIdsToDelete: string[] = [];
 
   for (const song of all) {
-    const normTitle = (song.title || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-    const normSource = song.sourceUrl ? song.sourceUrl.split('?')[0].split('/').pop() : '';
-    const key = normSource || normTitle;
+    const normT = normalizeSongTitle(song.title);
+    const audioHash = song.sourceUrl ? song.sourceUrl.split('?')[0].split('/').pop() : '';
 
-    if (seenKeys.has(key)) {
+    if (seenTitles.has(normT) || (audioHash && seenSources.has(audioHash))) {
       duplicateIdsToDelete.push(song.id);
     } else {
-      seenKeys.set(key, song);
+      seenTitles.set(normT, song);
+      if (audioHash) seenSources.add(audioHash);
     }
   }
 

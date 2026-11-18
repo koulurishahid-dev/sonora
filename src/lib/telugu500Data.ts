@@ -1,4 +1,4 @@
-// Auto-generated 600 Telugu Master Songs across 9 genres (Verified 320kbps audio)
+// Verified Clean Unique Telugu Master Songs (Single instance per song - No Duplicates)
 export interface TeluguSongItem {
   id: string;
   title: string;
@@ -17,10 +17,10 @@ export interface TeluguSongItem {
 export const TELUGU_500_SONGS: TeluguSongItem[] = [
   {
     "id": "telugu_1_peelings",
-    "title": "Peelings (From \"Pushpa 2 The Rule\")",
+    "title": "Peelings",
     "artist": "Shankarr Babu Kandukoori, Laxmi Dasa",
-    "movie": "Top 10 Dance Dhamaka Hits",
-    "album": "Top 10 Dance Dhamaka Hits",
+    "movie": "Pushpa 2 The Rule -",
+    "album": "Pushpa 2 The Rule -",
     "year": 2025,
     "category": "Hot Hits",
     "genre": "Hot Hits",
@@ -29,24 +29,11 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/915/Top-10-Dance-Dhamaka-Hits-Telugu-2025-20251014181041-500x500.jpg"
   },
   {
-    "id": "telugu_2_peelings",
-    "title": "Peelings (Telugu)",
-    "artist": "Devi Sri Prasad, Shankarr Babu Kandukoori, Laxmi Dasa, Chandrabose, Siju Thuravoor",
-    "movie": "Pushpa 2 The Rule - (Telugu)",
-    "album": "Pushpa 2 The Rule - (Telugu)",
-    "year": 2024,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 247,
-    "sourceUrl": "https://aac.saavncdn.com/366/2eb21d94241ba0d9e970d808a7dc015d_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/366/Pushpa-2-The-Rule-Telugu-Telugu-2024-20241205211012-500x500.jpg"
-  },
-  {
     "id": "telugu_3_kissik",
-    "title": "Kissik (From \"Pushpa 2 The Rule\")",
+    "title": "Kissik",
     "artist": "Sublahshini",
-    "movie": "Tollywood Heroines Musical Blockbusters",
-    "album": "Tollywood Heroines Musical Blockbusters",
+    "movie": "Pushpa 2 The Rule -",
+    "album": "Pushpa 2 The Rule -",
     "year": 2025,
     "category": "Hot Hits",
     "genre": "Hot Hits",
@@ -55,24 +42,11 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/917/Tollywood-Heroines-Musical-Blockbusters-Telugu-2025-20251120161002-500x500.jpg"
   },
   {
-    "id": "telugu_4_kissik",
-    "title": "Kissik (From \"Pushpa 2 The Rule\")",
-    "artist": "Sublahshini, Devi Sri Prasad, Chandrabose",
-    "movie": "Tollywood Romantic Songs",
-    "album": "Tollywood Romantic Songs",
-    "year": 2026,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 248,
-    "sourceUrl": "https://aac.saavncdn.com/209/a28988f11e10beedabf2eb4d98f2a77a_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/209/Tollywood-Romantic-Songs-Telugu-2026-20260206171136-500x500.jpg"
-  },
-  {
     "id": "telugu_5_sooseki",
-    "title": "Sooseki (From \"Pushpa 2 The Rule\")",
+    "title": "Sooseki",
     "artist": "Shreya Ghoshal, Devi Sri Prasad, Chandrabose",
-    "movie": "Evergreen Monsoon Melodies",
-    "album": "Evergreen Monsoon Melodies",
+    "movie": "Summer Hot Romatic Waves",
+    "album": "Summer Hot Romatic Waves",
     "year": 2026,
     "category": "Hot Hits",
     "genre": "Hot Hits",
@@ -81,34 +55,8 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/476/Evergreen-Monsoon-Melodies-Telugu-2026-20260821181532-500x500.jpg"
   },
   {
-    "id": "telugu_6_sooseki",
-    "title": "Sooseki (From \"Pushpa 2 The Rule\")",
-    "artist": "Chandrabose, Devi Sri Prasad, Shreya Ghoshal",
-    "movie": "Summer Hot Romatic Waves",
-    "album": "Summer Hot Romatic Waves",
-    "year": 2026,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 260,
-    "sourceUrl": "https://aac.saavncdn.com/814/8889030c23e8ba111f551605a9ef2b8f_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/814/Summer-Hot-Romatic-Waves-Telugu-2026-20260601162119-500x500.jpg"
-  },
-  {
-    "id": "telugu_7_sooseki",
-    "title": "Sooseki (From \"Pushpa 2 The Rule\")",
-    "artist": "Shreya Ghoshal, Devi Sri Prasad, Chandrabose",
-    "movie": "Prema Kavithalu - 2026 Valentines Day Special",
-    "album": "Prema Kavithalu - 2026 Valentines Day Special",
-    "year": 2026,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 260,
-    "sourceUrl": "https://aac.saavncdn.com/353/f328f688b0a65eba81004067abd4ada3_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/353/Prema-Kavithalu-2026-Valentines-Day-Special-Telugu-2026-20260212201005-500x500.jpg"
-  },
-  {
     "id": "telugu_8_pushpapushpa",
-    "title": "Pushpa Pushpa (Telugu)",
+    "title": "Pushpa Pushpa",
     "artist": "Devi Sri Prasad, Nakash Aziz, Deepak Blue, Chandrabose",
     "movie": "Pushpa 2 The Rule - (Telugu)",
     "album": "Pushpa 2 The Rule - (Telugu)",
@@ -120,24 +68,11 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/366/Pushpa-2-The-Rule-Telugu-Telugu-2024-20241205211012-500x500.jpg"
   },
   {
-    "id": "telugu_9_kissik",
-    "title": "Kissik (Telugu)",
-    "artist": "Devi Sri Prasad, Sublahshini, Chandrabose",
-    "movie": "Pushpa 2 The Rule - (Telugu)",
-    "album": "Pushpa 2 The Rule - (Telugu)",
-    "year": 2024,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 248,
-    "sourceUrl": "https://aac.saavncdn.com/366/da6848c6a220b99dd20f5d82549298b4_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/366/Pushpa-2-The-Rule-Telugu-Telugu-2024-20241205211012-500x500.jpg"
-  },
-  {
     "id": "telugu_10_gangorenukathalli",
-    "title": "Gango Renuka Thalli (From \"Pushpa 2 The Rule\")",
+    "title": "Gango Renuka Thalli",
     "artist": "Mahalingam, Devi Sri Prasad, Chandrabose",
-    "movie": "Tollywood Divine & Spiritual Melodies",
-    "album": "Tollywood Divine & Spiritual Melodies",
+    "movie": "Pushpa 2 The Rule -",
+    "album": "Pushpa 2 The Rule -",
     "year": 2026,
     "category": "Hot Hits",
     "genre": "Hot Hits",
@@ -146,73 +81,8 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/026/Tollywood-Divine-Spiritual-Melodies-Telugu-2026-20260813171124-500x500.jpg"
   },
   {
-    "id": "telugu_11_gangorenukathalli",
-    "title": "Gango Renuka Thalli (From \"Pushpa 2 The Rule\")",
-    "artist": "Mahalingam, Devi Sri Prasad, Chandrabose",
-    "movie": "Blockbuster Tollywood Ugadi",
-    "album": "Blockbuster Tollywood Ugadi",
-    "year": 2026,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 208,
-    "sourceUrl": "https://aac.saavncdn.com/154/420085c50dd1aa17e15c3b499715e2d7_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/154/Blockbuster-Tollywood-Ugadi-Telugu-2026-20260318161228-500x500.jpg"
-  },
-  {
-    "id": "telugu_12_gangorenukathalli",
-    "title": "Gango Renuka Thalli (From \"Pushpa 2 The Rule\")",
-    "artist": "Chandrabose, Devi Sri Prasad, Mahalingam",
-    "movie": "World Music Day - Top 10 Telugu Superhits",
-    "album": "World Music Day - Top 10 Telugu Superhits",
-    "year": 2026,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 208,
-    "sourceUrl": "https://aac.saavncdn.com/063/765646d56c6462de3c70cfbe292e7dfc_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/063/World-Music-Day-Top-10-Telugu-Superhits-Telugu-2026-20260619191140-500x500.jpg"
-  },
-  {
-    "id": "telugu_13_gangorenukathalli",
-    "title": "Gango Renuka Thalli (From \"Pushpa 2 The Rule\")",
-    "artist": "Mahalingam",
-    "movie": "Tollywood Diwali Celebrations",
-    "album": "Tollywood Diwali Celebrations",
-    "year": 2025,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 208,
-    "sourceUrl": "https://aac.saavncdn.com/245/661537fbd60c6879a7944fd9bff34fdc_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/245/Tollywood-Diwali-Celebrations-Telugu-2025-20251017161156-500x500.jpg"
-  },
-  {
-    "id": "telugu_14_sooseki",
-    "title": "Sooseki",
-    "artist": "Devi Sri Prasad, Shreya Ghoshal, Chandrabose",
-    "movie": "Pushpa 2 The Rule - (Telugu)",
-    "album": "Pushpa 2 The Rule - (Telugu)",
-    "year": 2024,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 260,
-    "sourceUrl": "https://aac.saavncdn.com/366/41c23b604eed1e0bb950ad4566b40198_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/366/Pushpa-2-The-Rule-Telugu-Telugu-2024-20241205211012-500x500.jpg"
-  },
-  {
-    "id": "telugu_15_gangorenukathalli",
-    "title": "Gango Renuka Thalli",
-    "artist": "Devi Sri Prasad, Mahalingam, Chandrabose",
-    "movie": "Pushpa 2 The Rule - (Telugu)",
-    "album": "Pushpa 2 The Rule - (Telugu)",
-    "year": 2024,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 208,
-    "sourceUrl": "https://aac.saavncdn.com/366/cf71b9e127419c4c0dd53b9320e2091f_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/366/Pushpa-2-The-Rule-Telugu-Telugu-2024-20241205211012-500x500.jpg"
-  },
-  {
     "id": "telugu_16_devarathandavam",
-    "title": "Devara Thandavam (From \"Devara Part 1\")",
+    "title": "Devara Thandavam",
     "artist": "Anirudh Ravichander",
     "movie": "Devara Thandavam (From \"Devara Part 1\")",
     "album": "Devara Thandavam (From \"Devara Part 1\")",
@@ -237,19 +107,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/301/Baahubali-The-Beginning-Telugu-2015-20251028160018-500x500.jpg"
   },
   {
-    "id": "telugu_18_devarathandavam",
-    "title": "Devara Thandavam (From \"Devara Part 1\") (From \"Devara Thandavam (From \"Devara Part 1\")\")",
-    "artist": "Anirudh Ravichander",
-    "movie": "Blockbuster Tollywood Ugadi",
-    "album": "Blockbuster Tollywood Ugadi",
-    "year": 2026,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 138,
-    "sourceUrl": "https://aac.saavncdn.com/154/04d000690fd464db10ae217bbc97aab7_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/154/Blockbuster-Tollywood-Ugadi-Telugu-2026-20260318161228-500x500.jpg"
-  },
-  {
     "id": "telugu_19_dheevaraenglishversi",
     "title": "Dheevara (English Version)",
     "artist": "Ramya Behara, Adithya",
@@ -263,21 +120,8 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/301/Baahubali-The-Beginning-Telugu-2015-20251028160018-500x500.jpg"
   },
   {
-    "id": "telugu_20_devaraentersthering",
-    "title": "Devara Enters The Ring",
-    "artist": "Anirudh Ravichander",
-    "movie": "Devara Part 1 Ost",
-    "album": "Devara Part 1 Ost",
-    "year": 2025,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 79,
-    "sourceUrl": "https://aac.saavncdn.com/326/f88e272c02ae3689c783f2548622f7a5_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/326/Devara-Part-1-Ost-Telugu-2025-20250410171004-500x500.jpg"
-  },
-  {
     "id": "telugu_21_chuttamalle",
-    "title": "Chuttamalle (From \"Devara Part 1\")",
+    "title": "Chuttamalle",
     "artist": "Ramajogayya Sastry, Anirudh Ravichander, Shilpa Rao",
     "movie": "Summer Hot Romatic Waves",
     "album": "Summer Hot Romatic Waves",
@@ -289,34 +133,8 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/814/Summer-Hot-Romatic-Waves-Telugu-2026-20260601162119-500x500.jpg"
   },
   {
-    "id": "telugu_22_chuttamalle",
-    "title": "Chuttamalle (From \"Devara Part 1\")",
-    "artist": "Ramajogayya Sastry, Anirudh Ravichander, Shilpa Rao",
-    "movie": "World Music Day - Top 10 Telugu Superhits",
-    "album": "World Music Day - Top 10 Telugu Superhits",
-    "year": 2026,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 222,
-    "sourceUrl": "https://aac.saavncdn.com/063/0b01de55e354a1a929e47f7981cc106d_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/063/World-Music-Day-Top-10-Telugu-Superhits-Telugu-2026-20260619191140-500x500.jpg"
-  },
-  {
-    "id": "telugu_23_chuttamalle",
-    "title": "Chuttamalle (From \"Devara Part 1\")",
-    "artist": "Shilpa Rao, Anirudh Ravichander, Ramajogayya Sastry",
-    "movie": "Prema Kavithalu - 2026 Valentines Day Special",
-    "album": "Prema Kavithalu - 2026 Valentines Day Special",
-    "year": 2026,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 222,
-    "sourceUrl": "https://aac.saavncdn.com/353/e0d72673f57b00aed0d3655783fb76e4_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/353/Prema-Kavithalu-2026-Valentines-Day-Special-Telugu-2026-20260212201005-500x500.jpg"
-  },
-  {
     "id": "telugu_24_fearsongtelugu",
-    "title": "Fear Song - Telugu",
+    "title": "Fear Song",
     "artist": "Anirudh Ravichander, Ramajogayya Sastry",
     "movie": "Devara Part 1 - Telugu",
     "album": "Devara Part 1 - Telugu",
@@ -328,34 +146,8 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/313/Devara-Part-1-Telugu-Telugu-2024-20240926171010-500x500.jpg"
   },
   {
-    "id": "telugu_25_devaraarrives",
-    "title": "Devara Arrives",
-    "artist": "Anirudh Ravichander",
-    "movie": "Devara Part 1 Ost",
-    "album": "Devara Part 1 Ost",
-    "year": 2025,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 73,
-    "sourceUrl": "https://aac.saavncdn.com/326/d3ac552e17eec48c72e054e2defe4bae_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/326/Devara-Part-1-Ost-Telugu-2025-20250410171004-500x500.jpg"
-  },
-  {
-    "id": "telugu_26_chuttamalle",
-    "title": "Chuttamalle",
-    "artist": "Anirudh Ravichander, Shilpa Rao, Ramajogayya Sastry",
-    "movie": "Devara Part 1 - Telugu",
-    "album": "Devara Part 1 - Telugu",
-    "year": 2024,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 222,
-    "sourceUrl": "https://aac.saavncdn.com/313/e49e604945889f330e5b3536dd0ff524_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/313/Devara-Part-1-Telugu-Telugu-2024-20240926171010-500x500.jpg"
-  },
-  {
     "id": "telugu_27_ayudhapoojatelugu",
-    "title": "Ayudha Pooja - Telugu",
+    "title": "Ayudha Pooja",
     "artist": "Anirudh Ravichander, Kaala Bhairava, Ramajogayya Sastry",
     "movie": "Devara Part 1 - Telugu",
     "album": "Devara Part 1 - Telugu",
@@ -368,7 +160,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_28_daavudi",
-    "title": "Daavudi (From \"Devara Part 1\")",
+    "title": "Daavudi",
     "artist": "Nakash Aziz, AKASA",
     "movie": "Tollywood Heroines Musical Blockbusters",
     "album": "Tollywood Heroines Musical Blockbusters",
@@ -378,32 +170,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 229,
     "sourceUrl": "https://aac.saavncdn.com/917/6aa572edae23eba2ec6e4eaf016e0224_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/917/Tollywood-Heroines-Musical-Blockbusters-Telugu-2025-20251120161002-500x500.jpg"
-  },
-  {
-    "id": "telugu_29_daavudi",
-    "title": "Daavudi (From \"Devara Part 1\")",
-    "artist": "Nakash Aziz, AKASA",
-    "movie": "Top 10 Dance Dhamaka Hits",
-    "album": "Top 10 Dance Dhamaka Hits",
-    "year": 2025,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 229,
-    "sourceUrl": "https://aac.saavncdn.com/915/89d1a09d84ce81b1b22bdd792743b212_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/915/Top-10-Dance-Dhamaka-Hits-Telugu-2025-20251014181041-500x500.jpg"
-  },
-  {
-    "id": "telugu_30_daavudi",
-    "title": "Daavudi (From \"Devara Part 1\")",
-    "artist": "Nakash Aziz, AKASA, Anirudh Ravichander, Ramajogayya Sastry",
-    "movie": "Tollywood Romantic Songs",
-    "album": "Tollywood Romantic Songs",
-    "year": 2026,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 229,
-    "sourceUrl": "https://aac.saavncdn.com/209/d5c3615b4e636dba4c5a657b794cf23c_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/209/Tollywood-Romantic-Songs-Telugu-2026-20260206171136-500x500.jpg"
   },
   {
     "id": "telugu_31_kurchimadathapetti",
@@ -479,7 +245,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "year": 2023,
     "category": "Hot Hits",
     "genre": "Hot Hits",
-    "duration": 242,
+    "duration": 319,
     "sourceUrl": "https://aac.saavncdn.com/000/6f3086fb8689e59be04f17dcc4b423be_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/000/Guntur-Kaaram-Telugu-2023-20240126145901-500x500.jpg"
   },
@@ -497,19 +263,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/000/Guntur-Kaaram-OST-Telugu-2024-20240311124447-500x500.jpg"
   },
   {
-    "id": "telugu_38_homecoming",
-    "title": "Home Coming",
-    "artist": "Thaman S",
-    "movie": "Guntur Kaaram - OST",
-    "album": "Guntur Kaaram - OST",
-    "year": 2024,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 88,
-    "sourceUrl": "https://aac.saavncdn.com/000/459d4ab51ead4d3641df3f9911f59e7d_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/000/Guntur-Kaaram-OST-Telugu-2024-20240311124447-500x500.jpg"
-  },
-  {
     "id": "telugu_39_kurchimadathapettiof",
     "title": "Kurchi Madathapetti - Official Remix",
     "artist": "Mahesh Babu, Thaman S, Sri Krishna, Sahithi Chaganti",
@@ -521,19 +274,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 189,
     "sourceUrl": "https://aac.saavncdn.com/000/5a62985e511816aaea24bb534e1eb000_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/000/Kurchi-Madathapetti-Official-Remix-From-Guntur-Kaaram-Telugu-2024-20240401161453-500x500.jpg"
-  },
-  {
-    "id": "telugu_40_theshadow",
-    "title": "The Shadow",
-    "artist": "Thaman S",
-    "movie": "Guntur Kaaram - OST",
-    "album": "Guntur Kaaram - OST",
-    "year": 2024,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 74,
-    "sourceUrl": "https://aac.saavncdn.com/000/546addf9fc7e43f4d9f71adda35ccd5b_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/000/Guntur-Kaaram-OST-Telugu-2024-20240311124447-500x500.jpg"
   },
   {
     "id": "telugu_41_intermission",
@@ -562,19 +302,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/000/Guntur-Kaaram-OST-Telugu-2024-20240311124447-500x500.jpg"
   },
   {
-    "id": "telugu_43_heroineintro",
-    "title": "Heroine Intro",
-    "artist": "Thaman S",
-    "movie": "Guntur Kaaram - OST",
-    "album": "Guntur Kaaram - OST",
-    "year": 2024,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 64,
-    "sourceUrl": "https://aac.saavncdn.com/000/923d552950a30b737b6254ac276b9b19_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/000/Guntur-Kaaram-OST-Telugu-2024-20240311124447-500x500.jpg"
-  },
-  {
     "id": "telugu_44_aarambam",
     "title": "Aarambam",
     "artist": "Thaman S",
@@ -599,19 +326,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 159,
     "sourceUrl": "https://aac.saavncdn.com/000/b02084db1674f38d7160ee2bc80d44cb_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/000/Guntur-Kaaram-OST-Telugu-2024-20240311124447-500x500.jpg"
-  },
-  {
-    "id": "telugu_46_themeofkalki",
-    "title": "Theme Of Kalki",
-    "artist": "Kala Bhairava, Ananthu, Gowtham Bharadwaj, Santhosh Narayanan",
-    "movie": "Kalki 2898 Ad (Telugu)",
-    "album": "Kalki 2898 Ad (Telugu)",
-    "year": 2024,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 189,
-    "sourceUrl": "https://aac.saavncdn.com/888/a40cb595cf75a62e1469ac0a8194e998_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/888/Kalki-2898-Ad-Telugu-Telugu-2024-20240712063717-500x500.jpg"
   },
   {
     "id": "telugu_47_veeradheera",
@@ -650,19 +364,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "genre": "Hot Hits",
     "duration": 207,
     "sourceUrl": "https://aac.saavncdn.com/888/ad1248d84cf30da97d5bad03b867e246_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/888/Kalki-2898-Ad-Telugu-Telugu-2024-20240712063717-500x500.jpg"
-  },
-  {
-    "id": "telugu_50_bujjitheme",
-    "title": "Bujji Theme",
-    "artist": "Priya Ragu, Santhosh Narayanan",
-    "movie": "Kalki 2898 Ad (Telugu)",
-    "album": "Kalki 2898 Ad (Telugu)",
-    "year": 2024,
-    "category": "Hot Hits",
-    "genre": "Hot Hits",
-    "duration": 46,
-    "sourceUrl": "https://aac.saavncdn.com/888/1e1c636bd1090e811b3fd4e3ee74fa4b_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/888/Kalki-2898-Ad-Telugu-Telugu-2024-20240712063717-500x500.jpg"
   },
   {
@@ -757,110 +458,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/683/RRR-Telugu-Telugu-2022-20250828171313-500x500.jpg"
   },
   {
-    "id": "telugu_108_naatunaatu",
-    "title": "Naatu Naatu (From \"Rrr\")",
-    "artist": "Rahul Sipligunj, Kaala Bhairava",
-    "movie": "Lets Celebrate With Superhit Songs",
-    "album": "Lets Celebrate With Superhit Songs",
-    "year": 2025,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 214,
-    "sourceUrl": "https://aac.saavncdn.com/939/8e48082eb8f4b40d0851f10c5e828025_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/939/Lets-Celebrate-With-Superhit-Songs-Telugu-2025-20251015181129-500x500.jpg"
-  },
-  {
-    "id": "telugu_109_naatunaatu",
-    "title": "Naatu Naatu (From \"Rrr\")",
-    "artist": "Rahul Sipligunj, Kaala Bhairava, M.M. Keeravaani, Chandrabose",
-    "movie": "Global Star  - Ram Charan Superhit Song Collection",
-    "album": "Global Star  - Ram Charan Superhit Song Collection",
-    "year": 2026,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 214,
-    "sourceUrl": "https://aac.saavncdn.com/806/baf8fca46e011773009247ba89c1784b_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/806/Global-Star-Ram-Charan-Superhit-Song-Collection-Telugu-2026-20260324181027-500x500.jpg"
-  },
-  {
-    "id": "telugu_110_naatunaatu",
-    "title": "Naatu Naatu (From \"Rrr\")",
-    "artist": "Rahul Sipligunj, Kaala Bhairava, M.M. Keeravaani, Chandrabose",
-    "movie": "Tollywood Patriotic Songs 2026",
-    "album": "Tollywood Patriotic Songs 2026",
-    "year": 2026,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 214,
-    "sourceUrl": "https://aac.saavncdn.com/860/e29c4baeee8304e808f69413de4264d0_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/860/Tollywood-Patriotic-Songs-2026-Telugu-2026-20260122191005-500x500.jpg"
-  },
-  {
-    "id": "telugu_111_naatunaatu",
-    "title": "Naatu Naatu (From \"Rrr\")",
-    "artist": "Rahul Sipligunj, Kaala Bhairava, M.M. Keeravaani, Chandrabose",
-    "movie": "Master Class M.M. Keeravaani Superhit Hits",
-    "album": "Master Class M.M. Keeravaani Superhit Hits",
-    "year": 2026,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 214,
-    "sourceUrl": "https://aac.saavncdn.com/111/03fb53c4d3630e7572783d52c6003620_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/111/Master-Class-M-M-Keeravaani-Superhit-Hits-Telugu-2026-20260708191144-500x500.jpg"
-  },
-  {
-    "id": "telugu_112_naatunaatu",
-    "title": "Naatu Naatu (From \"Rrr\")",
-    "artist": "Rahul Sipligunj, Kaala Bhairava",
-    "movie": "Top 10 Dance Dhamaka Hits",
-    "album": "Top 10 Dance Dhamaka Hits",
-    "year": 2025,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 214,
-    "sourceUrl": "https://aac.saavncdn.com/915/748c782c98a5163bd5c5423fae30dadb_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/915/Top-10-Dance-Dhamaka-Hits-Telugu-2025-20251014181041-500x500.jpg"
-  },
-  {
-    "id": "telugu_113_dosti",
-    "title": "Dosti (From \"Rrr\")",
-    "artist": "Hemachandra, M.M. Keeravaani, Sirivennela Seetharama Sastry",
-    "movie": "Global Star  - Ram Charan Superhit Song Collection",
-    "album": "Global Star  - Ram Charan Superhit Song Collection",
-    "year": 2026,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 340,
-    "sourceUrl": "https://aac.saavncdn.com/806/4c595b241edaa024ec53138fb205e61a_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/806/Global-Star-Ram-Charan-Superhit-Song-Collection-Telugu-2026-20260324181027-500x500.jpg"
-  },
-  {
-    "id": "telugu_114_dosti",
-    "title": "Dosti (From \"Rrr\")",
-    "artist": "Hema Chandra, M.M. Keeravani, Sirivennela Sitaramasastri",
-    "movie": "Dosti Special - Happy Friendship Day",
-    "album": "Dosti Special - Happy Friendship Day",
-    "year": 2026,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 340,
-    "sourceUrl": "https://aac.saavncdn.com/982/2259bda8458ed0aa9ded9fdefcf09fcf_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/982/Dosti-Special-Happy-Friendship-Day-Telugu-2026-20260801191017-500x500.jpg"
-  },
-  {
-    "id": "telugu_115_dosti",
-    "title": "Dosti (From \"Rrr\")",
-    "artist": "Hemachandra, M.M. Keeravaani, Sirivennela Seetharama Sastry",
-    "movie": "Master Class M.M. Keeravaani Superhit Hits",
-    "album": "Master Class M.M. Keeravaani Superhit Hits",
-    "year": 2026,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 340,
-    "sourceUrl": "https://aac.saavncdn.com/111/8605f59981e7e5c2cb3123aecf3734c0_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/111/Master-Class-M-M-Keeravaani-Superhit-Hits-Telugu-2026-20260708191144-500x500.jpg"
-  },
-  {
     "id": "telugu_116_ooantavaooooantava",
     "title": "Oo Antava Oo Oo Antava",
     "artist": "Indravathi Chauhan",
@@ -939,32 +536,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/000/Pushpa-The-Rise-Telugu-2023-20230403210942-500x500.jpg"
   },
   {
-    "id": "telugu_122_intervalbang",
-    "title": "Interval Bang",
-    "artist": "Devi Sri Prasad",
-    "movie": "Pushpa The Rise - OST",
-    "album": "Pushpa The Rise - OST",
-    "year": 2023,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 86,
-    "sourceUrl": "https://aac.saavncdn.com/000/e181d785b5c8956e5538999fe73881e6_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/000/Pushpa-The-Rise-OST-Telugu-2023-20230529153008-500x500.jpg"
-  },
-  {
-    "id": "telugu_123_srivallisadversion",
-    "title": "Srivalli Sad Version",
-    "artist": "Devi Sri Prasad",
-    "movie": "Pushpa The Rise - OST",
-    "album": "Pushpa The Rise - OST",
-    "year": 2023,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 86,
-    "sourceUrl": "https://aac.saavncdn.com/000/f4f6eb9b9806e158f3643149d08ae5ec_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/000/Pushpa-The-Rise-OST-Telugu-2023-20230529153008-500x500.jpg"
-  },
-  {
     "id": "telugu_124_pushpaentry",
     "title": "Pushpa Entry",
     "artist": "Devi Sri Prasad",
@@ -975,19 +546,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "genre": "Mass & Beats",
     "duration": 108,
     "sourceUrl": "https://aac.saavncdn.com/000/3ea2c957bc072b6cff6de044fafeb9b1_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/000/Pushpa-The-Rise-OST-Telugu-2023-20230529153008-500x500.jpg"
-  },
-  {
-    "id": "telugu_125_massthemeofpushpa",
-    "title": "Mass Theme Of Pushpa",
-    "artist": "Devi Sri Prasad",
-    "movie": "Pushpa The Rise - OST",
-    "album": "Pushpa The Rise - OST",
-    "year": 2023,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 115,
-    "sourceUrl": "https://aac.saavncdn.com/000/bb83c74e8715af6a6b82c4e3d1648030_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/000/Pushpa-The-Rise-OST-Telugu-2023-20230529153008-500x500.jpg"
   },
   {
@@ -1004,19 +562,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/000/Pushpa-The-Rise-OST-Telugu-2023-20230529153008-500x500.jpg"
   },
   {
-    "id": "telugu_127_forestfight",
-    "title": "Forest Fight",
-    "artist": "Devi Sri Prasad",
-    "movie": "Pushpa The Rise - OST",
-    "album": "Pushpa The Rise - OST",
-    "year": 2023,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 77,
-    "sourceUrl": "https://aac.saavncdn.com/000/65ed5c6b3a61444b9674316b63180035_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/000/Pushpa-The-Rise-OST-Telugu-2023-20230529153008-500x500.jpg"
-  },
-  {
     "id": "telugu_128_pushpatobecontinued",
     "title": "Pushpa To Be Continued",
     "artist": "Devi Sri Prasad",
@@ -1027,19 +572,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "genre": "Mass & Beats",
     "duration": 112,
     "sourceUrl": "https://aac.saavncdn.com/000/49b8d19b016fabdcec55b4582a133d36_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/000/Pushpa-The-Rise-OST-Telugu-2023-20230529153008-500x500.jpg"
-  },
-  {
-    "id": "telugu_129_pushpamothertheme",
-    "title": "Pushpa Mother Theme",
-    "artist": "Devi Sri Prasad",
-    "movie": "Pushpa The Rise - OST",
-    "album": "Pushpa The Rise - OST",
-    "year": 2023,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 74,
-    "sourceUrl": "https://aac.saavncdn.com/000/82a3cebd95f91a263c9c10bacc554173_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/000/Pushpa-The-Rise-OST-Telugu-2023-20230529153008-500x500.jpg"
   },
   {
@@ -1070,14 +602,14 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_132_samajavaragamanamale",
-    "title": "Samajavaragamana - Male",
+    "title": "Samajavaragamana",
     "artist": "Sid Sriram",
     "movie": "Ala Vaikunthapurramuloo",
     "album": "Ala Vaikunthapurramuloo",
     "year": 2019,
     "category": "Mass & Beats",
     "genre": "Mass & Beats",
-    "duration": 219,
+    "duration": 241,
     "sourceUrl": "https://aac.saavncdn.com/517/339d76dce4db4f43f4721eec2d8f03ef_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg"
   },
@@ -1103,7 +635,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "year": 2019,
     "category": "Mass & Beats",
     "genre": "Mass & Beats",
-    "duration": 245,
+    "duration": 246,
     "sourceUrl": "https://aac.saavncdn.com/517/5702757c42c1ad44b3224a339817c8b0_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg"
   },
@@ -1134,32 +666,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg"
   },
   {
-    "id": "telugu_137_alavaikunthapurramul",
-    "title": "Ala Vaikunthapurramuloo Dj Mashup",
-    "artist": "Sid Sriram, Anurag Kulkarni, Mangli, Roll Rida, Rahul Nambiar, Armaan Malik, Lady Kash, Rahul Sipligunj, Blaaze, Sri Krishna, Priya Sisters",
-    "movie": "Ala Vaikunthapurramuloo",
-    "album": "Ala Vaikunthapurramuloo",
-    "year": 2022,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 186,
-    "sourceUrl": "https://aac.saavncdn.com/202/b8acfaaf74449c520f28200fef76f533_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/202/Ala-Vaikunthapurramuloo-Telugu-2022-20260930120026-500x500.jpg"
-  },
-  {
-    "id": "telugu_138_samajavaragamanafema",
-    "title": "Samajavaragamana - Female",
-    "artist": "Shreya Ghoshal",
-    "movie": "Ala Vaikunthapurramuloo",
-    "album": "Ala Vaikunthapurramuloo",
-    "year": 2019,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 241,
-    "sourceUrl": "https://aac.saavncdn.com/517/dab4be47f3e89ee1f7f71ecef1bf72e4_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg"
-  },
-  {
     "id": "telugu_139_buttabommaofficialre",
     "title": "Butta Bomma Official Remix",
     "artist": "Armaan Malik",
@@ -1186,45 +692,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/621/Ala-Vaikunthapurramuloo-Telugu-2024-20260930120034-500x500.jpg"
   },
   {
-    "id": "telugu_141_samajavaragamanabgm",
-    "title": "Samajavaragamana Bgm",
-    "artist": "Thaman S",
-    "movie": "Ala Vaikunthapurramuloo - OST",
-    "album": "Ala Vaikunthapurramuloo - OST",
-    "year": 2023,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 77,
-    "sourceUrl": "https://aac.saavncdn.com/000/22fd330e4108e61bc75afbc541d810a2_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/000/Ala-Vaikunthapurramuloo-OST-Telugu-2023-20230523151925-500x500.jpg"
-  },
-  {
-    "id": "telugu_142_alavaikunthapurramul",
-    "title": "Ala Vaikunthapurramuloo Theme",
-    "artist": "Thaman S",
-    "movie": "Ala Vaikunthapurramuloo - OST",
-    "album": "Ala Vaikunthapurramuloo - OST",
-    "year": 2023,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 61,
-    "sourceUrl": "https://aac.saavncdn.com/000/a72b49cdb9f1237242706df94fee14f2_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/000/Ala-Vaikunthapurramuloo-OST-Telugu-2023-20230523151925-500x500.jpg"
-  },
-  {
-    "id": "telugu_143_alavaikunthapurramul",
-    "title": "Ala Vaikunthapurramuloo (From \"Ala Vaikunthapurramuloo\")",
-    "artist": "Sri Krishna, Priya Sisters",
-    "movie": "Ugadi Special Songs",
-    "album": "Ugadi Special Songs",
-    "year": 2020,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 193,
-    "sourceUrl": "https://aac.saavncdn.com/600/742fc1ad066c02168f6492c2e0e100b5_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/600/Ugadi-Special-Songs-Telugu-2020-20200321165807-500x500.jpg"
-  },
-  {
     "id": "telugu_144_samajavaragamanadjas",
     "title": "Samajavaragamana DJ A.Sen Lo-Fi Mix",
     "artist": "Sid Sriram",
@@ -1239,7 +706,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_145_hessoocute",
-    "title": "He’S Soo Cute (From \"Sarileru Neekevvaru\")",
+    "title": "He’S Soo Cute",
     "artist": "Sri Mani, Devi Sri Prasad, Madhu Priya",
     "movie": "Summer Hot Romatic Waves",
     "album": "Summer Hot Romatic Waves",
@@ -1274,19 +741,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "genre": "Mass & Beats",
     "duration": 264,
     "sourceUrl": "https://aac.saavncdn.com/432/ffbe828d51b98f8197bfbdbb66ce140a_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/432/Sarileru-Neekevvaru-Telugu-2020-20250818111038-500x500.jpg"
-  },
-  {
-    "id": "telugu_148_hessoocute",
-    "title": "He’S Soo Cute",
-    "artist": "Madhu Priya",
-    "movie": "Sarileru Neekevvaru",
-    "album": "Sarileru Neekevvaru",
-    "year": 2020,
-    "category": "Mass & Beats",
-    "genre": "Mass & Beats",
-    "duration": 209,
-    "sourceUrl": "https://aac.saavncdn.com/432/5e0e65567a9e5a379efb5f7fa7a6cd6f_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/432/Sarileru-Neekevvaru-Telugu-2020-20250818111038-500x500.jpg"
   },
   {
@@ -1352,19 +806,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "genre": "Melodies",
     "duration": 233,
     "sourceUrl": "https://aac.saavncdn.com/008/f213d31af98ea61cd2ee492555eecc91_sar_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/008/Shyam-Singha-Roy-Telugu-Telugu-2021-20220113123204-500x500.jpg"
-  },
-  {
-    "id": "telugu_154_sirivennelafemale",
-    "title": "Sirivennela - Female",
-    "artist": "Chaitra Ambadipudi",
-    "movie": "Shyam Singha Roy - Telugu",
-    "album": "Shyam Singha Roy - Telugu",
-    "year": 2021,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 180,
-    "sourceUrl": "https://aac.saavncdn.com/008/60ecef37499e2e4010dda5fe29c0f3f1_sar_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/008/Shyam-Singha-Roy-Telugu-Telugu-2021-20220113123204-500x500.jpg"
   },
   {
@@ -1512,29 +953,16 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_166_sirimalleneevepanthu",
-    "title": "Sirimalle Neeve - Panthulamma",
+    "title": "Sirimalle Neeve Panthulamma",
     "artist": "Rajan-Nagendra",
     "movie": "Melodies Of Telugu Flim Instrumental Vol. - 2",
     "album": "Melodies Of Telugu Flim Instrumental Vol. - 2",
     "year": 2008,
     "category": "Melodies",
     "genre": "Melodies",
-    "duration": 277,
+    "duration": 279,
     "sourceUrl": "https://aac.saavncdn.com/288/13f80d0c6429379026f1e45350ae96e0_sar_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/288/Melodies-Of-Telugu-Flim-Instrumental-Vol-2-Telugu-2008-20181105-500x500.jpg"
-  },
-  {
-    "id": "telugu_167_sirimalleneevepanthu",
-    "title": "Sirimalle Neeve Panthulamma",
-    "artist": "Rajan-Nagendra",
-    "movie": "Karaoke Vol - 2 Melodies Telugu Flim Tunes",
-    "album": "Karaoke Vol - 2 Melodies Telugu Flim Tunes",
-    "year": 2008,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 279,
-    "sourceUrl": "https://aac.saavncdn.com/460/da5a4311a87de272f5fed1b7c99b3eb5_sar_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/460/Karaoke-Vol-2-Melodies-Telugu-Flim-Tunes-2008-500x500.jpg"
   },
   {
     "id": "telugu_168_sirimalleneeve",
@@ -1584,7 +1012,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "year": 2019,
     "category": "Melodies",
     "genre": "Melodies",
-    "duration": 266,
+    "duration": 320,
     "sourceUrl": "https://aac.saavncdn.com/412/c98809c9e8a7acc775d5a06560546cff_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/412/Pelli-Choopulu-Original-Motion-Picture-Soundtrack-Telugu-2019-20251027141257-500x500.jpg"
   },
@@ -1615,32 +1043,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/412/Pelli-Choopulu-Original-Motion-Picture-Soundtrack-Telugu-2019-20251027141257-500x500.jpg"
   },
   {
-    "id": "telugu_174_aanandamayenuthemeso",
-    "title": "Aanandamayenu (Theme Song)",
-    "artist": "Ranjani Sivakumar",
-    "movie": "Pelli Choopulu (Original Motion Picture Soundtrack)",
-    "album": "Pelli Choopulu (Original Motion Picture Soundtrack)",
-    "year": 2019,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 102,
-    "sourceUrl": "https://aac.saavncdn.com/412/70decee617a3b4475bdab67e860db264_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/412/Pelli-Choopulu-Original-Motion-Picture-Soundtrack-Telugu-2019-20251027141257-500x500.jpg"
-  },
-  {
-    "id": "telugu_175_pellichoopulu",
-    "title": "Pelli Choopulu",
-    "artist": "Jhansi, Ravi Teja, Bvs Ravi",
-    "movie": "Mr. Bachchan - Dialogue",
-    "album": "Mr. Bachchan - Dialogue",
-    "year": 2024,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 206,
-    "sourceUrl": "https://aac.saavncdn.com/479/b7d7132baf1d188c5e3079bf335b0ee5_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/479/Mr-Bachchan-Dialogue-Telugu-2024-20241007190218-500x500.jpg"
-  },
-  {
     "id": "telugu_176_spitfirefriends",
     "title": "Spitfire Friends...",
     "artist": "Nikhil Bharadwaj",
@@ -1652,32 +1054,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 167,
     "sourceUrl": "https://aac.saavncdn.com/412/43c90b281df045f75648333c6db4d781_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/412/Pelli-Choopulu-Original-Motion-Picture-Soundtrack-Telugu-2019-20251027141257-500x500.jpg"
-  },
-  {
-    "id": "telugu_177_pellichoopulu",
-    "title": "Pelli Choopulu",
-    "artist": "Deepabalu Samy, Manish, Sujatha Mohan, Prashanth R Vihari",
-    "movie": "Maaremma [Dialogues] [Telugu]",
-    "album": "Maaremma [Dialogues] [Telugu]",
-    "year": 2026,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 196,
-    "sourceUrl": "https://aac.saavncdn.com/404/e01a4e4a1ae5d6d11b8ef24458067fae_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/404/Maaremma-Dialogues-Telugu-Telugu-2026-20261006171004-500x500.jpg"
-  },
-  {
-    "id": "telugu_178_pellichoopulu",
-    "title": "Pelli Choopulu",
-    "artist": "Narendra Ravi, Yamini Nageswar, Suresh Bobbili",
-    "movie": "The Great Pre-Wedding Show - Dialogue",
-    "album": "The Great Pre-Wedding Show - Dialogue",
-    "year": 2025,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 232,
-    "sourceUrl": "https://aac.saavncdn.com/189/c0879e34b149422d2622ad2b7ddfc500_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/189/The-Great-Pre-Wedding-Show-Dialogue-Telugu-2025-20251209181022-500x500.jpg"
   },
   {
     "id": "telugu_179_samayama",
@@ -1823,32 +1199,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/202/Sammohanam-Telugu-2018-20180609-500x500.jpg"
   },
   {
-    "id": "telugu_190_ochelithaara",
-    "title": "O cheli Thaara (From \"Sammohanam\")",
-    "artist": "Haricharan",
-    "movie": "Ramajogayya Sastry",
-    "album": "Ramajogayya Sastry",
-    "year": 2018,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 287,
-    "sourceUrl": "https://aac.saavncdn.com/262/e315053b9c3ff7caeb71a474cca6f0a7_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/262/Ramajogayya-Sastry-Telugu-2018-20180823-500x500.jpg"
-  },
-  {
-    "id": "telugu_191_ochelithaara",
-    "title": "O cheli Thaara (From \"Sammohanam\")",
-    "artist": "Haricharan",
-    "movie": "Saraswati Putra Ramajogayya Sastry",
-    "album": "Saraswati Putra Ramajogayya Sastry",
-    "year": 2022,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 287,
-    "sourceUrl": "https://aac.saavncdn.com/140/b5445c2f900410d64988343cfaf7dd4e_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/140/Saraswati-Putra-Ramajogayya-Sastry-Telugu-2022-20220823203915-500x500.jpg"
-  },
-  {
     "id": "telugu_192_ochelithaarafromsamm",
     "title": "O Cheli Thaara (From\" Sammohanam\")",
     "artist": "Haricharan",
@@ -1862,71 +1212,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/000/Musical-Hits-Of-Vivek-Sagar-Telugu-2022-20220131204728-500x500.jpg"
   },
   {
-    "id": "telugu_193_ochelithaara",
-    "title": "O cheli Thaara (From \"Sammohanam\")",
-    "artist": "Haricharan",
-    "movie": "New And Trending Now",
-    "album": "New And Trending Now",
-    "year": 2018,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 287,
-    "sourceUrl": "https://aac.saavncdn.com/256/7899ea523c26c2cd689d2f10c9a3ff34_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/256/New-And-Trending-Now-Telugu-2018-20180817-500x500.jpg"
-  },
-  {
-    "id": "telugu_194_ochelithaara",
-    "title": "O cheli Thaara (From \"Sammohanam\")",
-    "artist": "Haricharan",
-    "movie": "2018 Love Hits",
-    "album": "2018 Love Hits",
-    "year": 2018,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 287,
-    "sourceUrl": "https://aac.saavncdn.com/364/a528e3531cec4066dc2c0017e5612317_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/364/2018-Love-Hits-Telugu-2018-20181227215304-500x500.jpg"
-  },
-  {
-    "id": "telugu_195_ochelithaara",
-    "title": "O cheli Thaara (From \"Sammohanam\")",
-    "artist": "Haricharan",
-    "movie": "My Heart Is Beating",
-    "album": "My Heart Is Beating",
-    "year": 2018,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 287,
-    "sourceUrl": "https://aac.saavncdn.com/228/7967398dd8949f56c7599728eff19332_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/228/My-Heart-Is-Beating-Telugu-2018-20180628-500x500.jpg"
-  },
-  {
-    "id": "telugu_196_ochelithaara",
-    "title": "O Cheli Thaara (From \"Sammohanam\")",
-    "artist": "Haricharan",
-    "movie": "Hits Of Vivek Sagar",
-    "album": "Hits Of Vivek Sagar",
-    "year": 2020,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 287,
-    "sourceUrl": "https://aac.saavncdn.com/null/74d86cd772a3a64b4278b9b6bf6f2cc0_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/null/Hits-Of-Vivek-Sagar-Telugu-2020-20200804232151-500x500.jpg"
-  },
-  {
-    "id": "telugu_197_ochelithaara",
-    "title": "O Cheli Thaara (From \"Sammohanam\")",
-    "artist": "Haricharan",
-    "movie": "Dhamaka Hit's Of Diwali",
-    "album": "Dhamaka Hit's Of Diwali",
-    "year": 2018,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 287,
-    "sourceUrl": "https://aac.saavncdn.com/335/8c463d988422a6844692635b375171df_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/335/Dhamaka-Hit-s-Of-Diwali-Telugu-2018-20181106-500x500.jpg"
-  },
-  {
     "id": "telugu_198_oohaluooregegaalanth",
     "title": "Oohalu Oorege Gaalanthaa (From\" Sammohanam\")",
     "artist": "Haricharan, Keerthana",
@@ -1938,19 +1223,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 289,
     "sourceUrl": "https://aac.saavncdn.com/000/54eccf47e3c212d40b2ccef5eff32161_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/000/Musical-Hits-Of-Vivek-Sagar-Telugu-2022-20220131204728-500x500.jpg"
-  },
-  {
-    "id": "telugu_199_oohaluooregegaalanth",
-    "title": "Oohalu Oorege Gaalanthaa (From \"Sammohanam\")",
-    "artist": "Haricharan, Keerthana",
-    "movie": "New And Trending Now",
-    "album": "New And Trending Now",
-    "year": 2018,
-    "category": "Melodies",
-    "genre": "Melodies",
-    "duration": 289,
-    "sourceUrl": "https://aac.saavncdn.com/256/e00ff098807356f3b9e8f358cdb60433_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/256/New-And-Trending-Now-Telugu-2018-20180817-500x500.jpg"
   },
   {
     "id": "telugu_200_brochevarevarura",
@@ -2213,19 +1485,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/449/Varsham-2003-500x500.jpg"
   },
   {
-    "id": "telugu_220_neetimullaibit",
-    "title": "Neeti Mullai (Bit)",
-    "artist": "Devi Sri Prasad, Sagar, Sumangali",
-    "movie": "Varsham",
-    "album": "Varsham",
-    "year": 2003,
-    "category": "Golden Classics",
-    "genre": "Golden Classics",
-    "duration": 82,
-    "sourceUrl": "https://aac.saavncdn.com/449/f6a1dfa2703c891e5c9decee2e0d7a95_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/449/Varsham-2003-500x500.jpg"
-  },
-  {
     "id": "telugu_221_varshamlovennella",
     "title": "Varshamlo Vennella",
     "artist": "Sanjana Kalmanje, Aditya RK",
@@ -2291,71 +1550,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/394/Amrutha-Varsham-2006-500x500.jpg"
   },
   {
-    "id": "telugu_226_mellaga",
-    "title": "Mellaga (From \"Varsham\")",
-    "artist": "S.P.B. Charan, Sumangali",
-    "movie": "Darling Prabhas",
-    "album": "Darling Prabhas",
-    "year": 2018,
-    "category": "Golden Classics",
-    "genre": "Golden Classics",
-    "duration": 319,
-    "sourceUrl": "https://aac.saavncdn.com/319/f2ac52f228f3778bc521c4e0aed07d1a_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/319/Darling-Prabhas-Telugu-2018-20181022-500x500.jpg"
-  },
-  {
-    "id": "telugu_227_mellaga",
-    "title": "Mellaga (From \"Varsham\")",
-    "artist": "S.P.B. Charan, Sumangali",
-    "movie": "This Is DSP",
-    "album": "This Is DSP",
-    "year": 2019,
-    "category": "Golden Classics",
-    "genre": "Golden Classics",
-    "duration": 319,
-    "sourceUrl": "https://aac.saavncdn.com/489/49131ebfd21a21083844e83328282d58_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/489/This-Is-DSP-Telugu-2019-20190801174604-500x500.jpg"
-  },
-  {
-    "id": "telugu_228_mellaga",
-    "title": "Mellaga (From \"Varsham\")",
-    "artist": "Devi Sri Prasad, S.P.B. Charan, Sumangali",
-    "movie": "Evergreen Love Songs Of Sirivennela Sitarama Sastry",
-    "album": "Evergreen Love Songs Of Sirivennela Sitarama Sastry",
-    "year": 2014,
-    "category": "Golden Classics",
-    "genre": "Golden Classics",
-    "duration": 320,
-    "sourceUrl": "https://aac.saavncdn.com/785/35a20e1978e1c3827922d349f9f1a8f2_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/785/Evergreen-Love-Songs-Of-Sirivennela-Sitarama-Sastry-Telugu-2014-500x500.jpg"
-  },
-  {
-    "id": "telugu_229_mellaga",
-    "title": "Mellaga (From \"Varsham\")",
-    "artist": "S.P. Charan, Sumangali",
-    "movie": "Expression Queen Trisha",
-    "album": "Expression Queen Trisha",
-    "year": 2019,
-    "category": "Golden Classics",
-    "genre": "Golden Classics",
-    "duration": 319,
-    "sourceUrl": "https://aac.saavncdn.com/431/473f1635e06b632b9890f136f802cf16_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/431/Expression-Queen-Trisha-Telugu-2019-20190503002926-500x500.jpg"
-  },
-  {
-    "id": "telugu_230_mellaga",
-    "title": "Mellaga (From \"Varsham\")",
-    "artist": "Devi Sri Prasad, S.P.B. Charan, Sumangali",
-    "movie": "Prabhas Romantic Mood",
-    "album": "Prabhas Romantic Mood",
-    "year": 2014,
-    "category": "Golden Classics",
-    "genre": "Golden Classics",
-    "duration": 320,
-    "sourceUrl": "https://aac.saavncdn.com/211/92efb406c8e91a446e93f6bea3ed5d8b_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/211/Prabhas-Romantic-Mood-Telugu-2014-500x500.jpg"
-  },
-  {
     "id": "telugu_231_omshivahom",
     "title": "Om Shiva Hom",
     "artist": "Vijay Prakash",
@@ -2370,7 +1564,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_232_tumtum",
-    "title": "Tum Tum (From \"Enemy - Telugu\")",
+    "title": "Tum Tum",
     "artist": "Thaman S, Harini Ivaturi, Sahiti Chaganti",
     "movie": "Enemy - Telugu",
     "album": "Enemy - Telugu",
@@ -2421,19 +1615,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/583/Varna-Telugu-2013-20190914114159-500x500.jpg"
   },
   {
-    "id": "telugu_236_ahambrahmasmi",
-    "title": "Aham Brahmasmi",
-    "artist": "Bhupinder Singh",
-    "movie": "Nenu Devudni",
-    "album": "Nenu Devudni",
-    "year": 2009,
-    "category": "Golden Classics",
-    "genre": "Golden Classics",
-    "duration": 83,
-    "sourceUrl": "https://aac.saavncdn.com/236/3057c4f291e004e058b4061061d4fcdd_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/236/Nenu-Devudni-Telugu-2009-500x500.jpg"
-  },
-  {
     "id": "telugu_237_varaalichedevivam",
     "title": "Varaaliche Devivam",
     "artist": "Srimathumitha",
@@ -2471,19 +1652,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 266,
     "sourceUrl": "https://aac.saavncdn.com/976/bb5fb8a1ce798661f6c888fe7ccf5c1e_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/976/Mr-X-Telugu-Tamil-2026-20260415192624-500x500.jpg"
-  },
-  {
-    "id": "telugu_240_haiyayyo",
-    "title": "Haiyayyo (From \"Mr.X (Telugu)\")",
-    "artist": "Dhibu Ninan Thomas, Kapil Kapilan",
-    "movie": "Haiyayyo (From \"Mr.X (Telugu)\")",
-    "album": "Haiyayyo (From \"Mr.X (Telugu)\")",
-    "year": 2025,
-    "category": "Golden Classics",
-    "genre": "Golden Classics",
-    "duration": 266,
-    "sourceUrl": "https://aac.saavncdn.com/939/f43b16535450f9507e497a0a64232dfc_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/939/Haiyayyo-From-Mr-X-Telugu-Telugu-2025-20250319151322-500x500.jpg"
   },
   {
     "id": "telugu_241_maaganaga",
@@ -2538,19 +1706,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/583/Varna-Telugu-2013-20190914114159-500x500.jpg"
   },
   {
-    "id": "telugu_245_rundietheme",
-    "title": "Run & Die (Theme) [From \"Enemy\"]",
-    "artist": "Sam C.S., Lavita M. Lobo",
-    "movie": "Run & Die (Theme) [From \"Enemy\"]",
-    "album": "Run & Die (Theme) [From \"Enemy\"]",
-    "year": 2021,
-    "category": "Golden Classics",
-    "genre": "Golden Classics",
-    "duration": 106,
-    "sourceUrl": "https://aac.saavncdn.com/007/c6a83682e0ca5611f5bb0d1723e8e509_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/007/Run-Die-Theme-From-Enemy-Telugu-2021-20260203194000-500x500.jpg"
-  },
-  {
     "id": "telugu_246_aria",
     "title": "Aria",
     "artist": "Rabbit Mac, Deepak",
@@ -2591,7 +1746,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_249_uppenantha",
-    "title": "Uppenantha (From \"Aarya-2\")",
+    "title": "Uppenantha",
     "artist": "Devi Sri Prasad, KK, Balaji",
     "movie": "O Prema",
     "album": "O Prema",
@@ -2601,19 +1756,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 327,
     "sourceUrl": "https://aac.saavncdn.com/988/c771c293bf31f3ed6cf9ae56d0310564_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/988/O-Prema-Telugu-2025-20250829153024-500x500.jpg"
-  },
-  {
-    "id": "telugu_250_uppenantha",
-    "title": "Uppenantha (From \"Aarya-2\")",
-    "artist": "Devi Sri Prasad, KK, Balaji",
-    "movie": "Best of Devi Sri Prasad",
-    "album": "Best of Devi Sri Prasad",
-    "year": 2024,
-    "category": "Golden Classics",
-    "genre": "Golden Classics",
-    "duration": 327,
-    "sourceUrl": "https://aac.saavncdn.com/630/e58d63a23487a9a4e3ae18a85835eab3_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/630/Best-of-Devi-Sri-Prasad-Telugu-2024-20241204155403-500x500.jpg"
   },
   {
     "id": "telugu_291_violinsong",
@@ -2720,19 +1862,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/903/Jalsa-2008-500x500.jpg"
   },
   {
-    "id": "telugu_299_uppenantha",
-    "title": "Uppenantha",
-    "artist": "Devi Sri Prasad, KK, Balaji",
-    "movie": "Aarya - 2",
-    "album": "Aarya - 2",
-    "year": 2009,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 327,
-    "sourceUrl": "https://aac.saavncdn.com/298/eb880c4cd78d1b29d128d430d4be0dcb_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/298/Aarya-2-Telugu-2009-20190822135933-500x500.jpg"
-  },
-  {
     "id": "telugu_300_ahaallari",
     "title": "Aha Allari",
     "artist": "Devi Sri Prasad, K. S. Chithra, Raqueeb Alam",
@@ -2786,7 +1915,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_304_dadadhamaka",
-    "title": "Dada Dhamaka (From \"Dada\")",
+    "title": "Dada Dhamaka",
     "artist": "Thaman S, Ramajogayya Sastry, Nandamuri Balakrishna, Rajani Sree Poornima",
     "movie": "Dada Dhamaka (From \"Dada\")",
     "album": "Dada Dhamaka (From \"Dada\")",
@@ -2825,7 +1954,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_307_sahanasahanatelugu",
-    "title": "Sahana Sahana (From \"The Rajasaab\")  - Telugu",
+    "title": "Sahana Sahana",
     "artist": "Thaman S, Vishal Mishra, Sruthi Ranjani, Krishna Kanth",
     "movie": "Sahana Sahana (From \"The Rajasaab\") - Telugu",
     "album": "Sahana Sahana (From \"The Rajasaab\") - Telugu",
@@ -2835,71 +1964,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 263,
     "sourceUrl": "https://aac.saavncdn.com/101/dc6bbaa4eea1406130b1ad3ed143efff_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/101/Sahana-Sahana-From-The-Rajasaab-Telugu-Telugu-2025-20251217171045-500x500.jpg"
-  },
-  {
-    "id": "telugu_308_sahanasahana",
-    "title": "Sahana Sahana (From \"The Rajasaab\")",
-    "artist": "Vishal Mishra, Thaman S, Sruthi Ranjani, Krishna Kanth",
-    "movie": "Prema Kavithalu - 2026 Valentines Day Special",
-    "album": "Prema Kavithalu - 2026 Valentines Day Special",
-    "year": 2026,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 263,
-    "sourceUrl": "https://aac.saavncdn.com/353/5d78abc48a7ccb2a62be41547b523ac7_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/353/Prema-Kavithalu-2026-Valentines-Day-Special-Telugu-2026-20260212201005-500x500.jpg"
-  },
-  {
-    "id": "telugu_309_sahanasahana",
-    "title": "Sahana Sahana",
-    "artist": "Thaman S, Vishal Mishra, Sruthi Ranjani, Krishna Kanth",
-    "movie": "The Rajasaab - Telugu",
-    "album": "The Rajasaab - Telugu",
-    "year": 2026,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 263,
-    "sourceUrl": "https://aac.saavncdn.com/119/7b5310b978664e2035564c2b24f0c569_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/119/The-Rajasaab-Telugu-Telugu-2026-20260109191054-500x500.jpg"
-  },
-  {
-    "id": "telugu_310_sahanasahana",
-    "title": "Sahana Sahana (From \"The Rajasaab\")",
-    "artist": "Krishna Kanth, Thaman S, Vishal Mishra, Sruthi Ranjani",
-    "movie": "Its Time For Monsoon Romance",
-    "album": "Its Time For Monsoon Romance",
-    "year": 2026,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 263,
-    "sourceUrl": "https://aac.saavncdn.com/560/5c1c5eedba81082bc4b2cbc9a9350bf6_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/560/Its-Time-For-Monsoon-Romance-Telugu-2026-20260612121037-500x500.jpg"
-  },
-  {
-    "id": "telugu_311_sahanasahana",
-    "title": "Sahana Sahana (From \"The Rajasaab\")",
-    "artist": "Krishna Kanth, Thaman S, Vishal Mishra, Sruthi Ranjani",
-    "movie": "Summer Hot Romatic Waves",
-    "album": "Summer Hot Romatic Waves",
-    "year": 2026,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 263,
-    "sourceUrl": "https://aac.saavncdn.com/814/016702f2bb7331ce34cdf1290f9d6f4a_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/814/Summer-Hot-Romatic-Waves-Telugu-2026-20260601162119-500x500.jpg"
-  },
-  {
-    "id": "telugu_312_rakasikara",
-    "title": "Rakasikara (From \"Lenin\")",
-    "artist": "Thaman S, Jangi Reddy, Ramajogayya Sastry",
-    "movie": "Rakasikara (From \"Lenin\")",
-    "album": "Rakasikara (From \"Lenin\")",
-    "year": 2026,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 86,
-    "sourceUrl": "https://aac.saavncdn.com/347/948eec51a4cb8d7f7a83542236795bb7_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/347/Rakasikara-From-Lenin-Telugu-2026-20260730191154-500x500.jpg"
   },
   {
     "id": "telugu_313_bhoochadae",
@@ -2916,10 +1980,10 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_314_athilokasundari",
-    "title": "Athiloka Sundari (From \"Sarrainodu\")",
+    "title": "Athiloka Sundari",
     "artist": "Vishal Dadlani, Karthik",
-    "movie": "Lets Celebrate With Superhit Songs",
-    "album": "Lets Celebrate With Superhit Songs",
+    "movie": "Sarrainodu",
+    "album": "Sarrainodu",
     "year": 2025,
     "category": "Blockbusters",
     "genre": "Blockbusters",
@@ -2928,21 +1992,8 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/939/Lets-Celebrate-With-Superhit-Songs-Telugu-2025-20251015181129-500x500.jpg"
   },
   {
-    "id": "telugu_315_athilokasundari",
-    "title": "Athiloka Sundari",
-    "artist": "Vishal Dadlani, Karthik",
-    "movie": "Sarrainodu",
-    "album": "Sarrainodu",
-    "year": 2016,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 254,
-    "sourceUrl": "https://aac.saavncdn.com/685/9abcc6db0941cbf28f6f3064ef78e7dc_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/685/Sarrainodu-Telugu-2016-20250818111047-500x500.jpg"
-  },
-  {
     "id": "telugu_316_donudonudonu",
-    "title": "Don'u Don'u Don'u (From \"Maas\")",
+    "title": "Don'u Don'u Don'u",
     "artist": "Anirudh Ravichander, Sooraj Santhosh, Srimathumitha",
     "movie": "Best of Anirudh Ravichander (Telugu Hits)",
     "album": "Best of Anirudh Ravichander (Telugu Hits)",
@@ -2955,7 +2006,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_317_kollagottey",
-    "title": "Kollagottey (From \"Remo (Telugu)\")",
+    "title": "Kollagottey",
     "artist": "Anirudh Ravichander, Srimani",
     "movie": "Best of Anirudh Ravichander (Telugu Hits)",
     "album": "Best of Anirudh Ravichander (Telugu Hits)",
@@ -2968,33 +2019,20 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_318_hoynahoyna",
-    "title": "Hoyna Hoyna (From \"Gang Leader\")",
+    "title": "Hoyna Hoyna",
     "artist": "Anirudh Ravichander, Inno Genga, Anantha Sriram",
-    "movie": "Best of Anirudh Ravichander (Telugu Hits)",
-    "album": "Best of Anirudh Ravichander (Telugu Hits)",
+    "movie": "Gang Leader",
+    "album": "Gang Leader",
     "year": 2026,
     "category": "Blockbusters",
     "genre": "Blockbusters",
-    "duration": 271,
+    "duration": 276,
     "sourceUrl": "https://aac.saavncdn.com/394/9f1babaed2fbfa2451cc932038f27f8a_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/394/Best-of-Anirudh-Ravichander-Telugu-Hits-Telugu-2026-20260821131700-500x500.jpg"
   },
   {
-    "id": "telugu_319_thekarmathemetelugu",
-    "title": "The Karma Theme (Telugu (From \"U Turn\"))",
-    "artist": "Anirudh Ravichander, Sri Sai Kiran",
-    "movie": "Best of Anirudh Ravichander (Telugu Hits)",
-    "album": "Best of Anirudh Ravichander (Telugu Hits)",
-    "year": 2026,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 214,
-    "sourceUrl": "https://aac.saavncdn.com/394/b0fca519981b6b6529603e27272caf5e_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/394/Best-of-Anirudh-Ravichander-Telugu-Hits-Telugu-2026-20260821131700-500x500.jpg"
-  },
-  {
     "id": "telugu_320_dheema",
-    "title": "Dheema (From \"Love Insurance Kompany\")",
+    "title": "Dheema",
     "artist": "Anirudh Ravichander, Sri Sai Kiran",
     "movie": "Best of Anirudh Ravichander (Telugu Hits)",
     "album": "Best of Anirudh Ravichander (Telugu Hits)",
@@ -3007,20 +2045,20 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_321_povepothepainoflove",
-    "title": "Po Ve Po (From \"3 (Telugu)\") (The Pain of Love)",
+    "title": "Po Ve Po(The Pain of Love)",
     "artist": "Anirudh Ravichander, Mohit Chauhan, Bhuvana Chandra",
-    "movie": "Best of Anirudh Ravichander (Telugu Hits)",
-    "album": "Best of Anirudh Ravichander (Telugu Hits)",
+    "movie": "3",
+    "album": "3",
     "year": 2026,
     "category": "Blockbusters",
     "genre": "Blockbusters",
-    "duration": 254,
+    "duration": 255,
     "sourceUrl": "https://aac.saavncdn.com/394/15f3fe69e8cb20acf25bc8f6dbfd0465_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/394/Best-of-Anirudh-Ravichander-Telugu-Hits-Telugu-2026-20260821131700-500x500.jpg"
   },
   {
     "id": "telugu_322_yedhalookamounamthei",
-    "title": "Yedhalo Oka Mounam (From \"3 (Telugu)\") (The Innocence of Love)",
+    "title": "Yedhalo Oka Mounam(The Innocence of Love)",
     "artist": "Anirudh Ravichander, Ajesh",
     "movie": "Best of Anirudh Ravichander (Telugu Hits)",
     "album": "Best of Anirudh Ravichander (Telugu Hits)",
@@ -3033,7 +2071,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_323_kannuladhathekissofl",
-    "title": "Kannuladha (From \"3 (Telugu)\") (The Kiss of Love)",
+    "title": "Kannuladha(The Kiss of Love)",
     "artist": "Anirudh Ravichander, Dhanush, Shruti Haasan, Bhuvana Chandra",
     "movie": "Best of Anirudh Ravichander (Telugu Hits)",
     "album": "Best of Anirudh Ravichander (Telugu Hits)",
@@ -3046,20 +2084,20 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_324_emannavoo",
-    "title": "Emannavoo (From \"Nava Manmadhudu\")",
+    "title": "Emannavoo",
     "artist": "Anirudh Ravichander, Shweta Mohan, Vennelakanti",
-    "movie": "Best of Anirudh Ravichander (Telugu Hits)",
-    "album": "Best of Anirudh Ravichander (Telugu Hits)",
+    "movie": "Nava Manmadhudu",
+    "album": "Nava Manmadhudu",
     "year": 2026,
     "category": "Blockbusters",
     "genre": "Blockbusters",
-    "duration": 214,
+    "duration": 215,
     "sourceUrl": "https://aac.saavncdn.com/394/028493a289f70921dd1609fc4ce51ed3_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/394/Best-of-Anirudh-Ravichander-Telugu-Hits-Telugu-2026-20260821131700-500x500.jpg"
   },
   {
     "id": "telugu_325_massumaranam",
-    "title": "Massu Maranam (From \"Petta (Telugu)\")",
+    "title": "Massu Maranam",
     "artist": "Anirudh Ravichander, Mano",
     "movie": "Best of Anirudh Ravichander (Telugu Hits)",
     "album": "Best of Anirudh Ravichander (Telugu Hits)",
@@ -3072,7 +2110,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_326_peydhavichivarakey",
-    "title": "Peydhavi Chivarakey (From \"Petta (Telugu)\")",
+    "title": "Peydhavi Chivarakey",
     "artist": "Anirudh Ravichander, Vijay Prakash",
     "movie": "Best of Anirudh Ravichander (Telugu Hits)",
     "album": "Best of Anirudh Ravichander (Telugu Hits)",
@@ -3085,23 +2123,23 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_327_neepaatamadhuramthet",
-    "title": "Nee Paata Madhuram (From \"3 (Telugu)\") (The Touch of Love)",
+    "title": "Nee Paata Madhuram(The Touch of Love)",
     "artist": "Anirudh Ravichander, Roopkumar Rathod, Shreya Ghoshal, Bhuvana Chandra",
-    "movie": "Best of Anirudh Ravichander (Telugu Hits)",
-    "album": "Best of Anirudh Ravichander (Telugu Hits)",
+    "movie": "3",
+    "album": "3",
     "year": 2026,
     "category": "Blockbusters",
     "genre": "Blockbusters",
-    "duration": 263,
+    "duration": 264,
     "sourceUrl": "https://aac.saavncdn.com/394/a7c75baecfcb1f6c6ef216ec2acc38a7_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/394/Best-of-Anirudh-Ravichander-Telugu-Hits-Telugu-2026-20260821131700-500x500.jpg"
   },
   {
     "id": "telugu_328_ninnuchuseanandamlo",
-    "title": "Ninnu Chuse Anandamlo (From \"Gang Leader\")",
+    "title": "Ninnu Chuse Anandamlo",
     "artist": "Anirudh Ravichander, Sid Sriram, Anantha Sriram",
-    "movie": "Best of Anirudh Ravichander (Telugu Hits)",
-    "album": "Best of Anirudh Ravichander (Telugu Hits)",
+    "movie": "Gang Leader",
+    "album": "Gang Leader",
     "year": 2026,
     "category": "Blockbusters",
     "genre": "Blockbusters",
@@ -3110,21 +2148,8 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/394/Best-of-Anirudh-Ravichander-Telugu-Hits-Telugu-2026-20260821131700-500x500.jpg"
   },
   {
-    "id": "telugu_329_anirudhmashup",
-    "title": "Anirudh Mashup",
-    "artist": "Sitzz",
-    "movie": "Anirudh Mashup",
-    "album": "Anirudh Mashup",
-    "year": 2023,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 72,
-    "sourceUrl": "https://aac.saavncdn.com/478/a7b30bd4475c46b87d4e420745633fd4_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/478/Anirudh-Mashup-Telugu-2023-20230302101003-500x500.jpg"
-  },
-  {
     "id": "telugu_330_souraa",
-    "title": "Souraa (From \"Bharateeyudu 2\")",
+    "title": "Souraa",
     "artist": "Anirudh Ravichander, Ritesh G Rao, Shruthika Samudhrala",
     "movie": "Best of Anirudh Ravichander (Telugu Hits)",
     "album": "Best of Anirudh Ravichander (Telugu Hits)",
@@ -3162,71 +2187,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/684/Swayamvaram-2000-500x500.jpg"
   },
   {
-    "id": "telugu_333_keeravani",
-    "title": "Keeravani (From \"Anveshana\")",
-    "artist": "S.P. Balasubrahmanyam, S. Janaki",
-    "movie": "Telugu Retro Hits",
-    "album": "Telugu Retro Hits",
-    "year": 2020,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 255,
-    "sourceUrl": "https://aac.saavncdn.com/840/ee8712426aa2eb6890164b6b08e1dea7_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/840/Telugu-Retro-Hits-Telugu-2020-20200623204830-500x500.jpg"
-  },
-  {
-    "id": "telugu_334_keeravani",
-    "title": "Keeravani",
-    "artist": "S.P. Balasubrahmanyam, S. Janaki, Ilayaraja",
-    "movie": "Musical Nawab Hits of Ilaiyaraaja",
-    "album": "Musical Nawab Hits of Ilaiyaraaja",
-    "year": 2015,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 256,
-    "sourceUrl": "https://aac.saavncdn.com/770/29d7f1a1927565162cf12962b3bf8708_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/770/Musical-Nawab-Hits-of-Ilaiyaraaja-Telugu-2015-500x500.jpg"
-  },
-  {
-    "id": "telugu_335_keeravani",
-    "title": "Keeravani",
-    "artist": "S.P. Balasubrahmanyam, S. Janaki, Ilayaraja",
-    "movie": "Happy Hours Retro Style Tollywood",
-    "album": "Happy Hours Retro Style Tollywood",
-    "year": 2015,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 255,
-    "sourceUrl": "https://aac.saavncdn.com/046/a7dbaa87556701fbf64e7e9b88df0126_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/046/Happy-Hours-Retro-Style-Tollywood-Telugu-2015-500x500.jpg"
-  },
-  {
-    "id": "telugu_336_keeravani",
-    "title": "Keeravani (From \"Anveshana\")",
-    "artist": "S.P. Balasubrahmanyam, S. Janaki",
-    "movie": "80's Super Hits",
-    "album": "80's Super Hits",
-    "year": 2018,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 255,
-    "sourceUrl": "https://aac.saavncdn.com/311/03024d6ba6e9ba667bffe5dd10509604_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/311/80-s-Super-Hits-Telugu-2018-20181005-500x500.jpg"
-  },
-  {
-    "id": "telugu_337_keeravani",
-    "title": "Keeravani",
-    "artist": "Ch.Yella Rao",
-    "movie": "Nadhaswaram_Lavanya Raama",
-    "album": "Nadhaswaram_Lavanya Raama",
-    "year": 2007,
-    "category": "Blockbusters",
-    "genre": "Blockbusters",
-    "duration": 61,
-    "sourceUrl": "https://aac.saavncdn.com/789/ec9837e06309a06e8db7ca91346b1796_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/789/Nadhaswaram-Lavanya-Raama-Telugu-2007-20260428213929-500x500.jpg"
-  },
-  {
     "id": "telugu_338_neethountechaluyjmus",
     "title": "Neetho Unte Chalu - YJ Music Lofi",
     "artist": "Yj Music, Mohana Bhogaraju, Sandilya Pisapati",
@@ -3241,7 +2201,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_339_avachibpai",
-    "title": "A Vachi B Pai (From \"Chatrapathi\")",
+    "title": "A Vachi B Pai",
     "artist": "M.M. Keeravani, Mathangi",
     "movie": "Musical Hits Of M.M. Keeravani",
     "album": "Musical Hits Of M.M. Keeravani",
@@ -3254,7 +2214,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_340_bussekkivastavo",
-    "title": "Bussekki Vastavo (From \"Seethaiah\")",
+    "title": "Bussekki Vastavo",
     "artist": "S. P. Balasubrahmanyam, K. S. Chithra",
     "movie": "Musical Hits Of M.M. Keeravani",
     "album": "Musical Hits Of M.M. Keeravani",
@@ -3280,7 +2240,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_90s_1_yamahanagarifro",
-    "title": "Yamaha Nagari (From \"Choodalani Vundi\")",
+    "title": "Yamaha Nagari",
     "artist": "Hariharan",
     "movie": "Mani Sharma All Time Hits",
     "album": "Mani Sharma All Time Hits",
@@ -3436,7 +2396,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_90s_13_rukurukurukmini",
-    "title": "Ruku Ruku Rukmini (From \"Alias Rukmini\")",
+    "title": "Ruku Ruku Rukmini",
     "artist": "Vijai Bulganin, Anurag Kulkarni, Purna Chary Challury",
     "movie": "Ruku Ruku Rukmini (From \"Alias Rukmini\")",
     "album": "Ruku Ruku Rukmini (From \"Alias Rukmini\")",
@@ -3469,7 +2429,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "year": 1989,
     "category": "90s Classics",
     "genre": "90s Classics",
-    "duration": 243,
+    "duration": 244,
     "sourceUrl": "https://aac.saavncdn.com/556/86d9179bb54f9cd158c6439bbbe88237_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/556/Geetanjali-1989-500x500.jpg"
   },
@@ -3560,139 +2520,22 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "year": 2023,
     "category": "90s Classics",
     "genre": "90s Classics",
-    "duration": 186,
+    "duration": 321,
     "sourceUrl": "https://aac.saavncdn.com/595/05994ad52063512045328ad455af53ae_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/595/Geethanjali-Telugu-2023-20250507103859-500x500.jpg"
   },
   {
-    "id": "telugu_414_geetanjali",
-    "title": "Geetanjali",
-    "artist": "S.P. Sailaja",
-    "movie": "Bhaarathi",
-    "album": "Bhaarathi",
-    "year": 2018,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 321,
-    "sourceUrl": "https://aac.saavncdn.com/461/51b6d8d2e812614ce12183e787bd8ee7_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/461/Bhaarathi-Telugu-2018-20180706-500x500.jpg"
-  },
-  {
-    "id": "telugu_415_omnamaha",
-    "title": "Om Namaha (From \"Geetanjali\")",
-    "artist": "S. P. Balasubrahmanyam, S. Janaki",
-    "movie": "Golden Voices - Duets",
-    "album": "Golden Voices - Duets",
-    "year": 2018,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 243,
-    "sourceUrl": "https://aac.saavncdn.com/172/e78f8fd5d8180cef7faeaca31efe1c79_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/172/Golden-Voices-Duets-Telugu-2018-20180323-500x500.jpg"
-  },
-  {
-    "id": "telugu_416_omnamaha",
-    "title": "Om Namaha (From \"Geetanjali\")",
-    "artist": "S.P. Balasubrahmanyam, S. Janaki",
-    "movie": "100 Years Of Indian Cinema - Maestro Ilayaraja Vol - 4",
-    "album": "100 Years Of Indian Cinema - Maestro Ilayaraja Vol - 4",
-    "year": 2013,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 244,
-    "sourceUrl": "https://aac.saavncdn.com/085/ab7415f72b7e0e864dcb708699c38a26_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/085/100-Years-Of-Indian-Cinema-Maestro-Ilayaraja-Vol-4-2013-500x500.jpg"
-  },
-  {
-    "id": "telugu_417_omnamaha",
-    "title": "Om Namaha (From \"Geetanjali\")",
-    "artist": "Ilaiyaraaja, S.P. Balasubrahmanyam, S. Janaki",
-    "movie": "Ilaiyaraaja Romantic Telugu Hits",
-    "album": "Ilaiyaraaja Romantic Telugu Hits",
-    "year": 2014,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 244,
-    "sourceUrl": "https://aac.saavncdn.com/693/2666de950245dfa2ce65ca47cca9cabf_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/693/Ilaiyaraaja-Romantic-Telugu-Hits-Telugu-2014-500x500.jpg"
-  },
-  {
-    "id": "telugu_418_omnamaha",
-    "title": "Om Namaha (From \"Geetanjali\")",
-    "artist": "S.P. Balasubrahmanyam, S. Janaki",
-    "movie": "Golden Hits of S Janaki",
-    "album": "Golden Hits of S Janaki",
-    "year": 2019,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 243,
-    "sourceUrl": "https://aac.saavncdn.com/424/3a88b3bff331fa015bbe99a2b02c4828_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/424/Golden-Hits-of-S-Janaki-Telugu-2019-20190418233112-500x500.jpg"
-  },
-  {
-    "id": "telugu_419_omnamaha",
-    "title": "Om Namaha (From \"Geetanjali\")",
-    "artist": "S.P. Balasubrahmanyam, S. Janaki",
-    "movie": "Yuva Samrat",
-    "album": "Yuva Samrat",
-    "year": 2018,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 243,
-    "sourceUrl": "https://aac.saavncdn.com/266/6a21c5e171f61cf9f1044872bb49a712_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/266/Yuva-Samrat-Telugu-2018-20180827-500x500.jpg"
-  },
-  {
-    "id": "telugu_420_opriya",
-    "title": "O Priya (From \"Geetanjali\")",
-    "artist": "S.P. Balasubrahmanyam, K. S. Chithra",
-    "movie": "100 Years Of Indian Cinema - Maestro Ilayaraja Vol - 3",
-    "album": "100 Years Of Indian Cinema - Maestro Ilayaraja Vol - 3",
-    "year": 2013,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 344,
-    "sourceUrl": "https://aac.saavncdn.com/084/d43359ce0eb5409a01b30d0f2768e0d3_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/084/100-Years-Of-Indian-Cinema-Maestro-Ilayaraja-Vol-3-2013-500x500.jpg"
-  },
-  {
     "id": "telugu_421_jaamurathiri",
-    "title": "Jaamurathiri (From \"Kshana Kshanam\")",
+    "title": "Jaamurathiri",
     "artist": "S.P. Balasubrahmanyam, Chitra",
-    "movie": "Most Played Telugu 90S Melodies",
-    "album": "Most Played Telugu 90S Melodies",
+    "movie": "Kshana Kshanam",
+    "album": "Kshana Kshanam",
     "year": 2025,
     "category": "90s Classics",
     "genre": "90s Classics",
     "duration": 301,
     "sourceUrl": "https://aac.saavncdn.com/185/593f1186075b48dd1f0bd186febf7fc6_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/185/Most-Played-Telugu-90S-Melodies-Telugu-2025-20251219143001-500x500.jpg"
-  },
-  {
-    "id": "telugu_422_jaamurathiri",
-    "title": "Jaamurathiri (From \"Kshana Kshanam\")",
-    "artist": "S.P. Balasubrahmanyam, Chitra",
-    "movie": "Valentine Week Rose Day Telugu Hits",
-    "album": "Valentine Week Rose Day Telugu Hits",
-    "year": 2026,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 301,
-    "sourceUrl": "https://aac.saavncdn.com/496/19b11b88dee1cdfb338eb87b3c806bc4_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/496/Valentine-Week-Rose-Day-Telugu-Hits-Telugu-2026-20260206180000-500x500.jpg"
-  },
-  {
-    "id": "telugu_423_jaamurathiri",
-    "title": "Jaamurathiri",
-    "artist": "S.P. Balasubrahmanyam, Chitra",
-    "movie": "Kshana Kshanam",
-    "album": "Kshana Kshanam",
-    "year": 1991,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 301,
-    "sourceUrl": "https://aac.saavncdn.com/744/76b0c393b992b7577b85315513632817_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/744/Kshana-Kshanam-Telugu-2014-20260403110016-500x500.jpg"
   },
   {
     "id": "telugu_424_ammayimuddu",
@@ -3722,7 +2565,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_426_jumbaye",
-    "title": "Jumbaye (From \"Kshana Kshanam\")",
+    "title": "Jumbaye",
     "artist": "Mano, Chitra",
     "movie": "90'S Telugu Power Playlist",
     "album": "90'S Telugu Power Playlist",
@@ -3732,19 +2575,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 420,
     "sourceUrl": "https://aac.saavncdn.com/581/2a98143afd6008ec46a27841becb05a7_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/581/90-S-Telugu-Power-Playlist-Telugu-2025-20251223103002-500x500.jpg"
-  },
-  {
-    "id": "telugu_427_jumbaye",
-    "title": "Jumbaye",
-    "artist": "Sirivennela Seetharama Sastry, M. M. Keeravani, Mano, K. S. Chithra",
-    "movie": "Kshana Kshanam",
-    "album": "Kshana Kshanam",
-    "year": 1991,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 420,
-    "sourceUrl": "https://aac.saavncdn.com/617/14a3ab71ed4dd7c555e1bd637a5adef6_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/617/Kshana-Kshanam-Telugu-1991-20250717143944-500x500.jpg"
   },
   {
     "id": "telugu_428_andananthaettha",
@@ -3800,7 +2630,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_432_rojavemale",
-    "title": "Rojave - Male",
+    "title": "Rojave",
     "artist": "Hariharan",
     "movie": "Suryavamsam",
     "album": "Suryavamsam",
@@ -3838,56 +2668,17 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/395/Anekudu-Telugu-2015-20200805134602-500x500.jpg"
   },
   {
-    "id": "telugu_435_rojavefemale",
-    "title": "Rojave - Female",
-    "artist": "K. S. Chithra",
-    "movie": "Suryavamsam",
-    "album": "Suryavamsam",
-    "year": 2003,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 235,
-    "sourceUrl": "https://aac.saavncdn.com/588/f835addeb400addf2b62b397c13af6c0_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/588/Suryavamsham-2003-500x500.jpg"
-  },
-  {
     "id": "telugu_436_nachelirojave",
-    "title": "Na Cheli Rojave (From \"Roja\")",
+    "title": "Na Cheli Rojave",
     "artist": "S.P. Balasubrahmanyam, Sujatha Mohan",
-    "movie": "Most Played Telugu 90S Melodies",
-    "album": "Most Played Telugu 90S Melodies",
+    "movie": "Na Cheli Rojave (From \"Roja\")",
+    "album": "Na Cheli Rojave (From \"Roja\")",
     "year": 2025,
     "category": "90s Classics",
     "genre": "90s Classics",
     "duration": 296,
     "sourceUrl": "https://aac.saavncdn.com/185/8f019da08dbae14e30ae8943cedd9cda_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/185/Most-Played-Telugu-90S-Melodies-Telugu-2025-20251219143001-500x500.jpg"
-  },
-  {
-    "id": "telugu_437_nachelirojave",
-    "title": "Na Cheli Rojave (From \"Roja\")",
-    "artist": "S.P. Balasubrahmanyam, Sujatha Mohan",
-    "movie": "Valentine Week Rose Day Telugu Hits",
-    "album": "Valentine Week Rose Day Telugu Hits",
-    "year": 2026,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 296,
-    "sourceUrl": "https://aac.saavncdn.com/496/b6b885aa822ac6cefbffd74494ec5334_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/496/Valentine-Week-Rose-Day-Telugu-Hits-Telugu-2026-20260206180000-500x500.jpg"
-  },
-  {
-    "id": "telugu_438_nachelirojave",
-    "title": "Na Cheli Rojave (From \"Roja (Telugu)\")",
-    "artist": "S.P. Balasubrahmanyam, Sujatha Mohan",
-    "movie": "Na Cheli Rojave (From \"Roja (Telugu)\")",
-    "album": "Na Cheli Rojave (From \"Roja (Telugu)\")",
-    "year": 2014,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 296,
-    "sourceUrl": "https://aac.saavncdn.com/448/faffce224ab66845e4e13330be12c8b8_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/448/Na-Cheli-Rojave-From-Roja-Telugu-Telugu-2014-20260430113010-500x500.jpg"
   },
   {
     "id": "telugu_439_rojalolethavannele",
@@ -3901,19 +2692,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 268,
     "sourceUrl": "https://aac.saavncdn.com/822/59600202ea1d3cdff39e394e402c1ebe_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/822/Gharshana-Old-Telugu-1988-20201207210247-500x500.jpg"
-  },
-  {
-    "id": "telugu_440_nachelirojave",
-    "title": "Na Cheli Rojave",
-    "artist": "S.P. Balasubrahmanyam, Sujatha Mohan",
-    "movie": "Roja (Telugu)",
-    "album": "Roja (Telugu)",
-    "year": 2014,
-    "category": "90s Classics",
-    "genre": "90s Classics",
-    "duration": 296,
-    "sourceUrl": "https://aac.saavncdn.com/468/11f07275f8f182eb64ffdb7f82b459fb_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/468/Roja-Telugu-2014-20251012071631-500x500.jpg"
   },
   {
     "id": "telugu_love_1_ohsitaheyrama",
@@ -4030,19 +2808,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "genre": "Love Songs",
     "duration": 178,
     "sourceUrl": "https://aac.saavncdn.com/237/52ba609cf288b1c138e95f9a9112034d_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/237/Geetha-Govindam-Telugu-2018-20180921-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_10_tanemandhetanemandhe",
-    "title": "Tanemandhe Tanemandhe",
-    "artist": "Anurag",
-    "movie": "Geetha Govindam",
-    "album": "Geetha Govindam",
-    "year": 2018,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 74,
-    "sourceUrl": "https://aac.saavncdn.com/237/037d0c2cdf8185035de617d2f04469a6_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/237/Geetha-Govindam-Telugu-2018-20180921-500x500.jpg"
   },
   {
@@ -4722,58 +3487,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/134/Tholi-Prema-Telugu-2018-20180120-500x500.jpg"
   },
   {
-    "id": "telugu_love_63_samajavaragamanamale",
-    "title": "Samajavaragamana - Male",
-    "artist": "Sid Sriram",
-    "movie": "Ala Vaikunthapurramuloo",
-    "album": "Ala Vaikunthapurramuloo",
-    "year": 2019,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 219,
-    "sourceUrl": "https://aac.saavncdn.com/517/339d76dce4db4f43f4721eec2d8f03ef_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_64_buttabomma",
-    "title": "Buttabomma",
-    "artist": "Armaan Malik",
-    "movie": "Ala Vaikunthapurramuloo",
-    "album": "Ala Vaikunthapurramuloo",
-    "year": 2019,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 198,
-    "sourceUrl": "https://aac.saavncdn.com/517/68cc88035f2fbcd5772e6551bf64c111_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_65_ramulooramulaa",
-    "title": "Ramuloo Ramulaa",
-    "artist": "Anurag Kulkarni, Mangli",
-    "movie": "Ala Vaikunthapurramuloo",
-    "album": "Ala Vaikunthapurramuloo",
-    "year": 2019,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 245,
-    "sourceUrl": "https://aac.saavncdn.com/517/5702757c42c1ad44b3224a339817c8b0_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_66_srivalli",
-    "title": "Srivalli",
-    "artist": "Sid Sriram",
-    "movie": "Pushpa - The Rise",
-    "album": "Pushpa - The Rise",
-    "year": 2021,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 221,
-    "sourceUrl": "https://aac.saavncdn.com/000/05c5d77f6a8225d6667cf7a1fcaf37d8_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/blob/056/Pushpa-The-Rise-Telugu-2021-20211216115409-500x500.jpg"
-  },
-  {
     "id": "telugu_love_67_chalchalochalo",
     "title": "Chal Chalo Chalo",
     "artist": "Raghu Dixit, Sooraj Santhosh, Rita Thyagarajan",
@@ -4798,19 +3511,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 222,
     "sourceUrl": "https://aac.saavncdn.com/541/9a4bb4a2ab4813e94ad4734fae561c65_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/541/Kevvu-Keka-2013-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_69_katamarayuda",
-    "title": "Katama Rayuda",
-    "artist": "Devi Sri Prasad, Pawan Kalyan",
-    "movie": "Attarrintiki Daaredi",
-    "album": "Attarrintiki Daaredi",
-    "year": 2013,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 65,
-    "sourceUrl": "https://aac.saavncdn.com/464/97fb63a3ba248bf8ca9b8b6566c33f4b_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/464/Attarrintiki-Daaredi-Telugu-2013-500x500.jpg"
   },
   {
     "id": "telugu_love_70_guruvaram",
@@ -4878,19 +3578,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/082/Pokiri-2006-500x500.jpg"
   },
   {
-    "id": "telugu_love_75_sirosthara",
-    "title": "Sir Osthara",
-    "artist": "Thaman S, Suchitra",
-    "movie": "Businessman",
-    "album": "Businessman",
-    "year": 2011,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 232,
-    "sourceUrl": "https://aac.saavncdn.com/033/962a6cc95066c597e9a4537620babfbd_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/033/Businessman-Telugu-2011-500x500.jpg"
-  },
-  {
     "id": "telugu_love_76_lavalava",
     "title": "Lava Lava",
     "artist": "M.M. Keeravani, Anuj Gurwara, Shivani",
@@ -4928,58 +3615,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 282,
     "sourceUrl": "https://aac.saavncdn.com/679/85bf5d4b59843045f816ac905fd97219_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/679/Kushi-Telugu-Telugu-2023-20250130073127-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_79_narojanuvve",
-    "title": "Na Roja Nuvve",
-    "artist": "Hesham Abdul Wahab",
-    "movie": "Kushi (Telugu)",
-    "album": "Kushi (Telugu)",
-    "year": 2023,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 242,
-    "sourceUrl": "https://aac.saavncdn.com/679/26aefaaa62fc3425cf4d18bcf277fffc_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/679/Kushi-Telugu-Telugu-2023-20250130073127-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_80_merisemeriseweddingsong",
-    "title": "Merise Merise (Wedding Song)",
-    "artist": "Haricharan, Srinidhi Venkatesh, Sruthi Ranjani",
-    "movie": "Hello!",
-    "album": "Hello!",
-    "year": 2017,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 320,
-    "sourceUrl": "https://aac.saavncdn.com/933/61f7037b28c104bae7a253e7df889a97_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/933/Hello-Telugu-2017-20171210-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_81_chuttamalle",
-    "title": "Chuttamalle",
-    "artist": "Anirudh Ravichander, Shilpa Rao, Ramajogayya Sastry",
-    "movie": "Devara Part 1 - Telugu",
-    "album": "Devara Part 1 - Telugu",
-    "year": 2024,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 222,
-    "sourceUrl": "https://aac.saavncdn.com/313/e49e604945889f330e5b3536dd0ff524_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/313/Devara-Part-1-Telugu-Telugu-2024-20240926171010-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_82_ayudhapoojatelugu",
-    "title": "Ayudha Pooja - Telugu",
-    "artist": "Anirudh Ravichander, Kaala Bhairava, Ramajogayya Sastry",
-    "movie": "Devara Part 1 - Telugu",
-    "album": "Devara Part 1 - Telugu",
-    "year": 2024,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 174,
-    "sourceUrl": "https://aac.saavncdn.com/313/c955fc6af936b4ee08664792c8c98d0c_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/313/Devara-Part-1-Telugu-Telugu-2024-20240926171010-500x500.jpg"
   },
   {
     "id": "telugu_love_83_jaragandi",
@@ -5165,7 +3800,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_love_97_aafat",
-    "title": "Aafat (Telugu)",
+    "title": "Aafat",
     "artist": "Tanishk Bagchi, Simha, Sravana Bhargavi",
     "movie": "Liger (Telugu)",
     "album": "Liger (Telugu)",
@@ -5242,19 +3877,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/416/Naa-Peru-Surya-Naa-Illu-India-Telugu-2018-20180422-500x500.jpg"
   },
   {
-    "id": "telugu_love_103_mindblock",
-    "title": "Mind Block",
-    "artist": "Blaaze, Ranina Reddy",
-    "movie": "Sarileru Neekevvaru",
-    "album": "Sarileru Neekevvaru",
-    "year": 2020,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 264,
-    "sourceUrl": "https://aac.saavncdn.com/432/ffbe828d51b98f8197bfbdbb66ce140a_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/432/Sarileru-Neekevvaru-Telugu-2020-20250818111038-500x500.jpg"
-  },
-  {
     "id": "telugu_love_104_priyathama",
     "title": "Priyathama",
     "artist": "Sid Sriram",
@@ -5321,7 +3943,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_love_109_undiporaadheymaleversion",
-    "title": "Undiporaadhey - Male Version",
+    "title": "UndiporaadheyVersion",
     "artist": "Sid Sriram",
     "movie": "Hushaaru",
     "album": "Hushaaru",
@@ -5502,58 +4124,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/414/Jagadekaveerudu-Athiloka-Sundari-2000-500x500.jpg"
   },
   {
-    "id": "telugu_love_123_priyathamanaa",
-    "title": "Priyathama Naa",
-    "artist": "Kesava Kiran, Sri Krishna, Sumangali",
-    "movie": "Mooga Manasulu",
-    "album": "Mooga Manasulu",
-    "year": 2013,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 275,
-    "sourceUrl": "https://aac.saavncdn.com/324/6cce894bfc95a5e5b8e02d04009f58c8_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/324/Mooga-Manasulu-2013-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_124_opapalali",
-    "title": "O Papa Lali",
-    "artist": "Ilaiyaraaja, S.P. Balasubrahmanyam",
-    "movie": "Geetanjali",
-    "album": "Geetanjali",
-    "year": 1989,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 267,
-    "sourceUrl": "https://aac.saavncdn.com/556/9ca706767497ad08428abdb702bd3e3e_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/556/Geetanjali-1989-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_125_omnamaha",
-    "title": "Om Namaha",
-    "artist": "Ilaiyaraaja, S.P. Balasubrahmanyam, S. Janaki",
-    "movie": "Geetanjali",
-    "album": "Geetanjali",
-    "year": 1989,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 243,
-    "sourceUrl": "https://aac.saavncdn.com/556/86d9179bb54f9cd158c6439bbbe88237_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/556/Geetanjali-1989-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_126_jagadajagada",
-    "title": "Jagada Jagada",
-    "artist": "Ilaiyaraaja, S.P. Balasubrahmanyam",
-    "movie": "Geetanjali",
-    "album": "Geetanjali",
-    "year": 1989,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 264,
-    "sourceUrl": "https://aac.saavncdn.com/556/6d746e63d4911a15bb16ed708a0d61e2_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/556/Geetanjali-1989-500x500.jpg"
-  },
-  {
     "id": "telugu_love_127_premadesam",
     "title": "Prema Desam",
     "artist": "Mani Sharma, Saindhavi, Hemachandra",
@@ -5591,58 +4161,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 393,
     "sourceUrl": "https://aac.saavncdn.com/211/f25efd02ebb7e3090b55d329c5a4f122_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/211/Prema-Desam-Telugu-1996-20180518-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_130_cheppavechirugali",
-    "title": "Cheppave Chirugali",
-    "artist": "Mani Sharma, Udit Narayan, Sujatha Mohan",
-    "movie": "Okkadu",
-    "album": "Okkadu",
-    "year": 2000,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 332,
-    "sourceUrl": "https://aac.saavncdn.com/408/d5fadb97eff8b035a9885fe557cb6d26_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/408/Okkadu-2000-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_131_nuvvemmaya",
-    "title": "Nuvvem Maya",
-    "artist": "Mani Sharma, Shreya Ghoshal",
-    "movie": "Okkadu",
-    "album": "Okkadu",
-    "year": 2000,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 243,
-    "sourceUrl": "https://aac.saavncdn.com/408/b0e2f9df3ddd08a6abd45cd64aa34ec6_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/408/Okkadu-2000-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_132_mellaga",
-    "title": "Mellaga",
-    "artist": "Devi Sri Prasad, S.P. Charan, Sumangali",
-    "movie": "Varsham",
-    "album": "Varsham",
-    "year": 2003,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 321,
-    "sourceUrl": "https://aac.saavncdn.com/449/b717def9c5f121922438f64724791d20_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/449/Varsham-2003-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_133_langavoni",
-    "title": "Langa Voni",
-    "artist": "Devi Sri Prasad, Tippu, Usha",
-    "movie": "Varsham",
-    "album": "Varsham",
-    "year": 2003,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 234,
-    "sourceUrl": "https://aac.saavncdn.com/449/3522009cba6f4b7be84e1418d13817d9_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/449/Varsham-2003-500x500.jpg"
   },
   {
     "id": "telugu_love_134_neesneham",
@@ -5801,34 +4319,8 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/088/Urike-Urike-From-Hit-2-Telugu-2022-20221109104107-500x500.jpg"
   },
   {
-    "id": "telugu_love_146_povepothepainoflove",
-    "title": "Po Ve Po - The Pain Of Love",
-    "artist": "Anirudh Ravichander, Mohit Chauhan",
-    "movie": "3 (Telugu)",
-    "album": "3 (Telugu)",
-    "year": 2012,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 255,
-    "sourceUrl": "https://aac.saavncdn.com/244/c98976a02a6ce03c15004488708324fa_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/244/3-Telugu-2012-500x500.jpg"
-  },
-  {
-    "id": "telugu_love_147_neepaatamadhuramthetoucho",
-    "title": "Nee Paata Madhuram - The Touch Of Love",
-    "artist": "Anirudh Ravichander, Shreya Ghoshal, Roopkumar Rathod",
-    "movie": "3 (Telugu)",
-    "album": "3 (Telugu)",
-    "year": 2012,
-    "category": "Love Songs",
-    "genre": "Love Songs",
-    "duration": 264,
-    "sourceUrl": "https://aac.saavncdn.com/244/df58b6beb9954a7f9cde883e97ab690f_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/244/3-Telugu-2012-500x500.jpg"
-  },
-  {
     "id": "telugu_love_148_yedurangulavaanamale",
-    "title": "Yedurangula Vaana - Male",
+    "title": "Yedurangula Vaana",
     "artist": "Sid Sriram",
     "movie": "18 Pages",
     "album": "18 Pages",
@@ -5864,32 +4356,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 341,
     "sourceUrl": "https://aac.saavncdn.com/470/6ad7c9e997adc09fce8e019259a33394_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/470/Kushi-2001-500x500.jpg"
-  },
-  {
-    "id": "sid_sriram_1_urikeurike",
-    "title": "Urike Urike",
-    "artist": "M.M. Sreelekha, Sid Sriram, Ramya Behara",
-    "movie": "Urike Urike (From \"Hit 2\")",
-    "album": "Urike Urike (From \"Hit 2\")",
-    "year": 2022,
-    "category": "Sid Sriram",
-    "genre": "Sid Sriram",
-    "duration": 275,
-    "sourceUrl": "https://aac.saavncdn.com/088/c55df5f8dc78a21c0541ca8962d8e5be_sar_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/088/Urike-Urike-From-Hit-2-Telugu-2022-20221109104107-500x500.jpg"
-  },
-  {
-    "id": "sid_sriram_2_nuvvuntenaajathagaa",
-    "title": "Nuvvunte Naa Jathagaa",
-    "artist": "A.R. Rahman, Sid Sriram, Issrath Quadhri, Ramajogayya Sastry",
-    "movie": "I - Manoharudu",
-    "album": "I - Manoharudu",
-    "year": 2014,
-    "category": "Sid Sriram",
-    "genre": "Sid Sriram",
-    "duration": 352,
-    "sourceUrl": "https://aac.saavncdn.com/364/a9b08c9e5b3dacc0e984ef8b3a7701a9_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/364/I-Manoharudu-Telugu-2014-20190914115023-500x500.jpg"
   },
   {
     "id": "sid_sriram_3_yekannuluchudanichitrame",
@@ -5929,84 +4395,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "duration": 252,
     "sourceUrl": "https://aac.saavncdn.com/060/88662bab11be2453aa8dab5362ca6642_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/060/Hit-3-Telugu-Telugu-2025-20250609083609-500x500.jpg"
-  },
-  {
-    "id": "sid_sriram_6_kumkumala",
-    "title": "Kumkumala",
-    "artist": "Pritam, Sid Sriram, Chandra Bose",
-    "movie": "Brahmastra (Telugu)",
-    "album": "Brahmastra (Telugu)",
-    "year": 2022,
-    "category": "Sid Sriram",
-    "genre": "Sid Sriram",
-    "duration": 278,
-    "sourceUrl": "https://aac.saavncdn.com/490/7932037e6ae5f39472a9e2e1a604fe10_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/490/Brahmastra-Telugu-Original-Motion-Picture-Soundtrack-Telugu-2022-20221006132910-500x500.jpg"
-  },
-  {
-    "id": "sid_sriram_7_kalaavathi",
-    "title": "Kalaavathi",
-    "artist": "Sid Sriram",
-    "movie": "Sarkaru Vaari Paata",
-    "album": "Sarkaru Vaari Paata",
-    "year": 2022,
-    "category": "Sid Sriram",
-    "genre": "Sid Sriram",
-    "duration": 242,
-    "sourceUrl": "https://aac.saavncdn.com/250/d067c88312cbc32cc708e20ff55f4360_sar_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/250/Sarkaru-Vaari-Paata-Telugu-2022-20220704160854-500x500.jpg"
-  },
-  {
-    "id": "sid_sriram_8_kalalokooda",
-    "title": "Kalalo Kooda",
-    "artist": "Tanishk Bagchi, Sid Sriram, Vaishnavi Kovvuri, Bhaskarbhatla Ravikumar",
-    "movie": "Liger (Telugu)",
-    "album": "Liger (Telugu)",
-    "year": 2022,
-    "category": "Sid Sriram",
-    "genre": "Sid Sriram",
-    "duration": 246,
-    "sourceUrl": "https://aac.saavncdn.com/448/7aecba3f88bf10c2f23a23a990fcc36a_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/448/Liger-Telugu-Original-Motion-Picture-Soundtrack-Telugu-2022-20220826184921-500x500.jpg"
-  },
-  {
-    "id": "sid_sriram_9_samajavaragamana",
-    "title": "Samajavaragamana",
-    "artist": "Sid Sriram",
-    "movie": "Ala Vaikunthapurramuloo",
-    "album": "Ala Vaikunthapurramuloo",
-    "year": 2019,
-    "category": "Sid Sriram",
-    "genre": "Sid Sriram",
-    "duration": 219,
-    "sourceUrl": "https://aac.saavncdn.com/517/339d76dce4db4f43f4721eec2d8f03ef_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg"
-  },
-  {
-    "id": "sid_sriram_10_srivalli",
-    "title": "Srivalli",
-    "artist": "Sid Sriram",
-    "movie": "Pushpa - The Rise",
-    "album": "Pushpa - The Rise",
-    "year": 2021,
-    "category": "Sid Sriram",
-    "genre": "Sid Sriram",
-    "duration": 221,
-    "sourceUrl": "https://aac.saavncdn.com/000/05c5d77f6a8225d6667cf7a1fcaf37d8_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/blob/056/Pushpa-The-Rise-Telugu-2021-20211216115409-500x500.jpg"
-  },
-  {
-    "id": "sid_sriram_11_ninnuchuseanandamlo",
-    "title": "Ninnu Chuse Anandamlo",
-    "artist": "Anirudh Ravichander, Sid Sriram, Anantha Sriram",
-    "movie": "Gang Leader",
-    "album": "Gang Leader",
-    "year": 2019,
-    "category": "Sid Sriram",
-    "genre": "Sid Sriram",
-    "duration": 293,
-    "sourceUrl": "https://aac.saavncdn.com/663/5d1b213bd6651e80da2cd467d4da319e_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/663/Gang-Leader-Telugu-2019-20190905102749-500x500.jpg"
   },
   {
     "id": "sid_sriram_12_nandanandanaa",
@@ -6412,19 +4800,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/076/Kadali-Telugu-2012-20190822130810-500x500.jpg"
   },
   {
-    "id": "sid_sriram_43_ammasongfromokeokajeevith",
-    "title": "Amma Song (From Oke Oka Jeevitham) - From \"Oke Oka Jeevitham\"",
-    "artist": "Sid Sriram, Sirivennela Seetharama Sastry, Jakes Bejoy",
-    "movie": "Oke Oka Jeevitham (Original Motion Picture Soundtrack)",
-    "album": "Oke Oka Jeevitham (Original Motion Picture Soundtrack)",
-    "year": 2022,
-    "category": "Sid Sriram",
-    "genre": "Sid Sriram",
-    "duration": 319,
-    "sourceUrl": "https://aac.saavncdn.com/607/d3bbf17771970664d45f9051b1cf762a_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/607/Oke-Oka-Jeevitham-Telugu-2022-20250327070242-500x500.jpg"
-  },
-  {
     "id": "sid_sriram_44_yantharalokapusundarive",
     "title": "Yanthara Lokapu Sundarive",
     "artist": "A.R. Rahman, Sid Sriram, Shashaa Tirupati, Ananth Sriram",
@@ -6503,19 +4878,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "artworkUrl": "https://c.saavncdn.com/307/Hushaaru-Telugu-2018-20190107131110-500x500.jpg"
   },
   {
-    "id": "sid_sriram_50_vachindamma",
-    "title": "Vachindamma",
-    "artist": "Sid Sriram",
-    "movie": "Geetha Govindam",
-    "album": "Geetha Govindam",
-    "year": 2018,
-    "category": "Sid Sriram",
-    "genre": "Sid Sriram",
-    "duration": 250,
-    "sourceUrl": "https://aac.saavncdn.com/237/a89c49ed5b6aba2a9e5678eef38b90ba_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/237/Geetha-Govindam-Telugu-2018-20180921-500x500.jpg"
-  },
-  {
     "id": "telugu_travel_1_okeokajeevitham",
     "title": "Oke Oka Jeevitham",
     "artist": "Haricharan",
@@ -6542,62 +4904,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "sourceUrl": "https://aac.saavncdn.com/612/9c7b1b948242534344ea7acf3da553dc_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/612/Awaara-Telugu-2013-500x500.jpg",
     "spotifyUrl": "https://open.spotify.com/track/6O1VWYPfl85dDeKiaCJKza"
-  },
-  {
-    "id": "telugu_travel_3_lifeofram",
-    "title": "Life Of Ram",
-    "artist": "Pradeep Kumar",
-    "movie": "Jaanu",
-    "album": "Jaanu",
-    "year": 2020,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 364,
-    "sourceUrl": "https://aac.saavncdn.com/568/f6e92ec11e1400b109a8c8fabf18462a_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/568/Jaanu-Telugu-2020-20200201183214-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/0i5KYCaQs1xY7z9MWCFoXW"
-  },
-  {
-    "id": "telugu_travel_4_yentiyenti",
-    "title": "Yenti Yenti",
-    "artist": "Chinmayi Sripaada",
-    "movie": "Geetha Govindam",
-    "album": "Geetha Govindam",
-    "year": 2018,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 199,
-    "sourceUrl": "https://aac.saavncdn.com/237/576cecaf37f8d5921978d64f93956787_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/237/Geetha-Govindam-Telugu-2018-20180921-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/7tyNbBsDOWmyLV3bWAmqQt"
-  },
-  {
-    "id": "telugu_travel_5_hoynahoyna",
-    "title": "Hoyna Hoyna",
-    "artist": "Anirudh Ravichander, Inno Genga, Anantha Sriram",
-    "movie": "Gang Leader",
-    "album": "Gang Leader",
-    "year": 2019,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 276,
-    "sourceUrl": "https://aac.saavncdn.com/663/0d8dcf191477a3eb2f56cf3d5ff5c8a9_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/663/Gang-Leader-Telugu-2019-20190905102749-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/7hADNKBDHS8MblpUzLebLf"
-  },
-  {
-    "id": "telugu_travel_6_arereymanasa",
-    "title": "Arerey Manasa",
-    "artist": "Vivek Sagar, Sid Sriram, Kittu Vissapragada",
-    "movie": "Falaknuma Das",
-    "album": "Falaknuma Das",
-    "year": 2019,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 301,
-    "sourceUrl": "https://aac.saavncdn.com/243/fd52cc44c5140ce9b710b8d1f97b0ba6_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/243/Falaknuma-Das-Telugu-2019-20190527121508-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/61fXT6uwJ2THPkbmxa65OI"
   },
   {
     "id": "telugu_travel_7_aypilla",
@@ -6628,20 +4934,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/2bageubuN1HjNZwTNlyh0v"
   },
   {
-    "id": "telugu_travel_9_emaipoyave",
-    "title": "Emai Poyave",
-    "artist": "Sid Sriram",
-    "movie": "Padi Padi Leche Manasu",
-    "album": "Padi Padi Leche Manasu",
-    "year": 2018,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 154,
-    "sourceUrl": "https://aac.saavncdn.com/940/3ddd569cf466162e491db3d3abab0a61_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/940/Padi-Padi-Leche-Manasu-Telugu-2018-20250818123151-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/14M1StehpwsydSGGy8z9eq"
-  },
-  {
     "id": "telugu_travel_10_neeyadalonaaku",
     "title": "Nee Yadalo Naaku",
     "artist": "Yuvan Shankar Raja, Sagar Desai, Vennelakanti",
@@ -6668,20 +4960,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "sourceUrl": "https://aac.saavncdn.com/243/1c34cc064272e6216f44df2ef32cf7b1_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/385/Agnyaathavaasi-Telugu-2017-20180102061403-500x500.jpg",
     "spotifyUrl": "https://open.spotify.com/track/7MtXu7mXRMdICKyTOb8CuR"
-  },
-  {
-    "id": "telugu_travel_12_uppenantha",
-    "title": "Uppenantha",
-    "artist": "Devi Sri Prasad, KK, Balaji",
-    "movie": "Aarya - 2",
-    "album": "Aarya - 2",
-    "year": 2009,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 327,
-    "sourceUrl": "https://aac.saavncdn.com/298/eb880c4cd78d1b29d128d430d4be0dcb_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/298/Aarya-2-Telugu-2009-20190822135933-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/57zEYntUat0ofbFpoicN26"
   },
   {
     "id": "telugu_travel_13_pillaaraa",
@@ -6726,34 +5004,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/4kEd65XC9mEFTiscE6f6N9"
   },
   {
-    "id": "telugu_travel_16_samajavaragamana",
-    "title": "Samajavaragamana - Male",
-    "artist": "Sid Sriram",
-    "movie": "Ala Vaikunthapurramuloo",
-    "album": "Ala Vaikunthapurramuloo",
-    "year": 2019,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 219,
-    "sourceUrl": "https://aac.saavncdn.com/517/339d76dce4db4f43f4721eec2d8f03ef_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/3j9DrRebdWK1jkpOw9FZUy"
-  },
-  {
-    "id": "telugu_travel_17_buttabomma",
-    "title": "Buttabomma",
-    "artist": "Armaan Malik",
-    "movie": "Ala Vaikunthapurramuloo",
-    "album": "Ala Vaikunthapurramuloo",
-    "year": 2019,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 198,
-    "sourceUrl": "https://aac.saavncdn.com/517/68cc88035f2fbcd5772e6551bf64c111_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/0dnDTvdUco2UbaBjUtPxNS"
-  },
-  {
     "id": "telugu_travel_18_manasumaree",
     "title": "Manasu Maree",
     "artist": "Amit Trivedi, Shashaa Tirupati, Yazin Nizar",
@@ -6794,20 +5044,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "sourceUrl": "https://aac.saavncdn.com/584/5e1b75956e46bf8670f6513f36a3c155_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/584/V-Telugu-2020-20200828173314-500x500.jpg",
     "spotifyUrl": "https://open.spotify.com/track/0VMigv7BI8OpP6CRSkyKX6"
-  },
-  {
-    "id": "telugu_travel_21_ramulooramulaadu",
-    "title": "Ramuloo Ramulaa - Duet",
-    "artist": "Anurag Kulkarni, Mangli, Thaman S",
-    "movie": "Ramuloo Ramulaa - Duet",
-    "album": "Ramuloo Ramulaa - Duet",
-    "year": 2021,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 246,
-    "sourceUrl": "https://p.scdn.co/mp3-preview/14e756de82c29eb5c503774c546cdeffebe421a9",
-    "artworkUrl": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&h=600&fit=crop",
-    "spotifyUrl": "https://open.spotify.com/track/4uXJADmybUHUgycBWFHeq6"
   },
   {
     "id": "telugu_travel_22_singlesanthem",
@@ -6866,48 +5102,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/5pOY1Vg2TIIbVBfR6yAg0C"
   },
   {
-    "id": "telugu_travel_26_tharagathigadhi",
-    "title": "Tharagathi Gadhi",
-    "artist": "Kaala Bhairava",
-    "movie": "Colour Photo",
-    "album": "Colour Photo",
-    "year": 2020,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 213,
-    "sourceUrl": "https://aac.saavncdn.com/null/f131ae51093b978eadbc1b3c3716a8b7_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/null/Colour-Photo-Telugu-2020-20201118205906-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/7h8pQvwKxRYTt3oRGjNT93"
-  },
-  {
-    "id": "telugu_travel_27_kallolam",
-    "title": "Kallolam",
-    "artist": "Anurag Kulkarni",
-    "movie": "Padi Padi Leche Manasu",
-    "album": "Padi Padi Leche Manasu",
-    "year": 2018,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 209,
-    "sourceUrl": "https://aac.saavncdn.com/940/e9ef46d5d7c209c30e21c7c7e0fd9822_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/940/Padi-Padi-Leche-Manasu-Telugu-2018-20250818123151-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/37cGWOypYSmYzAV4gh786W"
-  },
-  {
-    "id": "telugu_travel_28_neekannuneelisam",
-    "title": "Nee Kannu Neeli Samudram",
-    "artist": "Javed Ali",
-    "movie": "Uppena",
-    "album": "Uppena",
-    "year": 2020,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 312,
-    "sourceUrl": "https://aac.saavncdn.com/587/31dcf48d7cf5fefe357f134760ba5402_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/587/Uppena-Telugu-2020-20210218155246-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/1C9SYGI40nNYh98gN87Fwr"
-  },
-  {
     "id": "telugu_travel_29_seethakaalam",
     "title": "Seethakaalam",
     "artist": "Yazin Nizar, 1080g (Rap)",
@@ -6920,48 +5114,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "sourceUrl": "https://aac.saavncdn.com/571/ded58cfd60c4d2496504a922eb3f0bec_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/571/S-O-Satyamurthy-Telugu-2015-500x500.jpg",
     "spotifyUrl": "https://open.spotify.com/track/2C72bOiY3kbCgDBBznoejk"
-  },
-  {
-    "id": "telugu_travel_30_violinsong",
-    "title": "Violin Song",
-    "artist": "David Simon, Anitha Karthikeyan",
-    "movie": "Iddarammayilatho",
-    "album": "Iddarammayilatho",
-    "year": 2013,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 264,
-    "sourceUrl": "https://aac.saavncdn.com/514/fd8d4dbdecb52b7634692291ddae2668_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/514/Idharammayilatho-2013-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/1C2gJaINSao4GEXySYopiS"
-  },
-  {
-    "id": "telugu_travel_31_crazyfeeling",
-    "title": "Crazy Feeling",
-    "artist": "Prudhvi Chandra",
-    "movie": "Nenu Sailaja",
-    "album": "Nenu Sailaja",
-    "year": 2015,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 209,
-    "sourceUrl": "https://aac.saavncdn.com/027/22c00a2f8d68946878fdb1f95ba656e2_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/027/Nenu-Sailaja-Telugu-2015-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/4cEhCuw7sLZsLIQA1EBvxZ"
-  },
-  {
-    "id": "telugu_travel_32_mellaga",
-    "title": "Mellaga",
-    "artist": "S.P. Charan, Sumangali",
-    "movie": "Varsham",
-    "album": "Varsham",
-    "year": 2003,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 321,
-    "sourceUrl": "https://aac.saavncdn.com/449/b717def9c5f121922438f64724791d20_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/449/Varsham-2003-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/6WCVnARSUrBrfzod8oAAQ3"
   },
   {
     "id": "telugu_travel_33_nenunenuga",
@@ -6992,22 +5144,8 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/2nm2eXJ9VWEIuIQKiuPtJF"
   },
   {
-    "id": "telugu_travel_35_dhakdhakdhak",
-    "title": "Dhak Dhak Dhak",
-    "artist": "Sarath Santosh, Haripriya",
-    "movie": "Uppena",
-    "album": "Uppena",
-    "year": 2020,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 105,
-    "sourceUrl": "https://aac.saavncdn.com/587/a807aa2ebc61f1ee016a13fc0df5f4ac_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/587/Uppena-Telugu-2020-20210218155246-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/4jf3Xq6DddYi95payh81IC"
-  },
-  {
     "id": "telugu_travel_36_swingzarafromjai",
-    "title": "Swing Zara (From \"Jai Lava Kusa\")",
+    "title": "Swing Zara",
     "artist": "Neha Bhasin, Dsp, Devi Sri Prasad",
     "movie": "Swing Zara (From \"Jai Lava Kusa\")",
     "album": "Swing Zara (From \"Jai Lava Kusa\")",
@@ -7062,36 +5200,8 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/6e6JTOc1GbdRWCirQ3OBRq"
   },
   {
-    "id": "telugu_travel_40_undipova",
-    "title": "Undipova",
-    "artist": "Spoorthi Jithender",
-    "movie": "Savaari",
-    "album": "Savaari",
-    "year": 2019,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 231,
-    "sourceUrl": "https://aac.saavncdn.com/516/a5a0c96a0a530a5e5f6cb9e08792cac5_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/516/Savaari-Telugu-2019-20200203152336-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/7d7BpHIZL65AJNi9FUFCme"
-  },
-  {
-    "id": "telugu_travel_41_kailovechedugudu",
-    "title": "Kailove Chedugudu",
-    "artist": "Naveen, S.P. Charan",
-    "movie": "Sakhi",
-    "album": "Sakhi",
-    "year": 2000,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 278,
-    "sourceUrl": "https://aac.saavncdn.com/586/f1d1882bb8c17529d9ff5de22180c632_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/586/Sakhi-Telugu-2000-20250410083435-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/6XbkcFDeIoyIOe2HWoAxBh"
-  },
-  {
     "id": "telugu_travel_42_maguvamaguvamale",
-    "title": "Maguva Maguva - Male",
+    "title": "Maguva Maguva",
     "artist": "Sid Sriram",
     "movie": "Vakeel Saab",
     "album": "Vakeel Saab",
@@ -7286,20 +5396,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/3YqxMRlG0Vccmb0bmUPkwJ"
   },
   {
-    "id": "telugu_travel_56_chalichaliga",
-    "title": "Chali Chaliga",
-    "artist": "Shreya Ghoshal",
-    "movie": "Mr. Perfect",
-    "album": "Mr. Perfect",
-    "year": 2011,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 298,
-    "sourceUrl": "https://aac.saavncdn.com/358/788c8380a1bccb121798d307d2c18414_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/358/Mr-Perfect-2011-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/0JLLcOdBUKfDtzY0seXQHC"
-  },
-  {
     "id": "telugu_travel_57_mutyaladhaarani",
     "title": "Mutyala Dhaarani",
     "artist": "Harris Jayaraj, Karthik, Megha, Bhuvana Chandra",
@@ -7312,34 +5408,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "sourceUrl": "https://aac.saavncdn.com/362/9f03dce0dcd676c59f039df594085077_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/362/7th-Sense-Telugu-2011-20190822153155-500x500.jpg",
     "spotifyUrl": "https://open.spotify.com/track/40lTZrTUyl0EaH8aoVBTVl"
-  },
-  {
-    "id": "telugu_travel_58_emannavoo",
-    "title": "Emannavoo",
-    "artist": "Anirudh Ravichander, Shweta Mohan, Vennelakanti",
-    "movie": "Nava Manmadhudu",
-    "album": "Nava Manmadhudu",
-    "year": 2015,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 215,
-    "sourceUrl": "https://aac.saavncdn.com/188/b123e2cfdeab3193b8b8e673d19c9403_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/188/Nava-Manmadhudu-Telugu-2015-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/36ylvIx1fVaM4i5pux7Ea1"
-  },
-  {
-    "id": "telugu_travel_59_evare",
-    "title": "Evare",
-    "artist": "Vijay Yesudas",
-    "movie": "Premam",
-    "album": "Premam",
-    "year": 2016,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 309,
-    "sourceUrl": "https://aac.saavncdn.com/121/474e2fa83b583a9a4ccee850e0fd5bc1_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/121/Premam2-Telugu-2016-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/1NXSmIEOulY9u4TxwuSUoe"
   },
   {
     "id": "telugu_travel_60_oyemeghamla",
@@ -7356,20 +5424,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/3bdDjuvvIlgU1sJ8gc40fj"
   },
   {
-    "id": "telugu_travel_61_telusaatelusaa",
-    "title": "Telusaa Telusaa",
-    "artist": "Jubin Nautiyal, Sameera Bharadwaj",
-    "movie": "Sarrainodu",
-    "album": "Sarrainodu",
-    "year": 2016,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 264,
-    "sourceUrl": "https://aac.saavncdn.com/685/d6f19c57e182037b773bc6a6fc391bba_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/685/Sarrainodu-Telugu-2016-20250818111047-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/1jz0PUb4rChtZUk4Itn1Co"
-  },
-  {
     "id": "telugu_travel_62_nuvvenuvve",
     "title": "Nuvve Nuvve",
     "artist": "Jonita Gandhi, S.S. Thaman",
@@ -7382,20 +5436,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "sourceUrl": "https://aac.saavncdn.com/709/f7b2585cc5170746149908e7c6bcc95b_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/709/Kick-2-Telugu-2015-500x500.jpg",
     "spotifyUrl": "https://open.spotify.com/track/1xbZ2No4vTyvc5sVcW4T9Q"
-  },
-  {
-    "id": "telugu_travel_63_heypillagaada",
-    "title": "Hey Pillagaada",
-    "artist": "Sinduri Vishal, Sinov Raj",
-    "movie": "Fidaa",
-    "album": "Fidaa",
-    "year": 2017,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 248,
-    "sourceUrl": "https://aac.saavncdn.com/904/d92507c33a3a123636fe57a004f5eee5_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/904/Fidaa-Telugu-2017-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/3A3vrhAzRGaK92PtFzndjS"
   },
   {
     "id": "telugu_travel_64_malliraava",
@@ -7426,20 +5466,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/3wWT5me50anKQKQAH41syl"
   },
   {
-    "id": "telugu_travel_66_egiregire",
-    "title": "Egiregire",
-    "artist": "Sid Sriram, Lipsika Bhashyam",
-    "movie": "Shailaja Reddy Alludu",
-    "album": "Shailaja Reddy Alludu",
-    "year": 2018,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 190,
-    "sourceUrl": "https://aac.saavncdn.com/253/7870e45e2e7818b0098ce36dcba03ee1_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/253/Shailaja-Reddy-Alludu-Telugu-2018-20180820-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/25aFmFxEx6jCvovZig4XIz"
-  },
-  {
     "id": "telugu_travel_67_mandaara",
     "title": "Mandaara",
     "artist": "Shreya Ghoshal",
@@ -7468,48 +5494,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/3YNDniFGYtIITxo02cHIZ5"
   },
   {
-    "id": "telugu_travel_69_kundanapubomma",
-    "title": "Kundanapu Bomma",
-    "artist": "A.R. Rahman, Benny Dayal, Kalyani Menon",
-    "movie": "Yemaaya Chesave",
-    "album": "Yemaaya Chesave",
-    "year": 2010,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 332,
-    "sourceUrl": "https://aac.saavncdn.com/596/def98c82e0df5d0e8ae0c26c4be23459_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/596/Yemaaya-Chesave-Telugu-2010-20190822154149-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/2xofTipSxfwbxwSdBcjYIe"
-  },
-  {
-    "id": "telugu_travel_70_nuvvelenuvvele",
-    "title": "Nuvvele Nuvvele",
-    "artist": "Shweta Mohan",
-    "movie": "Jaya Janaki Nayaka",
-    "album": "Jaya Janaki Nayaka",
-    "year": 2017,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 268,
-    "sourceUrl": "https://aac.saavncdn.com/056/c841cba36c9925132019a47c4687fc8a_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/056/Jaya-Janaki-Nayaka-Telugu-2017-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/2NEFT1kFinuwRgow5plEZE"
-  },
-  {
-    "id": "telugu_travel_71_kadalalle",
-    "title": "Kadalalle",
-    "artist": "Sid Sriram, Aishwarya Ravichandran",
-    "movie": "Dear Comrade - Telugu",
-    "album": "Dear Comrade - Telugu",
-    "year": 2019,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 260,
-    "sourceUrl": "https://aac.saavncdn.com/556/dbb967a858eeb237860c64033a9102c9_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/556/Dear-Comrade-Telugu-Telugu-2019-20250828182008-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/2kW6AMK99mnEO6X01r2E3T"
-  },
-  {
     "id": "telugu_travel_72_neekosam",
     "title": "Neekosam",
     "artist": "Shreya Ghoshal, KK",
@@ -7536,20 +5520,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "sourceUrl": "https://aac.saavncdn.com/215/56d607a1f35043a78863e55532c474c4_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/215/Snehituda-2009-500x500.jpg",
     "spotifyUrl": "https://open.spotify.com/track/13Z8HS0M1QPZt4BRVjO3EY"
-  },
-  {
-    "id": "telugu_travel_74_premadesam",
-    "title": "Prema Desam",
-    "artist": "Saindhavi, Hemachandra",
-    "movie": "Shakti",
-    "album": "Shakti",
-    "year": 2011,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 275,
-    "sourceUrl": "https://aac.saavncdn.com/756/2ed36752d3643b3d7de0385ebc2d754d_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/756/Shakti-2011-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/0Y61GxhLwaCYDJ2ojA7tZv"
   },
   {
     "id": "telugu_travel_75_yechilipi",
@@ -7595,7 +5565,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_travel_78_yeshanagulafromt",
-    "title": "Yeshanagula (From \"The Paradise\") (Telugu)",
+    "title": "Yeshanagula",
     "artist": "Anirudh Ravichander,Ranjith",
     "movie": "Yeshanagula (From \"The Paradise\") (Telugu)",
     "album": "Yeshanagula (From \"The Paradise\") (Telugu)",
@@ -7622,20 +5592,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/0tkVT2PRjiDHkKhellVpb6"
   },
   {
-    "id": "telugu_travel_80_arereyekkada",
-    "title": "Arere Yekkada",
-    "artist": "Naresh Iyer, Manisha Eerabhathini",
-    "movie": "Nenu Local",
-    "album": "Nenu Local",
-    "year": 2017,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 236,
-    "sourceUrl": "https://aac.saavncdn.com/896/8840d83f9eab7c9d6a73dc0499ba30ca_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/896/Nenu-Local1-Telugu-2017-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/1SbK7OHdqsTUfzPVKylwND"
-  },
-  {
     "id": "telugu_travel_81_preminchepremava",
     "title": "Preminche Premava",
     "artist": "Shreya Ghoshal, Naresh Ayar",
@@ -7651,7 +5607,7 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
   },
   {
     "id": "telugu_travel_82_vibeundifrommira",
-    "title": "Vibe Undi (From \"Mirai\") [Telugu]",
+    "title": "Vibe Undi[Telugu]",
     "artist": "Armaan Malik, Thaman S",
     "movie": "Vibe Undi (From \"Mirai\") [Telugu]",
     "album": "Vibe Undi (From \"Mirai\") [Telugu]",
@@ -7678,20 +5634,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/5DN8dF1Q0K8G6pgCQjqVvF"
   },
   {
-    "id": "telugu_travel_84_chitti",
-    "title": "Chitti",
-    "artist": "Ram Miriyala",
-    "movie": "Jathi Ratnalu",
-    "album": "Jathi Ratnalu",
-    "year": 2021,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 186,
-    "sourceUrl": "https://aac.saavncdn.com/604/f2c7f087e4bee0bf947b0c43bc22a507_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/604/Jathi-Ratnalu-Telugu-2021-20251011225120-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/6Z40IRipd6pNcUULY6SXng"
-  },
-  {
     "id": "telugu_travel_85_daredumdadum",
     "title": "Daredumdadum",
     "artist": "Mickey J Meyer, Sai Shivani",
@@ -7704,20 +5646,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "sourceUrl": "https://aac.saavncdn.com/877/3f7185b9017f92fbf5ec7b224bb9537f_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/877/Mukunda-Telugu-2014-500x500.jpg",
     "spotifyUrl": "https://open.spotify.com/track/42fjfbKn27YJ3hojtqtsXZ"
-  },
-  {
-    "id": "telugu_travel_86_poolanekunukeyam",
-    "title": "Poolane Kunukeyamantaa",
-    "artist": "A.R. Rahman, Haricharan, Shreya Ghoshal, Anantha Sriram",
-    "movie": "I - Manoharudu",
-    "album": "I - Manoharudu",
-    "year": 2014,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 308,
-    "sourceUrl": "https://aac.saavncdn.com/364/952499ea0aea6a7fe66cb37e88fa29a5_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/364/I-Manoharudu-Telugu-2014-20190914115023-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/4ZXsuOSu0vWtWMfmf1Gl3j"
   },
   {
     "id": "telugu_travel_87_chinukaikurisind",
@@ -7734,20 +5662,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/5B5Lr5ZeEyUAM9EMmS5PGB"
   },
   {
-    "id": "telugu_travel_88_merisemerisewedd",
-    "title": "Merise Merise (Wedding Song)",
-    "artist": "Haricharan, Srinidhi Venkatesh, Sruthi Ranjani",
-    "movie": "Hello!",
-    "album": "Hello!",
-    "year": 2017,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 320,
-    "sourceUrl": "https://aac.saavncdn.com/933/61f7037b28c104bae7a253e7df889a97_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/933/Hello-Telugu-2017-20171210-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/0SjtWtOJH8NdceaV1WE5RW"
-  },
-  {
     "id": "telugu_travel_89_premavennela",
     "title": "Prema Vennela",
     "artist": "Devi Sri Prasad, Sudharshan Ashok, Srimani",
@@ -7762,22 +5676,8 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "spotifyUrl": "https://open.spotify.com/track/60U549v4aGcURN9p3jdMdE"
   },
   {
-    "id": "telugu_travel_90_jalajalajalapaat",
-    "title": "Jala Jala Jalapaatham Nuvvu",
-    "artist": "Jaspreet Jasz, Shreya Ghoshal",
-    "movie": "Uppena",
-    "album": "Uppena",
-    "year": 2020,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 252,
-    "sourceUrl": "https://aac.saavncdn.com/587/a1893d7cea7d5a963c7f411af8e9bbcb_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/587/Uppena-Telugu-2020-20210218155246-500x500.jpg",
-    "spotifyUrl": "https://open.spotify.com/track/7HhiFHVmeM50rHXw7FlgNH"
-  },
-  {
     "id": "telugu_travel_91_emoemofromraahu",
-    "title": "Emo Emo (From \"Raahu\")",
+    "title": "Emo Emo",
     "artist": "Sid Sriram",
     "movie": "Forever Starts Here - Valentine Special's",
     "album": "Forever Starts Here - Valentine Special's",
@@ -7844,58 +5744,6 @@ export const TELUGU_500_SONGS: TeluguSongItem[] = [
     "sourceUrl": "https://aac.saavncdn.com/875/7237ecc5ca7a65bb0feaa7431d906a4e_320.mp4",
     "artworkUrl": "https://c.saavncdn.com/875/Rangam-2011-500x500.jpg",
     "spotifyUrl": "https://open.spotify.com/track/6Yqw4HtJuFXleJtgzYXWzT"
-  },
-  {
-    "title": "Ninnila",
-    "artist": "Armaan Malik, Thaman S",
-    "movie": "Tholi Prema",
-    "album": "Tholi Prema",
-    "year": 2018,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 234,
-    "sourceUrl": "https://aac.saavncdn.com/134/6d7e0af5fd8d66259125c7768afdf879_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/134/Tholi-Prema-Telugu-2018-20180120-500x500.jpg",
-    "id": "telugu_travel_96_ninnila"
-  },
-  {
-    "title": "Adiga Adiga",
-    "artist": "Sid Sriram",
-    "movie": "Ninnu Kori",
-    "album": "Ninnu Kori",
-    "year": 2017,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 209,
-    "sourceUrl": "https://aac.saavncdn.com/070/c9fc65602ab820be804527719172ac5c_sar_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/070/Ninnu-Kori-Telugu-2017-20220323073319-500x500.jpg",
-    "id": "telugu_travel_97_adigaadiga"
-  },
-  {
-    "title": "Inkem Inkem Inkem Kaavaale",
-    "artist": "Sid Sriram",
-    "movie": "Geetha Govindam",
-    "album": "Geetha Govindam",
-    "year": 2018,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 266,
-    "sourceUrl": "https://aac.saavncdn.com/237/7942edb73e64d4e35e488337e14753b7_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/237/Geetha-Govindam-Telugu-2018-20180921-500x500.jpg",
-    "id": "telugu_travel_98_inkeminkeminkemk"
-  },
-  {
-    "title": "Vachindamma",
-    "artist": "Sid Sriram",
-    "movie": "Geetha Govindam",
-    "album": "Geetha Govindam",
-    "year": 2018,
-    "category": "Telugu Travel Melodies",
-    "genre": "Telugu Travel Melodies",
-    "duration": 250,
-    "sourceUrl": "https://aac.saavncdn.com/237/a89c49ed5b6aba2a9e5678eef38b90ba_320.mp4",
-    "artworkUrl": "https://c.saavncdn.com/237/Geetha-Govindam-Telugu-2018-20180921-500x500.jpg",
-    "id": "telugu_travel_99_vachindamma"
   },
   {
     "title": "Neeli Neeli Aakasam",

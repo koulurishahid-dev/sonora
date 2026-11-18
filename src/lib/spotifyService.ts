@@ -1,5 +1,5 @@
 import { Song, Playlist } from '@/types/music';
-import { db, syncAlbumsAndArtists } from './db';
+import { db, syncAlbumsAndArtists, deduplicateSongsInLibrary } from './db';
 import { parseLrc } from '@/components/player/LyricsPanel';
 import { CURATED_TELUGU_SONGS } from './audioSynthesis';
 import { TELUGU_500_SONGS } from './telugu500Data';
@@ -623,11 +623,32 @@ export async function importAllSpotifyTeluguCategories(
   }
 
   const allSongsToImport: Song[] = [];
+  const seenTitles = new Set<string>();
+
+  function normSongKey(t: string): string {
+    return (t || '')
+      .toLowerCase()
+      .replace(/\s*\(from\s+"[^"]*"\)\s*/gi, '')
+      .replace(/\s*\(from\s+[^)]*\)\s*/gi, '')
+      .replace(/\s*-\s*from\s+"[^"]*"\s*/gi, '')
+      .replace(/\s*-\s*from\s+[^)]*\s*/gi, '')
+      .replace(/\s*\(telugu\)\s*/gi, '')
+      .replace(/\s*-\s*telugu\s*/gi, '')
+      .replace(/\s*-\s*male\s*/gi, '')
+      .replace(/\s*-\s*female\s*/gi, '')
+      .replace(/\s*-\s*duet\s*/gi, '')
+      .replace(/\s*\(remastered\)\s*/gi, '')
+      .replace(/[^a-z0-9]/g, '');
+  }
 
   // 1. Process Core Telugu songs from CURATED_TELUGU_SONGS
   const totalCore = CURATED_TELUGU_SONGS.length;
   for (let i = 0; i < totalCore; i++) {
     const item = CURATED_TELUGU_SONGS[i];
+    const key = normSongKey(item.title);
+    if (seenTitles.has(key)) continue;
+    seenTitles.add(key);
+
     const songId = `spotify_telugu_${item.title.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
 
     let category: string = item.mood;
@@ -689,6 +710,10 @@ export async function importAllSpotifyTeluguCategories(
   // 2. Add Mass, Dance, 2024 Trending & Golden Classic Tracks
   for (let k = 0; k < SPOTIFY_TELUGU_MASS_AND_CLASSICS.length; k++) {
     const extra = SPOTIFY_TELUGU_MASS_AND_CLASSICS[k];
+    const key = normSongKey(extra.title);
+    if (seenTitles.has(key)) continue;
+    seenTitles.add(key);
+
     const songId = `spotify_extra_${extra.title.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
 
     const song: Song = {
@@ -725,18 +750,17 @@ export async function importAllSpotifyTeluguCategories(
     });
   }
 
-  // 3. Add Comprehensive 500 Telugu Songs Collection (All Genres)
-  const existingKeys = new Set(allSongsToImport.map(s => `${s.title.toLowerCase().trim()}_${s.album.toLowerCase().trim()}`));
+  // 3. Add Comprehensive Master Telugu Songs Collection (Strictly Single Instance per Song)
   const telugu500SongsToAdd: Song[] = [];
   const telugu500LyricsToAdd: any[] = [];
 
   for (let m = 0; m < TELUGU_500_SONGS.length; m++) {
     const item = TELUGU_500_SONGS[m];
-    const albumName = item.movie || item.album || item.title || 'Telugu Master Recording';
-    const key = `${item.title.toLowerCase().trim()}_${albumName.toLowerCase().trim()}`;
-    if (existingKeys.has(key)) continue;
-    existingKeys.add(key);
+    const key = normSongKey(item.title);
+    if (seenTitles.has(key)) continue;
+    seenTitles.add(key);
 
+    const albumName = item.movie || item.album || item.title || 'Telugu Master Recording';
     const songId = `telugu_500_${item.id}`;
     const song: Song = {
       id: songId,
@@ -842,6 +866,7 @@ export async function importAllSpotifyTeluguCategories(
   }
 
   if (onProgress) onProgress(90, 'Syncing Spotify album and artist indexes...');
+  await deduplicateSongsInLibrary();
   await syncAlbumsAndArtists();
 
   if (onProgress) {
