@@ -94,11 +94,11 @@ export function AppLayout() {
         await deduplicateSongsInLibrary();
 
         const count = await db.songs.count();
-        const seededSpotify = localStorage.getItem('sonora_spotify_categories_v8');
-        if (!seededSpotify || count < 110) {
+        const seededSpotify = localStorage.getItem('sonora_telugu_500_v1');
+        if (!seededSpotify || count < 400) {
           isAutoSeedingInProgress = true;
           await importAllSpotifyTeluguCategories();
-          localStorage.setItem('sonora_spotify_categories_v8', 'true');
+          localStorage.setItem('sonora_telugu_500_v1', 'true');
         }
       } catch (e) {
         console.warn('Initial seeding error:', e);

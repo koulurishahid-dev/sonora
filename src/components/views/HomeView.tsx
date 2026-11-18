@@ -259,16 +259,17 @@ export function HomeView({
   // Distinct shelves
   const hotHitsSongs = allSongs.filter(
     s =>
-      s.year &&
-      s.year >= 2023 &&
-      (s.category === 'Mass & Beats' ||
-        s.category === 'Love Songs' ||
-        s.title.includes('Fear') ||
-        s.title.includes('Chuttamalle') ||
-        s.title.includes('Kurchi') ||
-        s.title.includes('Tillu') ||
-        s.title.includes('Sooseki') ||
-        s.title.includes('Pushpa'))
+      (s.category || s.genre || '').toLowerCase() === 'hot hits' ||
+      (s.year !== undefined &&
+        s.year >= 2023 &&
+        (s.category === 'Mass & Beats' ||
+          s.category === 'Love Songs' ||
+          s.title.includes('Fear') ||
+          s.title.includes('Chuttamalle') ||
+          s.title.includes('Kurchi') ||
+          s.title.includes('Tillu') ||
+          s.title.includes('Sooseki') ||
+          s.title.includes('Pushpa')))
   );
 
   const romanceSongs = allSongs.filter(
@@ -287,7 +288,35 @@ export function HomeView({
     s => (s.category || s.genre || '').toLowerCase().includes('classic') || (s.year && s.year <= 2012)
   );
 
-  const sidSriramSongs = allSongs.filter(s => s.artist.toLowerCase().includes('sid sriram'));
+  const sidSriramSongs = allSongs.filter(
+    s => (s.category || s.genre || '').toLowerCase() === 'sid sriram' || s.artist.toLowerCase().includes('sid sriram')
+  );
+
+  const blockbustersSongs = allSongs.filter(
+    s =>
+      (s.category || s.genre || '').toLowerCase() === 'blockbusters' ||
+      s.artist.toLowerCase().includes('thaman') ||
+      s.artist.toLowerCase().includes('devi sri prasad') ||
+      s.artist.toLowerCase().includes('anirudh') ||
+      s.artist.toLowerCase().includes('keeravaani')
+  );
+
+  const folkBeatsSongs = allSongs.filter(
+    s =>
+      (s.category || s.genre || '').toLowerCase().includes('folk') ||
+      s.artist.toLowerCase().includes('mangli') ||
+      s.artist.toLowerCase().includes('ram miriyala')
+  );
+
+  const vintage90sSongs = allSongs.filter(
+    s =>
+      (s.category || s.genre || '').toLowerCase().includes('90s') ||
+      (s.year !== undefined && s.year >= 1989 && s.year <= 1999)
+  );
+
+  const devotionalSongs = allSongs.filter(
+    s => (s.category || s.genre || '').toLowerCase().includes('devotional')
+  );
 
   // Master Filter & Search
   const filteredCatalog = allSongs.filter(s => {
@@ -297,11 +326,19 @@ export function HomeView({
       const cat = (s.category || s.genre || '').toLowerCase();
       const target = activeCategory.toLowerCase();
       if (target === 'sid sriram') {
-        matchesCategory = s.artist.toLowerCase().includes('sid sriram');
+        matchesCategory = cat === 'sid sriram' || s.artist.toLowerCase().includes('sid sriram');
       } else if (target === 'golden classics') {
         matchesCategory = cat === 'golden classics' || (s.year !== undefined && s.year <= 2012);
       } else if (target === 'mass & beats') {
         matchesCategory = cat === 'mass & beats' || cat === 'mass beats' || cat === 'party';
+      } else if (target === 'folk & beats') {
+        matchesCategory = cat.includes('folk') || s.artist.toLowerCase().includes('mangli') || s.artist.toLowerCase().includes('ram miriyala');
+      } else if (target === '90s classics') {
+        matchesCategory = cat.includes('90s') || (s.year !== undefined && s.year >= 1989 && s.year <= 1999);
+      } else if (target === 'devotional') {
+        matchesCategory = cat.includes('devotional');
+      } else if (target === 'blockbusters') {
+        matchesCategory = cat === 'blockbusters' || s.artist.toLowerCase().includes('thaman') || s.artist.toLowerCase().includes('devi sri prasad') || s.artist.toLowerCase().includes('anirudh') || s.artist.toLowerCase().includes('keeravaani');
       } else {
         matchesCategory = cat === target;
       }
@@ -402,17 +439,22 @@ export function HomeView({
         </div>
       )}
 
-      {/* 2. SPOTIFY SIGNATURE 6-PACK QUICK ACCESS TILES */}
+      {/* 2. SPOTIFY SIGNATURE QUICK ACCESS TILES (ALL 10 GENRES) */}
       <section className="space-y-3">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
-          {SPOTIFY_TELUGU_CATEGORIES.slice(0, 6).map(cat => {
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {SPOTIFY_TELUGU_CATEGORIES.map(cat => {
             const playlistSongs = allSongs.filter(s => {
-              if (cat.id === 'pl_spotify_hot_hits') return s.year && s.year >= 2023;
-              if (cat.id === 'pl_spotify_romance') return (s.category || s.genre) === 'Love Songs';
-              if (cat.id === 'pl_spotify_melodies') return (s.category || s.genre) === 'Melodies';
-              if (cat.id === 'pl_spotify_mass_beats') return (s.category || s.genre) === 'Mass & Beats';
-              if (cat.id === 'pl_spotify_golden_classics') return (s.category || s.genre) === 'Golden Classics';
-              if (cat.id === 'pl_spotify_sid_sriram') return s.artist.toLowerCase().includes('sid sriram');
+              const catTag = s.category || s.genre || '';
+              if (cat.id === 'pl_spotify_hot_hits') return catTag === 'Hot Hits' || (s.year !== undefined && s.year >= 2023);
+              if (cat.id === 'pl_spotify_romance') return catTag === 'Love Songs';
+              if (cat.id === 'pl_spotify_melodies') return catTag === 'Melodies';
+              if (cat.id === 'pl_spotify_mass_beats') return catTag === 'Mass & Beats';
+              if (cat.id === 'pl_spotify_golden_classics') return catTag === 'Golden Classics';
+              if (cat.id === 'pl_spotify_sid_sriram') return catTag === 'Sid Sriram' || s.artist.toLowerCase().includes('sid sriram');
+              if (cat.id === 'pl_spotify_blockbusters') return catTag === 'Blockbusters' || s.artist.toLowerCase().includes('thaman') || s.artist.toLowerCase().includes('devi sri prasad') || s.artist.toLowerCase().includes('anirudh');
+              if (cat.id === 'pl_spotify_folk_beats') return catTag === 'Folk & Beats';
+              if (cat.id === 'pl_spotify_90s_classics') return catTag === '90s Classics';
+              if (cat.id === 'pl_spotify_devotional') return catTag === 'Devotional';
               return true;
             });
 
@@ -521,7 +563,55 @@ export function HomeView({
         onSongContextMenu={onSongContextMenu}
       />
 
-      {/* 8. MASTER CATALOG SECTION WITH REAL-TIME SEARCH & CATEGORY PILLS */}
+      {/* 8. SHELF 6: COMPOSER BLOCKBUSTERS */}
+      <SpotifyShelf
+        title="🎬 Composer Blockbusters: DSP, Thaman & Anirudh"
+        subtitle="High-voltage Telugu chartbusters composed by the masters of Tollywood"
+        songs={blockbustersSongs}
+        onPlaySong={playSong}
+        currentSongId={currentSong?.id}
+        isPlaying={isPlaying}
+        onTogglePlay={togglePlay}
+        onSongContextMenu={onSongContextMenu}
+      />
+
+      {/* 9. SHELF 7: TELUGU FOLK, TEENMAAR & VILLAGE BEATS */}
+      <SpotifyShelf
+        title="🥁 Telugu Folk, Teenmaar & Village Beats"
+        subtitle="Mangli, Ram Miriyala, raw folk drums, Dappu and festive celebrations"
+        songs={folkBeatsSongs}
+        onPlaySong={playSong}
+        currentSongId={currentSong?.id}
+        isPlaying={isPlaying}
+        onTogglePlay={togglePlay}
+        onSongContextMenu={onSongContextMenu}
+      />
+
+      {/* 10. SHELF 8: 90s GOLDEN ERA & VINTAGE CLASSICS */}
+      <SpotifyShelf
+        title="📻 90s Telugu Golden Era & Vintage Masterpieces"
+        subtitle="SP Balasubrahmanyam, Chithra, Ilaiyaraaja, Keeravani vintage gems"
+        songs={vintage90sSongs}
+        onPlaySong={playSong}
+        currentSongId={currentSong?.id}
+        isPlaying={isPlaying}
+        onTogglePlay={togglePlay}
+        onSongContextMenu={onSongContextMenu}
+      />
+
+      {/* 11. SHELF 9: DEVOTIONAL & SPIRITUAL MELODIES */}
+      <SpotifyShelf
+        title="🪔 Sacred Devotional & Spiritual Melodies"
+        subtitle="Annamayya, Sri Ramadasu, Shirdi Sai and timeless devotional chants"
+        songs={devotionalSongs}
+        onPlaySong={playSong}
+        currentSongId={currentSong?.id}
+        isPlaying={isPlaying}
+        onTogglePlay={togglePlay}
+        onSongContextMenu={onSongContextMenu}
+      />
+
+      {/* 12. MASTER CATALOG SECTION WITH REAL-TIME SEARCH & CATEGORY PILLS */}
       <section className="space-y-5 pt-4 border-t border-white/[0.08]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -532,7 +622,7 @@ export function HomeView({
               </span>
             </h2>
             <p className="text-xs text-white/50 mt-0.5">
-              Browse all Telugu studio recordings with synced lyrics & 320kbps master audio
+              Browse up to 500 Telugu studio recordings across all 10 genres with 320kbps master audio
             </p>
           </div>
 
@@ -553,11 +643,16 @@ export function HomeView({
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-nowrap -mx-1 px-1">
           {[
             { id: 'All', label: `All (${allSongs.length})` },
+            { id: 'Hot Hits', label: `⚡ Hot Hits (${hotHitsSongs.length})` },
             { id: 'Love Songs', label: `💖 Romance (${romanceSongs.length})` },
             { id: 'Melodies', label: `🎵 Melodies (${melodySongs.length})` },
             { id: 'Mass & Beats', label: `🔥 Mass Beats (${massBeatsSongs.length})` },
             { id: 'Golden Classics', label: `🌟 2000s Classics (${classicsSongs.length})` },
             { id: 'Sid Sriram', label: `🎤 Sid Sriram (${sidSriramSongs.length})` },
+            { id: 'Blockbusters', label: `🎬 Blockbusters (${blockbustersSongs.length})` },
+            { id: 'Folk & Beats', label: `🥁 Folk & Beats (${folkBeatsSongs.length})` },
+            { id: '90s Classics', label: `📻 90s Vintage (${vintage90sSongs.length})` },
+            { id: 'Devotional', label: `🪔 Devotional (${devotionalSongs.length})` },
           ].map(tab => (
             <button
               key={tab.id}
