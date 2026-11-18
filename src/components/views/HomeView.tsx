@@ -667,17 +667,18 @@ export function HomeView({
       />
 
       {/* 12. MASTER CATALOG SECTION WITH REAL-TIME SEARCH & CATEGORY PILLS */}
-      <section className="space-y-5 pt-4 border-t border-white/[0.08]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* 4. MASTER CATALOG SECTION WITH FULL 10-GENRE FILTERING */}
+      <section className="space-y-4 pt-4 border-t border-white/[0.08]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
               <span>Full Master Catalog</span>
               <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-[#1ED760]/15 text-[#1ED760] border border-[#1ED760]/30">
                 {filteredCatalog.length} songs
               </span>
             </h2>
             <p className="text-xs text-white/50 mt-0.5">
-              Browse up to 500 Telugu studio recordings across all 10 genres with 320kbps master audio
+              Browse 600+ verified Telugu studio master tracks across all 10 genres in 320kbps audio
             </p>
           </div>
 
@@ -689,38 +690,53 @@ export function HomeView({
               placeholder="Search by title, movie, singer..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-full bg-white/[0.05] border border-white/[0.1] focus:border-[#1ED760] text-xs text-white placeholder-white/30 focus:outline-none transition-colors"
+              className="w-full pl-9 pr-4 py-2 sm:py-2.5 rounded-full bg-white/[0.06] border border-white/[0.12] focus:border-[#1ED760] text-xs text-white placeholder-white/40 focus:outline-none transition-colors shadow-sm"
             />
           </div>
         </div>
 
-        {/* Category Pills (Spotify Style) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none flex-nowrap -mx-1 px-1">
-          {[
-            { id: 'All', label: `All (${allSongs.length})` },
-            { id: 'Hot Hits', label: `⚡ Hot Hits (${hotHitsSongs.length})` },
-            { id: 'Love Songs', label: `💖 Romance (${romanceSongs.length})` },
-            { id: 'Melodies', label: `🎵 Melodies (${melodySongs.length})` },
-            { id: 'Mass & Beats', label: `🔥 Mass Beats (${massBeatsSongs.length})` },
-            { id: 'Golden Classics', label: `🌟 2000s Classics (${classicsSongs.length})` },
-            { id: 'Sid Sriram', label: `🎤 Sid Sriram (${sidSriramSongs.length})` },
-            { id: 'Blockbusters', label: `🎬 Blockbusters (${blockbustersSongs.length})` },
-            { id: 'Folk & Beats', label: `🥁 Folk & Beats (${folkBeatsSongs.length})` },
-            { id: '90s Classics', label: `📻 90s Vintage (${vintage90sSongs.length})` },
-            { id: 'Devotional', label: `🪔 Devotional (${devotionalSongs.length})` },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveCategory(tab.id)}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-sm ${
-                activeCategory === tab.id
-                  ? 'bg-[#1ED760] text-black shadow-md shadow-[#1ED760]/20 scale-105'
-                  : 'bg-white/[0.05] text-white/70 hover:text-white hover:bg-white/[0.1] border border-white/[0.06]'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* Category Pills (Spotify-style with smooth mobile touch scrolling & no word-wrapping) */}
+        <div className="relative -mx-3 sm:mx-0 px-3 sm:px-0">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none flex-nowrap scroll-smooth touch-pan-x">
+            {[
+              { id: 'All', label: 'All', count: allSongs.length, icon: null },
+              { id: 'Hot Hits', label: 'Hot Hits', count: hotHitsSongs.length, icon: '⚡' },
+              { id: 'Love Songs', label: 'Romance', count: romanceSongs.length, icon: '💖' },
+              { id: 'Melodies', label: 'Melodies', count: melodySongs.length, icon: '🎵' },
+              { id: 'Mass & Beats', label: 'Mass Beats', count: massBeatsSongs.length, icon: '🔥' },
+              { id: 'Golden Classics', label: '2000s Classics', count: classicsSongs.length, icon: '🌟' },
+              { id: 'Sid Sriram', label: 'Sid Sriram', count: sidSriramSongs.length, icon: '🎤' },
+              { id: 'Blockbusters', label: 'Blockbusters', count: blockbustersSongs.length, icon: '🎬' },
+              { id: 'Folk & Beats', label: 'Folk & Beats', count: folkBeatsSongs.length, icon: '🥁' },
+              { id: '90s Classics', label: '90s Vintage', count: vintage90sSongs.length, icon: '📻' },
+              { id: 'Devotional', label: 'Devotional', count: devotionalSongs.length, icon: '🪔' },
+            ].map(tab => {
+              const isActive = activeCategory === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveCategory(tab.id)}
+                  className={`h-9 px-3.5 sm:px-4 rounded-full text-xs font-bold whitespace-nowrap shrink-0 transition-all duration-200 flex items-center gap-1.5 shadow-sm active:scale-95 select-none ${
+                    isActive
+                      ? 'bg-[#1ED760] text-black shadow-md shadow-[#1ED760]/25 scale-[1.02]'
+                      : 'bg-[#141724] hover:bg-[#1C2133] active:bg-[#252B42] text-white/75 hover:text-white border border-white/[0.08] hover:border-white/20'
+                  }`}
+                >
+                  {tab.icon && <span className="text-[13px]">{tab.icon}</span>}
+                  <span>{tab.label}</span>
+                  <span
+                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full font-bold ${
+                      isActive
+                        ? 'bg-black/20 text-black'
+                        : 'bg-white/[0.08] text-white/50'
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Master Song Cards Grid */}
