@@ -363,12 +363,8 @@ export function HomeView({
         matchesCategory = cat === 'golden classics' || (s.year !== undefined && s.year <= 2012);
       } else if (target === 'mass & beats') {
         matchesCategory = cat === 'mass & beats' || cat === 'mass beats' || cat === 'party';
-      } else if (target === 'folk & beats') {
-        matchesCategory = cat.includes('folk') || s.artist.toLowerCase().includes('mangli') || s.artist.toLowerCase().includes('ram miriyala');
       } else if (target === '90s classics') {
         matchesCategory = cat.includes('90s') || (s.year !== undefined && s.year >= 1989 && s.year <= 1999);
-      } else if (target === 'devotional') {
-        matchesCategory = cat.includes('devotional');
       } else if (target === 'blockbusters') {
         matchesCategory = cat === 'blockbusters' || s.artist.toLowerCase().includes('thaman') || s.artist.toLowerCase().includes('devi sri prasad') || s.artist.toLowerCase().includes('anirudh') || s.artist.toLowerCase().includes('keeravaani');
       } else {
@@ -617,19 +613,7 @@ export function HomeView({
         onSongContextMenu={onSongContextMenu}
       />
 
-      {/* 9. SHELF 7: TELUGU FOLK, TEENMAAR & VILLAGE BEATS */}
-      <SpotifyShelf
-        title="🥁 Telugu Folk, Teenmaar & Village Beats"
-        subtitle="Mangli, Ram Miriyala, raw folk drums, Dappu and festive celebrations"
-        songs={folkBeatsSongs}
-        onPlaySong={playSong}
-        currentSongId={currentSong?.id}
-        isPlaying={isPlaying}
-        onTogglePlay={togglePlay}
-        onSongContextMenu={onSongContextMenu}
-      />
-
-      {/* 10. SHELF 8: 90s GOLDEN ERA & VINTAGE CLASSICS */}
+      {/* 9. SHELF 7: 90s GOLDEN ERA & VINTAGE CLASSICS */}
       <SpotifyShelf
         title="📻 90s Telugu Golden Era & Vintage Masterpieces"
         subtitle="SP Balasubrahmanyam, Chithra, Ilaiyaraaja, Keeravani vintage gems"
@@ -641,19 +625,7 @@ export function HomeView({
         onSongContextMenu={onSongContextMenu}
       />
 
-      {/* 11. SHELF 9: DEVOTIONAL & SPIRITUAL MELODIES */}
-      <SpotifyShelf
-        title="🪔 Sacred Devotional & Spiritual Melodies"
-        subtitle="Annamayya, Sri Ramadasu, Shirdi Sai and timeless devotional chants"
-        songs={devotionalSongs}
-        onPlaySong={playSong}
-        currentSongId={currentSong?.id}
-        isPlaying={isPlaying}
-        onTogglePlay={togglePlay}
-        onSongContextMenu={onSongContextMenu}
-      />
-
-      {/* 12. MASTER CATALOG SECTION WITH REAL-TIME SEARCH & CATEGORY PILLS */}
+      {/* 10. MASTER CATALOG SECTION WITH REAL-TIME SEARCH & CATEGORY PILLS */}
       {/* 4. MASTER CATALOG SECTION WITH FULL 10-GENRE FILTERING */}
       <section className="space-y-4 pt-4 border-t border-white/[0.08]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
@@ -665,7 +637,7 @@ export function HomeView({
               </span>
             </h2>
             <p className="text-xs text-white/50 mt-0.5">
-              Browse 600+ verified Telugu studio master tracks across all 10 genres in 320kbps audio
+              Browse 500 verified Telugu studio master tracks across all 8 genres in 320kbps audio
             </p>
           </div>
 
@@ -694,9 +666,7 @@ export function HomeView({
               { id: 'Golden Classics', label: '2000s Classics', count: classicsSongs.length, icon: '🌟' },
               { id: 'Sid Sriram', label: 'Sid Sriram', count: sidSriramSongs.length, icon: '🎤' },
               { id: 'Blockbusters', label: 'Blockbusters', count: blockbustersSongs.length, icon: '🎬' },
-              { id: 'Folk & Beats', label: 'Folk & Beats', count: folkBeatsSongs.length, icon: '🥁' },
               { id: '90s Classics', label: '90s Vintage', count: vintage90sSongs.length, icon: '📻' },
-              { id: 'Devotional', label: 'Devotional', count: devotionalSongs.length, icon: '🪔' },
             ].map(tab => {
               const isActive = activeCategory === tab.id;
               return (
