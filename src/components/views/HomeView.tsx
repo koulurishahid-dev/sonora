@@ -350,6 +350,10 @@ export function HomeView({
       (s.year !== undefined && s.year >= 1989 && s.year <= 1999)
   );
 
+  const travelSongs = allSongs.filter(
+    s => (s.category || s.genre || '').toLowerCase().includes('travel')
+  );
+
   // Master Filter & Search
   const filteredCatalog = allSongs.filter(s => {
     // Category match
@@ -367,6 +371,8 @@ export function HomeView({
         matchesCategory = cat.includes('90s') || (s.year !== undefined && s.year >= 1989 && s.year <= 1999);
       } else if (target === 'blockbusters') {
         matchesCategory = cat === 'blockbusters' || s.artist.toLowerCase().includes('thaman') || s.artist.toLowerCase().includes('devi sri prasad') || s.artist.toLowerCase().includes('anirudh') || s.artist.toLowerCase().includes('keeravaani');
+      } else if (target === 'telugu travel melodies' || target === 'travel melodies') {
+        matchesCategory = cat.includes('travel');
       } else {
         matchesCategory = cat === target;
       }
@@ -479,7 +485,7 @@ export function HomeView({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-2 sm:gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-3">
           {SPOTIFY_TELUGU_CATEGORIES.map(cat => {
             const playlistSongs = allSongs.filter(s => {
               const catTag = s.category || s.genre || '';
@@ -491,6 +497,7 @@ export function HomeView({
               if (cat.id === 'pl_spotify_sid_sriram') return catTag === 'Sid Sriram' || s.artist.toLowerCase().includes('sid sriram');
               if (cat.id === 'pl_spotify_blockbusters') return catTag === 'Blockbusters' || s.artist.toLowerCase().includes('thaman') || s.artist.toLowerCase().includes('devi sri prasad') || s.artist.toLowerCase().includes('anirudh');
               if (cat.id === 'pl_spotify_90s_classics') return catTag === '90s Classics';
+              if (cat.id === 'pl_spotify_travel_melodies') return catTag === 'Telugu Travel Melodies';
               return true;
             });
 
@@ -625,7 +632,19 @@ export function HomeView({
         onSongContextMenu={onSongContextMenu}
       />
 
-      {/* 10. MASTER CATALOG SECTION WITH REAL-TIME SEARCH & CATEGORY PILLS */}
+      {/* 10. SHELF 8: TELUGU TRAVEL MELODIES & ROAD TRIPS */}
+      <SpotifyShelf
+        title="🚗 Telugu Travel Melodies & Road Trips"
+        subtitle="Soulful travel tracks, breezy road trip anthems & wanderlust tunes from Spotify"
+        songs={travelSongs}
+        onPlaySong={playSong}
+        currentSongId={currentSong?.id}
+        isPlaying={isPlaying}
+        onTogglePlay={togglePlay}
+        onSongContextMenu={onSongContextMenu}
+      />
+
+      {/* 11. MASTER CATALOG SECTION WITH REAL-TIME SEARCH & CATEGORY PILLS */}
       {/* 4. MASTER CATALOG SECTION WITH FULL 10-GENRE FILTERING */}
       <section className="space-y-4 pt-4 border-t border-white/[0.08]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
@@ -637,7 +656,7 @@ export function HomeView({
               </span>
             </h2>
             <p className="text-xs text-white/50 mt-0.5">
-              Browse 500 verified Telugu studio master tracks across all 8 genres in 320kbps audio
+              Browse 600 verified Telugu studio master tracks across all 9 genres in 320kbps audio
             </p>
           </div>
 
@@ -659,6 +678,7 @@ export function HomeView({
           <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none flex-nowrap scroll-smooth touch-pan-x">
             {[
               { id: 'All', label: 'All', count: allSongs.length, icon: null },
+              { id: 'Telugu Travel Melodies', label: 'Travel Melodies', count: travelSongs.length, icon: '🚗' },
               { id: 'Hot Hits', label: 'Hot Hits', count: hotHitsSongs.length, icon: '⚡' },
               { id: 'Love Songs', label: 'Romance', count: romanceSongs.length, icon: '💖' },
               { id: 'Melodies', label: 'Melodies', count: melodySongs.length, icon: '🎵' },

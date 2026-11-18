@@ -87,6 +87,15 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
     categoryTag: '90s Classics',
     coverImage: '/covers/classics_90s.svg',
   },
+  {
+    id: 'pl_spotify_travel_melodies',
+    title: 'Telugu Travel Melodies & Road Trips',
+    shortTitle: 'Travel Melodies',
+    spotifyPlaylistUrl: 'https://open.spotify.com/playlist/1BoRpOjbTUlsXSdAWOueXZ',
+    description: 'Breezy acoustic guitars, wanderlust highway anthems and soulful Telugu road trip melodies.',
+    categoryTag: 'Telugu Travel Melodies',
+    coverImage: '/covers/telugu_travel_melodies.jpg',
+  },
 ];
 
 // Expanded Mass, Dance, Viral & Golden Classic Tracks to ensure complete Telugu representation
@@ -814,6 +823,9 @@ export async function importAllSpotifyTeluguCategories(
       }
       if (cat.id === 'pl_spotify_90s_classics') {
         return catTag === '90s Classics' || (s.year !== undefined && s.year >= 1989 && s.year <= 1999);
+      }
+      if (cat.id === 'pl_spotify_travel_melodies') {
+        return catTag === 'Telugu Travel Melodies';
       }
       return false;
     });

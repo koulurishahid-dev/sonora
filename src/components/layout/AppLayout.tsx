@@ -90,7 +90,7 @@ export function AppLayout() {
     async function initCollection() {
       if (isAutoSeedingInProgress) return;
       try {
-        const seededSpotify = localStorage.getItem('sonora_telugu_v5_500clean_no_devotional_folk');
+        const seededSpotify = localStorage.getItem('sonora_telugu_v6_travel_melodies_600');
         const count = await db.songs.count();
 
         // Purge old Devotional & Folk songs from local DB if upgrading
@@ -109,10 +109,10 @@ export function AppLayout() {
         // First run automatic deduplication on any pre-existing database rows
         await deduplicateSongsInLibrary();
 
-        if (!seededSpotify || count < 480) {
+        if (!seededSpotify || count < 580) {
           isAutoSeedingInProgress = true;
           await importAllSpotifyTeluguCategories();
-          localStorage.setItem('sonora_telugu_v5_500clean_no_devotional_folk', 'true');
+          localStorage.setItem('sonora_telugu_v6_travel_melodies_600', 'true');
         }
       } catch (e) {
         console.warn('Initial seeding error:', e);
