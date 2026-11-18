@@ -483,8 +483,18 @@ export function HomeView({
       )}
 
       {/* 2. SPOTIFY SIGNATURE QUICK ACCESS TILES (ALL 10 GENRES) */}
-      <section className="space-y-3">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <section className="space-y-2.5 sm:space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm sm:text-base md:text-lg font-black text-white tracking-tight flex items-center gap-2">
+            <Flame className="w-4 h-4 text-[#1ED760]" />
+            <span>Featured Collections</span>
+          </h2>
+          <span className="text-[11px] font-mono text-white/40">
+            {SPOTIFY_TELUGU_CATEGORIES.length} Playlists
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
           {SPOTIFY_TELUGU_CATEGORIES.map(cat => {
             const playlistSongs = allSongs.filter(s => {
               const catTag = s.category || s.genre || '';
@@ -505,12 +515,14 @@ export function HomeView({
               <div
                 key={cat.id}
                 onClick={() => onNavigate('playlist-detail', cat.id)}
-                className="flex items-center gap-2.5 sm:gap-3.5 h-14 sm:h-16 md:h-20 rounded-xl bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.06] hover:border-white/[0.15] cursor-pointer transition-all duration-200 overflow-hidden group shadow-md relative"
+                className="flex items-center gap-2 sm:gap-3 h-14 sm:h-16 md:h-18 rounded-xl bg-[#131622]/90 hover:bg-[#1A1F30] active:bg-[#22283D] active:scale-[0.98] border border-white/[0.08] hover:border-white/20 cursor-pointer transition-all duration-200 overflow-hidden group shadow-md relative select-none"
               >
-                <div className="w-14 sm:w-16 md:w-20 h-full shrink-0 relative bg-zinc-900 overflow-hidden">
+                <div className="w-14 sm:w-16 md:w-18 h-full shrink-0 relative bg-zinc-900 overflow-hidden">
                   <img
                     src={cat.coverImage}
-                    alt={cat.shortTitle}
+                    alt=""
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
                     onError={(e) => {
                       const target = e.currentTarget;
                       target.src = '/covers/hot_hits_telugu.jpg';
@@ -519,16 +531,16 @@ export function HomeView({
                   />
                 </div>
 
-                <div className="min-w-0 flex-1 pr-10 sm:pr-12">
-                  <h3 className="text-xs sm:text-sm font-bold text-white truncate tracking-tight">
+                <div className="min-w-0 flex-1 px-1.5 sm:px-2 pr-2 sm:pr-12 flex flex-col justify-center">
+                  <h3 className="text-[11px] sm:text-xs md:text-sm font-bold text-white line-clamp-2 leading-tight tracking-tight">
                     {cat.shortTitle}
                   </h3>
-                  <p className="text-[10px] sm:text-[11px] text-white/50 truncate font-mono mt-0.5">
+                  <p className="text-[9px] sm:text-[10px] text-white/50 font-mono mt-0.5 truncate">
                     {playlistSongs.length} tracks
                   </p>
                 </div>
 
-                {/* Floating Spotify Play Button */}
+                {/* Floating Spotify Play Button - Desktop Only */}
                 <div
                   onClick={e => {
                     e.stopPropagation();
@@ -536,9 +548,9 @@ export function HomeView({
                       playSong(playlistSongs[0], playlistSongs);
                     }
                   }}
-                  className="absolute right-3 w-10 h-10 rounded-full bg-[#1ED760] text-black flex items-center justify-center shadow-xl opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 hover:scale-110 active:scale-95 transition-all"
+                  className="hidden sm:flex absolute right-2.5 w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#1ED760] text-black items-center justify-center shadow-xl opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 hover:scale-110 active:scale-95 transition-all"
                 >
-                  <Play className="w-4 h-4 fill-black ml-0.5" />
+                  <Play className="w-3.5 h-3.5 fill-black ml-0.5" />
                 </div>
               </div>
             );

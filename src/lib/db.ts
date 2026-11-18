@@ -106,9 +106,9 @@ export function getArtworkObjectUrl(songOrArtwork: Song | Album | Artist | Playl
     if (cat.includes('mass') || cat.includes('beat') || cat.includes('party')) return '/covers/mass_party_beats.jpg';
     if (cat.includes('sid sriram')) return '/covers/sid_sriram_essentials.jpg';
     if (cat.includes('blockbuster') || cat.includes('composer')) return '/covers/blockbuster_hits.jpg';
-    if (cat.includes('folk') || cat.includes('teenmaar')) return '/covers/folk_beats.jpg';
-    if (cat.includes('90s') || cat.includes('vintage')) return '/covers/classics_90s.jpg';
-    if (cat.includes('devotional') || cat.includes('spiritual')) return '/covers/devotional_classics.jpg';
+    if (cat.includes('folk') || cat.includes('teenmaar')) return '/covers/folk_beats.svg';
+    if (cat.includes('90s') || cat.includes('vintage')) return '/covers/classics_90s.svg';
+    if (cat.includes('devotional') || cat.includes('spiritual')) return '/covers/devotional_classics.svg';
     if (cat.includes('classic') || cat.includes('nostalgia')) return '/covers/golden_classics.jpg';
     if (cat.includes('melod')) return '/covers/soulful_melodies.jpg';
     return '/covers/hot_hits_telugu.jpg';

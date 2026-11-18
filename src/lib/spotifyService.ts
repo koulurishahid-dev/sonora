@@ -85,7 +85,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DXa2hu5i2qHqE',
     description: 'High-energy Telangana folk, energetic Dappu, Teenmaar beats and rural chartbusters.',
     categoryTag: 'Folk & Beats',
-    coverImage: '/covers/folk_beats.jpg',
+    coverImage: '/covers/folk_beats.svg',
   },
   {
     id: 'pl_spotify_90s_classics',
@@ -94,7 +94,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DXcKq84G1W11B',
     description: 'Nostalgic 90s Telugu masterpieces featuring SP Balasubrahmanyam, Chithra, Ilaiyaraaja.',
     categoryTag: '90s Classics',
-    coverImage: '/covers/classics_90s.jpg',
+    coverImage: '/covers/classics_90s.svg',
   },
   {
     id: 'pl_spotify_devotional',
@@ -103,7 +103,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
     spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX5c31g5s0D5F',
     description: 'Timeless spiritual and classical chants from Annamayya, Sri Ramadasu and sacred lore.',
     categoryTag: 'Devotional',
-    coverImage: '/covers/devotional_classics.jpg',
+    coverImage: '/covers/devotional_classics.svg',
   },
 ];
 
