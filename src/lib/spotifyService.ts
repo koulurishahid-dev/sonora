@@ -64,7 +64,7 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
     id: 'pl_spotify_sid_sriram',
     title: 'Sid Sriram Essentials',
     shortTitle: 'Sid Sriram Hits',
-    spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DXdgn5uXkM2Nn',
+    spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DXb5Hc9BmAT8t',
     description: 'Every iconic Sid Sriram Telugu chartbuster in one uninterrupted collection.',
     categoryTag: 'Sid Sriram',
     coverImage: '/covers/sid_sriram_essentials.jpg',

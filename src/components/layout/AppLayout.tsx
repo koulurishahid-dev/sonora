@@ -94,11 +94,11 @@ export function AppLayout() {
         await deduplicateSongsInLibrary();
 
         const count = await db.songs.count();
-        const seededSpotify = localStorage.getItem('sonora_telugu_v3_150love');
-        if (!seededSpotify || count < 550) {
+        const seededSpotify = localStorage.getItem('sonora_telugu_v4_sidsriram_spotify');
+        if (!seededSpotify || count < 580) {
           isAutoSeedingInProgress = true;
           await importAllSpotifyTeluguCategories();
-          localStorage.setItem('sonora_telugu_v3_150love', 'true');
+          localStorage.setItem('sonora_telugu_v4_sidsriram_spotify', 'true');
         }
       } catch (e) {
         console.warn('Initial seeding error:', e);
