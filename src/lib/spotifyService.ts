@@ -79,15 +79,6 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
     coverImage: '/covers/blockbuster_hits.jpg',
   },
   {
-    id: 'pl_spotify_folk_beats',
-    title: 'Telugu Folk, Teenmaar & Village Beats',
-    shortTitle: 'Folk & Teenmaar',
-    spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DXa2hu5i2qHqE',
-    description: 'High-energy Telangana folk, energetic Dappu, Teenmaar beats and rural chartbusters.',
-    categoryTag: 'Folk & Beats',
-    coverImage: '/covers/folk_beats.svg',
-  },
-  {
     id: 'pl_spotify_90s_classics',
     title: '90s Telugu Golden Era & Vintage Gems',
     shortTitle: '90s Golden Era',
@@ -95,15 +86,6 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
     description: 'Nostalgic 90s Telugu masterpieces featuring SP Balasubrahmanyam, Chithra, Ilaiyaraaja.',
     categoryTag: '90s Classics',
     coverImage: '/covers/classics_90s.svg',
-  },
-  {
-    id: 'pl_spotify_devotional',
-    title: 'Telugu Devotional & Spiritual Classics',
-    shortTitle: 'Sacred Devotional',
-    spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX5c31g5s0D5F',
-    description: 'Timeless spiritual and classical chants from Annamayya, Sri Ramadasu and sacred lore.',
-    categoryTag: 'Devotional',
-    coverImage: '/covers/devotional_classics.svg',
   },
 ];
 
@@ -818,14 +800,8 @@ export async function importAllSpotifyTeluguCategories(
           s.artist.toLowerCase().includes('keeravaani')
         );
       }
-      if (cat.id === 'pl_spotify_folk_beats') {
-        return catTag === 'Folk & Beats' || s.artist.toLowerCase().includes('mangli') || s.artist.toLowerCase().includes('ram miriyala');
-      }
       if (cat.id === 'pl_spotify_90s_classics') {
         return catTag === '90s Classics' || (s.year !== undefined && s.year >= 1989 && s.year <= 1999);
-      }
-      if (cat.id === 'pl_spotify_devotional') {
-        return catTag === 'Devotional';
       }
       return false;
     });

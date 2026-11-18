@@ -344,21 +344,10 @@ export function HomeView({
       s.artist.toLowerCase().includes('keeravaani')
   );
 
-  const folkBeatsSongs = allSongs.filter(
-    s =>
-      (s.category || s.genre || '').toLowerCase().includes('folk') ||
-      s.artist.toLowerCase().includes('mangli') ||
-      s.artist.toLowerCase().includes('ram miriyala')
-  );
-
   const vintage90sSongs = allSongs.filter(
     s =>
       (s.category || s.genre || '').toLowerCase().includes('90s') ||
       (s.year !== undefined && s.year >= 1989 && s.year <= 1999)
-  );
-
-  const devotionalSongs = allSongs.filter(
-    s => (s.category || s.genre || '').toLowerCase().includes('devotional')
   );
 
   // Master Filter & Search
@@ -494,7 +483,7 @@ export function HomeView({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-2 sm:gap-3">
           {SPOTIFY_TELUGU_CATEGORIES.map(cat => {
             const playlistSongs = allSongs.filter(s => {
               const catTag = s.category || s.genre || '';
@@ -505,9 +494,7 @@ export function HomeView({
               if (cat.id === 'pl_spotify_golden_classics') return catTag === 'Golden Classics';
               if (cat.id === 'pl_spotify_sid_sriram') return catTag === 'Sid Sriram' || s.artist.toLowerCase().includes('sid sriram');
               if (cat.id === 'pl_spotify_blockbusters') return catTag === 'Blockbusters' || s.artist.toLowerCase().includes('thaman') || s.artist.toLowerCase().includes('devi sri prasad') || s.artist.toLowerCase().includes('anirudh');
-              if (cat.id === 'pl_spotify_folk_beats') return catTag === 'Folk & Beats';
               if (cat.id === 'pl_spotify_90s_classics') return catTag === '90s Classics';
-              if (cat.id === 'pl_spotify_devotional') return catTag === 'Devotional';
               return true;
             });
 
