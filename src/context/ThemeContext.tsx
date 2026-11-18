@@ -6,17 +6,17 @@ import { db } from '@/lib/db';
 import { hexToRgb } from '@/lib/utils';
 
 export const ACCENT_COLORS = [
-  { name: 'Emerald', hex: '#1ED760' },
-  { name: 'Violet', hex: '#8B5CF6' },
-  { name: 'Cyan Neon', hex: '#06B6D4' },
-  { name: 'Sunset Rose', hex: '#F43F5E' },
-  { name: 'Amber Gold', hex: '#F59E0B' },
-  { name: 'Electric Blue', hex: '#3B82F6' },
+  { name: 'Electric Lavender', hex: '#A78BFA' },
+  { name: 'Bright Lavender', hex: '#D8B4FE' },
+  { name: 'Violet Glow', hex: '#8B5CF6' },
+  { name: 'Royal Purple', hex: '#7C3AED' },
+  { name: 'Deep Amethyst', hex: '#C084FC' },
+  { name: 'Midnight Orchid', hex: '#E879F9' },
 ];
 
 const DEFAULT_SETTINGS: AppSettings = {
   theme: 'dark',
-  accentColor: '#1ED760',
+  accentColor: '#A78BFA',
   defaultVolume: 0.8,
   crossfadeEnabled: false,
   crossfadeDuration: 3,
@@ -58,8 +58,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isLoaded) return;
     const root = document.documentElement;
-    // Apply accent color
-    const accent = settings.accentColor || '#1ED760';
+    // Apply accent color (migrate legacy emerald to electric lavender)
+    const accent = (!settings.accentColor || settings.accentColor.toLowerCase() === '#1ed760')
+      ? '#A78BFA'
+      : settings.accentColor;
     root.style.setProperty('--accent', accent);
     const rgb = hexToRgb(accent);
     root.style.setProperty('--accent-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);

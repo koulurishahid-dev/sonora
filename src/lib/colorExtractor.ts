@@ -1,16 +1,16 @@
-// Lightweight client-side dominant color extractor for artwork
+// Lightweight client-side dominant color extractor for artwork with Midnight Purple & Electric Lavender harmonization
 export interface ExtractedColors {
-  primary: string;       // Vibrant dominant hex
+  primary: string;       // Vibrant dominant hex (harmonized)
   secondary: string;     // Complementary or mid-tone hex
   glow: string;          // Semi-transparent rgba for shadows & glow
   ambientRgb: string;    // 'r, g, b' for CSS variables
 }
 
 const DEFAULT_COLORS: ExtractedColors = {
-  primary: '#1ED760',
-  secondary: '#38BDF8',
-  glow: 'rgba(30, 215, 96, 0.35)',
-  ambientRgb: '30, 215, 96',
+  primary: '#A78BFA',
+  secondary: '#D8B4FE',
+  glow: 'rgba(167, 139, 250, 0.25)',
+  ambientRgb: '167, 139, 250',
 };
 
 const colorCache = new Map<string, ExtractedColors>();
@@ -41,7 +41,7 @@ export function extractColorsFromImage(imgUrl?: string): Promise<ExtractedColors
         const imgData = ctx.getImageData(0, 0, 32, 32).data;
         let rSum = 0, gSum = 0, bSum = 0;
         let maxSat = 0;
-        let satR = 30, satG = 215, satB = 96;
+        let satR = 167, satG = 139, satB = 250;
         let count = 0;
 
         for (let i = 0; i < imgData.length; i += 4) {
@@ -79,23 +79,28 @@ export function extractColorsFromImage(imgUrl?: string): Promise<ExtractedColors
           return resolve(DEFAULT_COLORS);
         }
 
-        const avgR = Math.round(rSum / count);
-        const avgG = Math.round(gSum / count);
-        const avgB = Math.round(bSum / count);
+        const rawR = maxSat > 0.25 ? satR : Math.round(rSum / count);
+        const rawG = maxSat > 0.25 ? satG : Math.round(gSum / count);
+        const rawB = maxSat > 0.25 ? satB : Math.round(bSum / count);
 
-        // Vibrant color preference
-        const pR = maxSat > 0.25 ? satR : avgR;
-        const pG = maxSat > 0.25 ? satG : avgG;
-        const pB = maxSat > 0.25 ? satB : avgB;
+        // Harmonize 65% extracted artwork hue with 35% Electric Lavender (#A78BFA: 167, 139, 250)
+        // This derives secondary ambient atmosphere from artwork without breaking the midnight purple palette
+        const pR = Math.round(rawR * 0.65 + 167 * 0.35);
+        const pG = Math.round(rawG * 0.65 + 139 * 0.35);
+        const pB = Math.round(rawB * 0.65 + 250 * 0.35);
+
+        const secR = Math.round(rawR * 0.4 + 216 * 0.6);
+        const secG = Math.round(rawG * 0.4 + 180 * 0.6);
+        const secB = Math.round(rawB * 0.4 + 254 * 0.6);
 
         const toHex = (n: number) => n.toString(16).padStart(2, '0');
         const primaryHex = `#${toHex(pR)}${toHex(pG)}${toHex(pB)}`;
-        const secHex = `#${toHex(avgR)}${toHex(avgG)}${toHex(avgB)}`;
+        const secHex = `#${toHex(secR)}${toHex(secG)}${toHex(secB)}`;
 
         const result: ExtractedColors = {
           primary: primaryHex,
           secondary: secHex,
-          glow: `rgba(${pR}, ${pG}, ${pB}, 0.38)`,
+          glow: `rgba(${pR}, ${pG}, ${pB}, 0.25)`,
           ambientRgb: `${pR}, ${pG}, ${pB}`,
         };
 
