@@ -4,9 +4,11 @@
   "description": "Premium Personal Music Library & Streaming Player",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay"],
   "background_color": "#0B0B0D",
-  "theme_color": "#1ED760",
+  "theme_color": "#F59E0B",
   "orientation": "any",
+  "categories": ["music", "audio", "entertainment"],
   "icons": [
     {
       "src": "/icon.svg",

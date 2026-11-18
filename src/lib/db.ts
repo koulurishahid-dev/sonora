@@ -49,19 +49,21 @@ export const db = new SonoraDatabase();
 const objectUrlCache = new Map<string, string>();
 
 export function getAudioObjectUrl(song: Song): string {
-  if (song.sourceUrl && !song.isLocal) {
+  // 1. Prioritize original audio stream sourceUrl (real original vocals & studio master)
+  if (song.sourceUrl) {
     return song.sourceUrl;
   }
-  if (!song.audioBlob) {
-    return song.sourceUrl || '';
+  // 2. For local uploaded files, use the blob object URL
+  if (song.audioBlob) {
+    const cacheKey = `audio_${song.id}`;
+    if (objectUrlCache.has(cacheKey)) {
+      return objectUrlCache.get(cacheKey)!;
+    }
+    const url = URL.createObjectURL(song.audioBlob);
+    objectUrlCache.set(cacheKey, url);
+    return url;
   }
-  const cacheKey = `audio_${song.id}`;
-  if (objectUrlCache.has(cacheKey)) {
-    return objectUrlCache.get(cacheKey)!;
-  }
-  const url = URL.createObjectURL(song.audioBlob);
-  objectUrlCache.set(cacheKey, url);
-  return url;
+  return '';
 }
 
 export function getArtworkObjectUrl(songOrArtwork: Song | Album | Artist | Playlist | Blob | undefined): string | undefined {
@@ -97,7 +99,17 @@ export function getArtworkObjectUrl(songOrArtwork: Song | Album | Artist | Playl
     }
   }
 
-  return undefined;
+  // 3. Dynamic Spotify fallback for any track or playlist missing artwork
+  if ('category' in songOrArtwork || 'genre' in songOrArtwork) {
+    const cat = (((songOrArtwork as any).category || (songOrArtwork as any).genre) || '').toLowerCase();
+    if (cat.includes('love') || cat.includes('romance')) return '/covers/telugu_romance.jpg';
+    if (cat.includes('mass') || cat.includes('beat')) return '/covers/mass_party_beats.jpg';
+    if (cat.includes('classic') || cat.includes('nostalgia')) return '/covers/golden_classics.jpg';
+    if (cat.includes('melod')) return '/covers/soulful_melodies.jpg';
+    return '/covers/hot_hits_telugu.jpg';
+  }
+
+  return '/covers/hot_hits_telugu.jpg';
 }
 
 export function revokeAudioObjectUrl(songId: string) {
@@ -109,87 +121,106 @@ export function revokeAudioObjectUrl(songId: string) {
   }
 }
 
-// Rebuild albums and artists indexes based on all current songs
+// Rebuild albums and artists indexes based on all current songs (with concurrency guard & bulkPut)
+let syncPromise: Promise<void> | null = null;
+
 export async function syncAlbumsAndArtists(): Promise<void> {
-  const allSongs = await db.songs.toArray();
-  const albumsMap = new Map<string, { artist: string; year?: number; artworkBlob?: Blob; count: number; duration: number }>();
-  const artistsMap = new Map<string, { artworkBlob?: Blob; songs: Set<string>; albums: Set<string> }>();
+  if (syncPromise) {
+    return syncPromise;
+  }
 
-  for (const song of allSongs) {
-    // Albums grouping by title+artist
-    const albumTitle = song.album || 'Unknown Album';
-    const albumKey = `${albumTitle}:::${song.artist || 'Unknown Artist'}`.toLowerCase();
-    
-    if (!albumsMap.has(albumKey)) {
-      albumsMap.set(albumKey, {
-        artist: song.artist || 'Unknown Artist',
-        year: song.year,
-        artworkBlob: song.artworkBlob,
-        count: 1,
-        duration: song.duration,
-      });
-    } else {
-      const existing = albumsMap.get(albumKey)!;
-      existing.count += 1;
-      existing.duration += song.duration;
-      if (!existing.artworkBlob && song.artworkBlob) {
-        existing.artworkBlob = song.artworkBlob;
+  syncPromise = (async () => {
+    try {
+      const allSongs = await db.songs.toArray();
+      const albumsMap = new Map<string, { artist: string; year?: number; artworkBlob?: Blob; count: number; duration: number }>();
+      const artistsMap = new Map<string, { artworkBlob?: Blob; songs: Set<string>; albums: Set<string> }>();
+
+      for (const song of allSongs) {
+        // Albums grouping by title+artist
+        const albumTitle = song.album || 'Unknown Album';
+        const albumKey = `${albumTitle}:::${song.artist || 'Unknown Artist'}`.toLowerCase();
+        
+        if (!albumsMap.has(albumKey)) {
+          albumsMap.set(albumKey, {
+            artist: song.artist || 'Unknown Artist',
+            year: song.year,
+            artworkBlob: song.artworkBlob,
+            count: 1,
+            duration: song.duration,
+          });
+        } else {
+          const existing = albumsMap.get(albumKey)!;
+          existing.count += 1;
+          existing.duration += song.duration;
+          if (!existing.artworkBlob && song.artworkBlob) {
+            existing.artworkBlob = song.artworkBlob;
+          }
+        }
+
+        // Artists grouping
+        const artistName = song.artist || 'Unknown Artist';
+        const artistKey = artistName.toLowerCase();
+        if (!artistsMap.has(artistKey)) {
+          artistsMap.set(artistKey, {
+            artworkBlob: song.artworkBlob,
+            songs: new Set([song.id]),
+            albums: new Set([albumTitle]),
+          });
+        } else {
+          const existing = artistsMap.get(artistKey)!;
+          existing.songs.add(song.id);
+          existing.albums.add(albumTitle);
+          if (!existing.artworkBlob && song.artworkBlob) {
+            existing.artworkBlob = song.artworkBlob;
+          }
+        }
       }
-    }
 
-    // Artists grouping
-    const artistName = song.artist || 'Unknown Artist';
-    const artistKey = artistName.toLowerCase();
-    if (!artistsMap.has(artistKey)) {
-      artistsMap.set(artistKey, {
-        artworkBlob: song.artworkBlob,
-        songs: new Set([song.id]),
-        albums: new Set([albumTitle]),
+      // Save to albums & artists tables atomically using a transaction and bulkPut
+      await db.transaction('rw', [db.albums, db.artists], async () => {
+        const newAlbums: Album[] = [];
+        albumsMap.forEach((val, key) => {
+          const title = key.split(':::')[0];
+          newAlbums.push({
+            id: `album_${key}`,
+            title: title.charAt(0).toUpperCase() + title.slice(1),
+            artist: val.artist,
+            year: val.year,
+            artworkBlob: val.artworkBlob,
+            songCount: val.count,
+            duration: Math.round(val.duration),
+          });
+        });
+
+        await db.albums.clear();
+        if (newAlbums.length > 0) {
+          await db.albums.bulkPut(newAlbums);
+        }
+
+        const newArtists: Artist[] = [];
+        artistsMap.forEach((val, key) => {
+          newArtists.push({
+            id: `artist_${key}`,
+            name: key.charAt(0).toUpperCase() + key.slice(1),
+            artworkBlob: val.artworkBlob,
+            songCount: val.songs.size,
+            albumCount: val.albums.size,
+          });
+        });
+
+        await db.artists.clear();
+        if (newArtists.length > 0) {
+          await db.artists.bulkPut(newArtists);
+        }
       });
-    } else {
-      const existing = artistsMap.get(artistKey)!;
-      existing.songs.add(song.id);
-      existing.albums.add(albumTitle);
-      if (!existing.artworkBlob && song.artworkBlob) {
-        existing.artworkBlob = song.artworkBlob;
-      }
+    } catch (err) {
+      console.warn('syncAlbumsAndArtists error:', err);
+    } finally {
+      syncPromise = null;
     }
-  }
+  })();
 
-  // Save to albums table
-  await db.albums.clear();
-  const newAlbums: Album[] = [];
-  albumsMap.forEach((val, key) => {
-    const title = key.split(':::')[0];
-    newAlbums.push({
-      id: `album_${key}`,
-      title: title.charAt(0).toUpperCase() + title.slice(1),
-      artist: val.artist,
-      year: val.year,
-      artworkBlob: val.artworkBlob,
-      songCount: val.count,
-      duration: Math.round(val.duration),
-    });
-  });
-  if (newAlbums.length > 0) {
-    await db.albums.bulkAdd(newAlbums);
-  }
-
-  // Save to artists table
-  await db.artists.clear();
-  const newArtists: Artist[] = [];
-  artistsMap.forEach((val, key) => {
-    newArtists.push({
-      id: `artist_${key}`,
-      name: key.charAt(0).toUpperCase() + key.slice(1),
-      artworkBlob: val.artworkBlob,
-      songCount: val.songs.size,
-      albumCount: val.albums.size,
-    });
-  });
-  if (newArtists.length > 0) {
-    await db.artists.bulkAdd(newArtists);
-  }
+  return syncPromise;
 }
 
 // Auto-repairs missing/broken artwork, clears dead blob: URLs, and cleans junk tags from titles
@@ -199,6 +230,17 @@ export async function repairLibraryArtworkAndTitles(
   const songs = await db.songs.toArray();
   let updatedCount = 0;
   const total = songs.length;
+
+  let massAndClassics: any[] = [];
+  let curatedSongs: any[] = [];
+  try {
+    const sp = await import('./spotifyService');
+    const as = await import('./audioSynthesis');
+    massAndClassics = sp.SPOTIFY_TELUGU_MASS_AND_CLASSICS || [];
+    curatedSongs = as.CURATED_TELUGU_SONGS || [];
+  } catch {
+    // Non-blocking
+  }
 
   for (let i = 0; i < total; i++) {
     const song = songs[i];
@@ -216,6 +258,27 @@ export async function repairLibraryArtworkAndTitles(
     if (newArtworkUrl && newArtworkUrl.startsWith('blob:')) {
       newArtworkUrl = undefined;
       needsUpdate = true;
+    }
+
+    // Automatically synchronize with latest verified high-res iTunes artwork & active audio streams
+    let newSourceUrl = song.sourceUrl;
+    const curatedMatch =
+      massAndClassics.find(
+        c => c.title.toLowerCase().trim() === newTitle.toLowerCase().trim()
+      ) ||
+      curatedSongs.find(
+        c => c.title.toLowerCase().trim() === newTitle.toLowerCase().trim()
+      );
+
+    if (curatedMatch) {
+      if (curatedMatch.artworkUrl && song.artworkUrl !== curatedMatch.artworkUrl) {
+        newArtworkUrl = curatedMatch.artworkUrl;
+        needsUpdate = true;
+      }
+      if (curatedMatch.sourceUrl && song.sourceUrl !== curatedMatch.sourceUrl) {
+        newSourceUrl = curatedMatch.sourceUrl;
+        needsUpdate = true;
+      }
     }
 
     // If no artworkBlob and no valid artworkUrl, search verified movie artwork!
@@ -252,6 +315,7 @@ export async function repairLibraryArtworkAndTitles(
         artist: newArtist,
         album: newAlbum,
         artworkUrl: newArtworkUrl,
+        sourceUrl: newSourceUrl,
       });
       updatedCount++;
     }
@@ -582,6 +646,7 @@ export async function resetAllSongs(): Promise<number> {
   const all = await db.songs.toArray();
   const count = all.length;
   await db.songs.clear();
+  await db.playlists.clear();
   await db.playlistSongs.clear();
   await db.favorites.clear();
   await db.listeningHistory.clear();
@@ -589,4 +654,37 @@ export async function resetAllSongs(): Promise<number> {
   await db.albums.clear();
   await db.artists.clear();
   return count;
+}
+
+// Scans the library, identifies any duplicate song entries by title or audio URL, and deletes redundant copies
+export async function deduplicateSongsInLibrary(): Promise<number> {
+  const all = await db.songs.toArray();
+  const seenKeys = new Map<string, Song>();
+  const duplicateIdsToDelete: string[] = [];
+
+  for (const song of all) {
+    const normTitle = (song.title || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    const normSource = song.sourceUrl ? song.sourceUrl.split('?')[0].split('/').pop() : '';
+    const key = normSource || normTitle;
+
+    if (seenKeys.has(key)) {
+      duplicateIdsToDelete.push(song.id);
+    } else {
+      seenKeys.set(key, song);
+    }
+  }
+
+  if (duplicateIdsToDelete.length > 0) {
+    await db.songs.bulkDelete(duplicateIdsToDelete);
+    for (const id of duplicateIdsToDelete) {
+      await db.playlistSongs.where('songId').equals(id).delete();
+      await db.favorites.where('songId').equals(id).delete();
+      await db.listeningHistory.where('songId').equals(id).delete();
+      await db.lyrics.where('songId').equals(id).delete();
+      revokeAudioObjectUrl(id);
+    }
+    await syncAlbumsAndArtists();
+  }
+
+  return duplicateIdsToDelete.length;
 }

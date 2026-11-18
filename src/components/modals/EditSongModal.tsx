@@ -153,10 +153,10 @@ export function EditSongModal({ isOpen, onClose, song, onSuccess }: EditSongModa
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="relative w-full max-w-xl bg-[#121216] border border-[#303038] rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[92vh]"
+          className="relative w-full max-w-xl glass-modal border border-white/15 rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[92vh]"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[#303038]/60 bg-[#16161D]">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 glass-pure">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center">
                 <Edit2 className="w-4 h-4" />

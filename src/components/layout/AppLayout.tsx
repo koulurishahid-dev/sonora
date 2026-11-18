@@ -14,10 +14,12 @@ import { AddLinkModal } from '../modals/AddLinkModal';
 import { CreatePlaylistModal } from '../modals/CreatePlaylistModal';
 import { EditSongModal } from '../modals/EditSongModal';
 import { SongContextMenu } from '../modals/SongContextMenu';
+import { SpotifyImportModal } from '../modals/SpotifyImportModal';
 import { LyricsPanel } from '../player/LyricsPanel';
 import { usePlayer } from '@/context/PlayerContext';
 import { useTheme } from '@/context/ThemeContext';
-import { Lock, Radio } from 'lucide-react';
+import { Lock, Radio, Disc } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Views
 import { HomeView } from '../views/HomeView';
@@ -34,10 +36,24 @@ import { RecentlyPlayedView } from '../views/RecentlyPlayedView';
 import { OfflineView } from '../views/OfflineView';
 import { SearchView } from '../views/SearchView';
 import { SettingsView } from '../views/SettingsView';
+import { seedCuratedPersonalMusic, CURATED_TELUGU_SONGS } from '@/lib/audioSynthesis';
+import { importAllSpotifyTeluguCategories } from '@/lib/spotifyService';
+import { db, deduplicateSongsInLibrary } from '@/lib/db';
+
+let isAutoSeedingInProgress = false;
 
 export function AppLayout() {
-  const { isLyricsOpen, setIsLyricsOpen, currentSong, currentTime, seek, setIsNowPlayingOpen } =
-    usePlayer();
+  const {
+    isLyricsOpen,
+    setIsLyricsOpen,
+    currentSong,
+    currentTime,
+    seek,
+    setIsNowPlayingOpen,
+    isSideViewOpen,
+    toggleSideView,
+    isPlaying,
+  } = usePlayer();
   const { settings } = useTheme();
 
   // Navigation History
@@ -58,6 +74,7 @@ export function AppLayout() {
   // Modals
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isAddLinkOpen, setIsAddLinkOpen] = useState(false);
+  const [isSpotifyImportOpen, setIsSpotifyImportOpen] = useState(false);
   const [isCreatePlaylistOpen, setIsCreatePlaylistOpen] = useState(false);
   const [playlistToEdit, setPlaylistToEdit] = useState<Playlist | null>(null);
   const [isEditSongOpen, setIsEditSongOpen] = useState(false);
@@ -65,9 +82,32 @@ export function AppLayout() {
   const [contextMenu, setContextMenu] = useState<{ song: Song; x: number; y: number } | null>(
     null
   );
-  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
 
   const currentRoute = history[historyIndex] || { view: 'home' };
+
+  // Auto-seed and deduplicate all Telugu Melodies & Love Songs
+  React.useEffect(() => {
+    async function initCollection() {
+      if (isAutoSeedingInProgress) return;
+      try {
+        // First run automatic deduplication on any pre-existing database rows
+        await deduplicateSongsInLibrary();
+
+        const count = await db.songs.count();
+        const seededSpotify = localStorage.getItem('sonora_spotify_categories_v8');
+        if (!seededSpotify || count < 110) {
+          isAutoSeedingInProgress = true;
+          await importAllSpotifyTeluguCategories();
+          localStorage.setItem('sonora_spotify_categories_v8', 'true');
+        }
+      } catch (e) {
+        console.warn('Initial seeding error:', e);
+      } finally {
+        isAutoSeedingInProgress = false;
+      }
+    }
+    initCollection();
+  }, []);
 
   const handleNavigate = (view: ViewType, param?: string) => {
     if (view === 'now-playing') {
@@ -117,8 +157,8 @@ export function AppLayout() {
   // If privacy lock is enabled and user hasn't entered passcode yet
   if (settings.privacyLockEnabled && !isUnlocked) {
     return (
-      <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#0B0B0D] text-white p-6 select-none">
-        <div className="w-full max-w-sm p-8 rounded-3xl bg-[#121216] border border-[#303038] shadow-2xl text-center space-y-6">
+      <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#08090B] text-white p-6 select-none relative">
+        <div className="w-full max-w-sm p-8 rounded-3xl glass-modal border border-white/15 shadow-2xl text-center space-y-6 relative z-10">
           <div className="w-16 h-16 rounded-2xl bg-[var(--accent)] text-black flex items-center justify-center mx-auto shadow-xl">
             <Lock className="w-8 h-8" />
           </div>
@@ -141,7 +181,7 @@ export function AppLayout() {
                 setEnteredPin(e.target.value);
                 setPinError(false);
               }}
-              className="w-full text-center text-xl tracking-widest py-3 px-4 rounded-xl bg-[#19191F] border border-[#303038] text-white focus:border-[var(--accent)] outline-none font-mono"
+              className="w-full text-center text-xl tracking-widest py-3 px-4 rounded-xl glass-pure border border-white/15 text-white focus:border-[var(--accent)] outline-none font-mono"
             />
 
             {pinError && (
@@ -161,7 +201,7 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#0B0B0D] text-white">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#08090B] text-white relative">
       {/* Left Sidebar for Desktop */}
       <Sidebar
         currentView={currentRoute.view}
@@ -216,120 +256,133 @@ export function AppLayout() {
             onGoForward={handleGoForward}
             onOpenUpload={() => setIsUploadOpen(true)}
             onOpenAddLink={() => setIsAddLinkOpen(true)}
+            onOpenSpotifyImport={() => setIsSpotifyImportOpen(true)}
             onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
             onOpenSearch={() => handleNavigate('search')}
           />
 
-        {/* Dynamic View Body */}
-        <main className="flex-1 overflow-y-auto relative pb-36 md:pb-28">
-          {currentRoute.view === 'home' && (
-            <HomeView
-              onNavigate={handleNavigate}
-              onOpenUpload={() => setIsUploadOpen(true)}
-              onSongContextMenu={handleSongContextMenu}
-            />
-          )}
+        {/* Dynamic View Body with Smooth Cinematic Page Transitions */}
+        <main className="flex-1 overflow-y-auto relative pb-36 md:pb-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentRoute.view + (currentRoute.param || '')}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full h-full"
+            >
+              {currentRoute.view === 'home' && (
+                <HomeView
+                  onNavigate={handleNavigate}
+                  onOpenUpload={() => setIsUploadOpen(true)}
+                  onOpenSpotifyImport={() => setIsSpotifyImportOpen(true)}
+                  onSongContextMenu={handleSongContextMenu}
+                />
+              )}
 
-          {currentRoute.view === 'library' && (
-            <MyLibraryHubView
-              onNavigate={handleNavigate}
-              onOpenUpload={() => setIsUploadOpen(true)}
-              onOpenAddLink={() => setIsAddLinkOpen(true)}
-              onSongContextMenu={handleSongContextMenu}
-            />
-          )}
+              {currentRoute.view === 'library' && (
+                <MyLibraryHubView
+                  onNavigate={handleNavigate}
+                  onOpenUpload={() => setIsUploadOpen(true)}
+                  onOpenAddLink={() => setIsAddLinkOpen(true)}
+                  onSongContextMenu={handleSongContextMenu}
+                />
+              )}
 
-          {currentRoute.view === 'all-songs' && (
-            <LibraryView
-              onNavigate={handleNavigate}
-              onSongContextMenu={handleSongContextMenu}
-              onOpenUpload={() => setIsUploadOpen(true)}
-            />
-          )}
+              {currentRoute.view === 'all-songs' && (
+                <LibraryView
+                  onNavigate={handleNavigate}
+                  onSongContextMenu={handleSongContextMenu}
+                  onOpenUpload={() => setIsUploadOpen(true)}
+                />
+              )}
 
-          {currentRoute.view === 'playlists' && (
-            <PlaylistsView
-              onNavigate={handleNavigate}
-              onOpenCreatePlaylist={() => {
-                setPlaylistToEdit(null);
-                setIsCreatePlaylistOpen(true);
-              }}
-              onEditPlaylist={pl => {
-                setPlaylistToEdit(pl);
-                setIsCreatePlaylistOpen(true);
-              }}
-            />
-          )}
+              {currentRoute.view === 'playlists' && (
+                <PlaylistsView
+                  onNavigate={handleNavigate}
+                  onOpenCreatePlaylist={() => {
+                    setPlaylistToEdit(null);
+                    setIsCreatePlaylistOpen(true);
+                  }}
+                  onEditPlaylist={pl => {
+                    setPlaylistToEdit(pl);
+                    setIsCreatePlaylistOpen(true);
+                  }}
+                />
+              )}
 
-          {currentRoute.view === 'playlist-detail' && currentRoute.param && (
-            <PlaylistDetailView
-              playlistId={currentRoute.param}
-              onNavigate={handleNavigate}
-              onEditPlaylist={pl => {
-                setPlaylistToEdit(pl);
-                setIsCreatePlaylistOpen(true);
-              }}
-              onSongContextMenu={handleSongContextMenu}
-            />
-          )}
+              {currentRoute.view === 'playlist-detail' && currentRoute.param && (
+                <PlaylistDetailView
+                  playlistId={currentRoute.param}
+                  onNavigate={handleNavigate}
+                  onEditPlaylist={pl => {
+                    setPlaylistToEdit(pl);
+                    setIsCreatePlaylistOpen(true);
+                  }}
+                  onSongContextMenu={handleSongContextMenu}
+                />
+              )}
 
-          {currentRoute.view === 'liked' && (
-            <LikedSongsView
-              onNavigate={handleNavigate}
-              onSongContextMenu={handleSongContextMenu}
-              onOpenUpload={() => setIsUploadOpen(true)}
-            />
-          )}
+              {currentRoute.view === 'liked' && (
+                <LikedSongsView
+                  onNavigate={handleNavigate}
+                  onSongContextMenu={handleSongContextMenu}
+                  onOpenUpload={() => setIsUploadOpen(true)}
+                />
+              )}
 
-          {currentRoute.view === 'albums' && <AlbumsView onNavigate={handleNavigate} />}
+              {currentRoute.view === 'albums' && <AlbumsView onNavigate={handleNavigate} />}
 
-          {currentRoute.view === 'album-detail' && currentRoute.param && (
-            <AlbumDetailView
-              albumTitle={currentRoute.param}
-              onNavigate={handleNavigate}
-              onSongContextMenu={handleSongContextMenu}
-            />
-          )}
+              {currentRoute.view === 'album-detail' && currentRoute.param && (
+                <AlbumDetailView
+                  albumTitle={currentRoute.param}
+                  onNavigate={handleNavigate}
+                  onSongContextMenu={handleSongContextMenu}
+                />
+              )}
 
-          {currentRoute.view === 'artists' && <ArtistsView onNavigate={handleNavigate} />}
+              {currentRoute.view === 'artists' && <ArtistsView onNavigate={handleNavigate} />}
 
-          {currentRoute.view === 'artist-detail' && currentRoute.param && (
-            <ArtistDetailView
-              artistName={currentRoute.param}
-              onNavigate={handleNavigate}
-              onSongContextMenu={handleSongContextMenu}
-            />
-          )}
+              {currentRoute.view === 'artist-detail' && currentRoute.param && (
+                <ArtistDetailView
+                  artistName={currentRoute.param}
+                  onNavigate={handleNavigate}
+                  onSongContextMenu={handleSongContextMenu}
+                />
+              )}
 
-          {currentRoute.view === 'recently-played' && (
-            <RecentlyPlayedView
-              onNavigate={handleNavigate}
-              onSongContextMenu={handleSongContextMenu}
-            />
-          )}
+              {currentRoute.view === 'recently-played' && (
+                <RecentlyPlayedView
+                  onNavigate={handleNavigate}
+                  onSongContextMenu={handleSongContextMenu}
+                />
+              )}
 
-          {currentRoute.view === 'offline' && (
-            <OfflineView
-              onNavigate={handleNavigate}
-              onSongContextMenu={handleSongContextMenu}
-            />
-          )}
+              {currentRoute.view === 'offline' && (
+                <OfflineView
+                  onNavigate={handleNavigate}
+                  onSongContextMenu={handleSongContextMenu}
+                />
+              )}
 
-          {currentRoute.view === 'search' && (
-            <SearchView
-              initialQuery={currentRoute.param || ''}
-              onNavigate={handleNavigate}
-              onSongContextMenu={handleSongContextMenu}
-            />
-          )}
+              {currentRoute.view === 'search' && (
+                <SearchView
+                  initialQuery={currentRoute.param || ''}
+                  onNavigate={handleNavigate}
+                  onSongContextMenu={handleSongContextMenu}
+                />
+              )}
 
-          {currentRoute.view === 'settings' && <SettingsView />}
+              {currentRoute.view === 'settings' && <SettingsView />}
+            </motion.div>
+          </AnimatePresence>
         </main>
 
         {/* Lyrics Drawer if toggled from bottom bar */}
         {isLyricsOpen && (
-          <div className="absolute right-0 top-16 bottom-24 w-full sm:w-96 bg-[#121216]/95 backdrop-blur-xl border-l border-[#303038] shadow-2xl z-20 flex flex-col">
-            <div className="flex justify-end p-2 border-b border-[#303038]/60">
+          <div className="absolute right-0 top-16 bottom-24 w-full sm:w-96 glass-pure backdrop-blur-2xl border-l border-white/10 shadow-2xl z-20 flex flex-col">
+            <div className="flex justify-end p-2 border-b border-white/10">
               <button
                 onClick={() => setIsLyricsOpen(false)}
                 className="text-xs text-[#A1A1AA] hover:text-white px-2 py-1"
@@ -345,16 +398,29 @@ export function AppLayout() {
 
         </div>
 
-        {/* Curated Right Panel (Image 1 style) */}
+        {/* Now Playing Player Sidebar (Docked on Right Side) */}
         <RightSidebar
-          isOpen={isRightSidebarOpen}
-          onToggle={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+          isOpen={isSideViewOpen}
+          onToggle={toggleSideView}
         />
 
-        {/* Persistent Bottom Controls Container */}
-        <div className="absolute bottom-0 left-0 right-0 z-30 flex flex-col pointer-events-auto">
+        {/* Floating Quick Tab when Player Sidebar is collapsed on desktop */}
+        {!isSideViewOpen && (
+          <button
+            onClick={toggleSideView}
+            className="hidden lg:flex fixed right-0 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 py-4 px-2.5 rounded-l-2xl bg-[#141720]/95 border-l border-y border-white/10 hover:border-amber-500/40 text-white/70 hover:text-white shadow-2xl transition-all hover:translate-x-[-2px] group"
+            title="Open Player Sidebar"
+          >
+            <Disc className={`w-5 h-5 text-amber-400 ${isPlaying ? 'animate-spin' : ''}`} style={{ animationDuration: '3s' }} />
+            <span className="text-[10px] font-mono uppercase tracking-widest [writing-mode:vertical-rl] rotate-180 text-white/60 group-hover:text-amber-300">
+              Player
+            </span>
+          </button>
+        )}
+
+        {/* Mobile Navigation Bar only (Desktop uses Player Sidebar with no bottom player bar) */}
+        <div className="md:hidden absolute bottom-0 left-0 right-0 z-40 bg-[#0D0F12] border-t border-[#292D35] flex flex-col pointer-events-auto shadow-[0_-20px_50px_rgba(0,0,0,0.95)]">
           <MobileNavBar currentView={currentRoute.view} onNavigate={handleNavigate} />
-          <BottomPlayer />
         </div>
       </div>
 
@@ -371,6 +437,12 @@ export function AppLayout() {
       <AddLinkModal
         isOpen={isAddLinkOpen}
         onClose={() => setIsAddLinkOpen(false)}
+        onSuccess={() => {}}
+      />
+
+      <SpotifyImportModal
+        isOpen={isSpotifyImportOpen}
+        onClose={() => setIsSpotifyImportOpen(false)}
         onSuccess={() => {}}
       />
 

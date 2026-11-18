@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { usePlayer } from '@/context/PlayerContext';
 import { useTheme } from '@/context/ThemeContext';
 import { getArtworkObjectUrl } from '@/lib/db';
 import { formatDuration } from '@/lib/utils';
+import { extractColorsFromImage, ExtractedColors } from '@/lib/colorExtractor';
 import { AudioVisualizer } from './AudioVisualizer';
 import { LyricsPanel } from './LyricsPanel';
-import { VinylCover } from '@/components/common/VinylCover';
+import { TurntableStudioStage } from './TurntableStudioStage';
+import { VisualizerMode, EqPresetName, EqBands } from '@/types/music';
 import {
   ChevronDown,
   Play,
@@ -23,9 +25,17 @@ import {
   ListMusic,
   FileText,
   Sliders,
-  Music2,
   Activity,
-  ExternalLink,
+  Maximize2,
+  Minimize2,
+  Radio,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  RotateCcw,
+  Gauge,
+  Sparkles,
+  Disc,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -55,351 +65,464 @@ export function NowPlayingModal() {
     toggleFavorite,
     queue,
     queueIndex,
+    reorderQueue,
+    removeFromQueue,
+    clearQueue,
+    playbackRate,
+    setPlaybackRate,
+    eqBands,
+    eqPreset,
+    setEqBand,
+    setEqPreset,
+    resetEq,
   } = usePlayer();
 
-  const { settings, updateSettings } = useTheme();
+  const { settings } = useTheme();
 
-  const [activeTab, setActiveTab] = useState<'visualizer' | 'lyrics' | 'queue' | 'eq'>('visualizer');
+  const [activeTab, setActiveTab] = useState<'turntable' | 'visualizer' | 'lyrics' | 'queue' | 'eq'>('turntable');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [colors, setColors] = useState<ExtractedColors>({
+    primary: '#1ED760',
+    secondary: '#38BDF8',
+    glow: 'rgba(30, 215, 96, 0.35)',
+    ambientRgb: '30, 215, 96',
+  });
+
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  // Extract artwork dominant color whenever song changes
+  useEffect(() => {
+    if (!currentSong) return;
+    const artUrl = getArtworkObjectUrl(currentSong);
+    extractColorsFromImage(artUrl).then(setColors);
+  }, [currentSong]);
+
+  // Track Fullscreen state
+  useEffect(() => {
+    const onFsChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => document.removeEventListener('fullscreenchange', onFsChange);
+  }, []);
+
+  const toggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        if (modalRef.current?.requestFullscreen) {
+          await modalRef.current.requestFullscreen();
+        } else if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        }
+      }
+    } catch (err) {
+      console.warn('Fullscreen request failed:', err);
+    }
+  };
 
   if (!isNowPlayingOpen || !currentSong) return null;
 
   const artworkUrl = getArtworkObjectUrl(currentSong);
 
-  const visualizerModes = [
-    { id: 'bars' as const, label: 'Bars' },
-    { id: 'wave' as const, label: 'Waveform' },
-    { id: 'circle' as const, label: 'Radial' },
-    { id: 'pulse' as const, label: 'Aura' },
+  const visualizerModes: { id: VisualizerMode; label: string }[] = [
+    { id: 'bars', label: 'Spectrum Bars' },
+    { id: 'wave', label: 'Waveform' },
+    { id: 'radial', label: 'Radial' },
+    { id: 'aura', label: 'Ambient Aura' },
   ];
+
+  const eqPresetsList: { name: string; preset: Exclude<EqPresetName, 'custom'> }[] = [
+    { name: 'Normal', preset: 'normal' },
+    { name: 'Bass Boost', preset: 'bass-boost' },
+    { name: 'Treble Boost', preset: 'treble-boost' },
+    { name: 'Vocal', preset: 'vocal' },
+    { name: 'Classical', preset: 'classical' },
+  ];
+
+  const bandsConfig: { key: keyof EqBands; label: string; freq: string }[] = [
+    { key: 'band60', label: 'Sub', freq: '60 Hz' },
+    { key: 'band250', label: 'Bass', freq: '250 Hz' },
+    { key: 'band1k', label: 'Mid', freq: '1 kHz' },
+    { key: 'band4k', label: 'Treble', freq: '4 kHz' },
+    { key: 'band12k', label: 'Air', freq: '12 kHz' },
+  ];
+
+  const speedOptions = [0.75, 1, 1.25, 1.5, 2];
+
+  // Up next tracks
+  const upcomingQueue = queue.slice(queueIndex + 1);
+
+  const moveQueueItem = (fromIdx: number, toIdx: number) => {
+    if (toIdx < 0 || toIdx >= queue.length) return;
+    const newQueue = [...queue];
+    const [moved] = newQueue.splice(fromIdx, 1);
+    newQueue.splice(toIdx, 0, moved);
+    reorderQueue(newQueue);
+  };
 
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, y: '100%' }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: '100%' }}
-        transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-        className="fixed inset-0 z-50 flex flex-col bg-[#0B0B0D] overflow-hidden select-none"
+        ref={modalRef}
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.98 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed inset-0 z-50 flex flex-col bg-[#07080B] text-[#F5F5F5] overflow-hidden select-none"
       >
-        {/* Dynamic blurred ambient background from artwork or accent */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
-          {artworkUrl ? (
-            <div
-              className="absolute inset-0 scale-125 filter blur-[90px] brightness-75 transition-all duration-1000"
-              style={{
-                backgroundImage: `url(${artworkUrl})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            />
-          ) : (
-            <div
-              className="absolute inset-0 filter blur-[120px] transition-all duration-1000"
-              style={{
-                background: `radial-gradient(circle at 50% 50%, var(--accent) 0%, transparent 70%)`,
-              }}
+        {/* ========================================================= */}
+        {/* BACKGROUND ATMOSPHERE (Deep obsidian listening studio)    */}
+        {/* ========================================================= */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Subtle blurred artwork illumination */}
+          {artworkUrl && (
+            <motion.div
+              key={currentSong.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.25 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2 }}
+              className="absolute inset-[-10%] bg-cover bg-center filter blur-[120px] saturate-150 brightness-[0.3]"
+              style={{ backgroundImage: `url(${artworkUrl})` }}
             />
           )}
-          <div className="absolute inset-0 bg-black/60" />
+
+          {/* Deep studio vignette */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#07080B]/90 via-[#07080B]/60 to-[#07080B]/95" />
+
+          {/* Very fine studio acoustic texture grid */}
+          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:32px_32px]" />
         </div>
 
-        {/* Top Bar */}
-        <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-[#303038]/40">
-          <button
-            onClick={() => setIsNowPlayingOpen(false)}
-            className="p-2 rounded-xl text-[#A1A1AA] hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2"
-          >
-            <ChevronDown className="w-6 h-6" />
-            <span className="text-sm font-medium hidden sm:inline">Minimize</span>
-          </button>
-
-          {/* Navigation Tabs */}
-          <div className="flex items-center gap-1 p-1 bg-[#19191F]/80 rounded-xl border border-[#303038]">
+        {/* ========================================================= */}
+        {/* A. TOP NAVIGATION — Fixed Height around 64–72px           */}
+        {/* ========================================================= */}
+        <header className="relative z-30 h-16 sm:h-18 px-3 sm:px-8 border-b border-white/[0.08] bg-[#0A0C11]/85 backdrop-blur-2xl shrink-0 flex items-center justify-between gap-2">
+          {/* Left: Minimize button, SONORA logo & status dot */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
-              onClick={() => setActiveTab('visualizer')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'visualizer'
-                  ? 'bg-[var(--accent)] text-black shadow-md'
-                  : 'text-[#A1A1AA] hover:text-white'
-              }`}
+              onClick={() => setIsNowPlayingOpen(false)}
+              className="group flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 hover:border-[#1ED760]/40 text-[#A1A1AA] hover:text-white transition-all active:scale-95 shadow-md"
+              title="Minimize to player dock"
             >
-              <Activity className="w-3.5 h-3.5" /> Visualizer
+              <ChevronDown className="w-4 h-4 text-[#A1A1AA] group-hover:text-[#1ED760] transition-colors" />
+              <span className="text-xs font-semibold tracking-wide hidden sm:inline">Minimize</span>
             </button>
-            <button
-              onClick={() => setActiveTab('lyrics')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'lyrics'
-                  ? 'bg-[var(--accent)] text-black shadow-md'
-                  : 'text-[#A1A1AA] hover:text-white'
-              }`}
-            >
-              <FileText className="w-3.5 h-3.5" /> Lyrics
-            </button>
-            <button
-              onClick={() => setActiveTab('queue')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'queue'
-                  ? 'bg-[var(--accent)] text-black shadow-md'
-                  : 'text-[#A1A1AA] hover:text-white'
-              }`}
-            >
-              <ListMusic className="w-3.5 h-3.5" /> Queue
-            </button>
-            <button
-              onClick={() => setActiveTab('eq')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'eq'
-                  ? 'bg-[var(--accent)] text-black shadow-md'
-                  : 'text-[#A1A1AA] hover:text-white'
-              }`}
-            >
-              <Sliders className="w-3.5 h-3.5" /> Audio EQ
-            </button>
-          </div>
 
-          <div className="w-20 hidden sm:block text-right">
-            <span className="text-xs uppercase font-bold tracking-wider text-[#A1A1AA]">
-              {currentSong.codec || (currentSong.isLocal ? 'Lossless' : 'Stream')}
-            </span>
-          </div>
-        </header>
-
-        {/* Main Content Area */}
-        <main className="relative z-10 flex-1 flex flex-col md:flex-row items-center justify-center p-6 md:p-12 overflow-hidden gap-8 max-w-6xl mx-auto w-full">
-          {/* Left Column: Artwork & Info (Reference Image 2 & 4 style) */}
-          <div className="flex flex-col items-center max-w-md w-full shrink-0">
-            {/* Album Artwork with Spinning Vinyl or YouTube Embed */}
-            {currentSong.providerType === 'youtube' && currentSong.youtubeId ? (
-              <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#19191F]">
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${currentSong.youtubeId}?autoplay=1`}
-                  title={currentSong.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full border-0"
-                />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center p-2">
-                <VinylCover
-                  artworkUrl={artworkUrl}
-                  title={currentSong.title}
-                  artist={currentSong.artist}
-                  isPlaying={isPlaying}
-                  size="xl"
-                  showBadge={true}
-                />
-              </div>
-            )}
-
-            {/* Song Meta */}
-            <div className="mt-6 text-center w-full px-4">
-              <div className="flex items-center justify-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-white truncate max-w-[280px] sm:max-w-xs tracking-tight">
-                  {currentSong.title}
-                </h1>
-                <button
-                  onClick={() => toggleFavorite(currentSong.id)}
-                  className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
-                >
-                  <Heart
-                    className={`w-5 h-5 transition-all ${
-                      currentSong.isFavorite
-                        ? 'fill-rose-500 text-rose-500 scale-110'
-                        : 'text-[#A1A1AA] hover:text-white'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {/* Format & Genre Pill (Reference Image 2 style) */}
-              <div className="flex items-center justify-center gap-2 mt-2">
-                <span className="px-2.5 py-0.5 rounded-full bg-white/10 border border-white/15 text-[11px] font-medium text-[#D4D4D8]">
-                  {currentSong.artist}
-                </span>
-                {currentSong.album && (
-                  <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px] text-[#A1A1AA]">
-                    {currentSong.album}
-                  </span>
-                )}
-                <span className="px-2 py-0.5 rounded bg-[var(--accent)]/15 border border-[var(--accent)]/30 text-[9px] font-mono font-bold text-[var(--accent)]">
-                  {currentSong.codec?.toUpperCase() || (currentSong.isLocal ? 'LOSSLESS' : 'WEB AUDIO')}
-                </span>
-              </div>
-
-              {/* Open External Source button if external or YouTube */}
-              {currentSong.sourceUrl && !currentSong.isLocal && (
-                <div className="pt-2">
-                  <a
-                    href={currentSong.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#19191F] hover:bg-[#25252D] border border-[#303038] text-[11px] font-semibold text-[#A1A1AA] hover:text-white transition-colors"
-                  >
-                    <ExternalLink className="w-3 h-3 text-sky-400" /> Open External Source
-                  </a>
-                </div>
-              )}
+            <div className="flex items-center gap-1.5 sm:gap-2 pl-1 sm:pl-2">
+              <span className="text-xs sm:text-sm tracking-[0.2em] sm:tracking-[0.25em] font-black uppercase text-white">
+                SONORA
+              </span>
+              <span className="w-2 h-2 rounded-full bg-[#1ED760] shadow-[0_0_10px_#1ED760] animate-pulse" />
             </div>
           </div>
 
-          {/* Right Column: Visualizer / Lyrics / Queue / EQ Tab */}
-          <div className="flex-1 w-full h-[320px] sm:h-[400px] flex flex-col rounded-2xl bg-[#121216]/80 backdrop-blur-xl border border-[#303038] overflow-hidden">
-            {activeTab === 'visualizer' && (
-              <div className="flex flex-col h-full p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs uppercase font-bold tracking-wider text-[#A1A1AA]">
-                    Live Audio Spectrum (Web Audio API)
-                  </span>
-                  <div className="flex gap-1.5">
-                    {visualizerModes.map(m => (
-                      <button
-                        key={m.id}
-                        onClick={() => setVisualizerMode(m.id)}
-                        className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
-                          visualizerMode === m.id
-                            ? 'bg-[var(--accent)] text-black font-semibold'
-                            : 'bg-[#25252D] text-[#A1A1AA] hover:text-white'
-                        }`}
-                      >
-                        {m.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex-1 w-full rounded-xl bg-[#0B0B0D]/50 border border-[#303038]/50 p-4 flex items-center justify-center overflow-hidden">
-                  <AudioVisualizer mode={visualizerMode} accentColor={settings.accentColor} />
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'lyrics' && (
-              <LyricsPanel song={currentSong} currentTime={currentTime} onSeek={seek} />
-            )}
-
-            {activeTab === 'queue' && (
-              <div className="flex flex-col h-full p-6">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-[#A1A1AA] mb-4">
-                  Upcoming Queue ({queue.length - 1 - queueIndex} tracks remaining)
-                </h3>
-                <div className="flex-1 overflow-y-auto space-y-2 pr-2">
-                  {queue.slice(queueIndex + 1).map((s, idx) => (
-                    <div
-                      key={`${s.id}_${idx}`}
-                      onClick={() => playSong(s)}
-                      className="flex items-center justify-between p-3 rounded-xl bg-[#19191F] hover:bg-[#25252D] border border-transparent hover:border-[#303038] cursor-pointer transition-all"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className="text-xs font-mono text-[#71717A] w-5 text-center">
-                          {idx + 1}
-                        </span>
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-white truncate">{s.title}</p>
-                          <p className="text-xs text-[#A1A1AA] truncate">{s.artist}</p>
-                        </div>
-                      </div>
-                      <span className="text-xs text-[#A1A1AA] font-mono shrink-0">
-                        {formatDuration(s.duration)}
-                      </span>
-                    </div>
-                  ))}
-                  {queue.length - 1 <= queueIndex && (
-                    <div className="text-center py-12 text-[#A1A1AA] text-sm">
-                      No more tracks in queue. Add songs from your library!
-                    </div>
+          {/* Center: 5 Studio Navigation Tabs */}
+          <nav className="flex items-center p-0.5 sm:p-1 rounded-full bg-[#12141C]/90 backdrop-blur-xl border border-white/10 shadow-xl overflow-x-auto scrollbar-none">
+            {(
+              [
+                { id: 'turntable', label: 'Turntable Studio', icon: Disc },
+                { id: 'visualizer', label: 'Visualizer', icon: Activity },
+                { id: 'lyrics', label: 'Lyrics', icon: FileText },
+                { id: 'queue', label: 'Queue', icon: ListMusic },
+                { id: 'eq', label: 'Equalizer', icon: Sliders },
+              ] as const
+            ).map(tab => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`relative flex items-center gap-1.5 px-2.5 sm:px-4 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 ${
+                    isActive ? 'text-[#08090B]' : 'text-[#A1A1AA] hover:text-white'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeNavIndicator"
+                      className="absolute inset-0 bg-[#1ED760] rounded-full shadow-[0_0_15px_rgba(30,215,96,0.5)]"
+                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                    />
                   )}
-                </div>
-              </div>
-            )}
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    <Icon className="w-3.5 h-3.5" />
+                    <span className="hidden md:inline">{tab.label}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
 
-            {activeTab === 'eq' && (
-              <div className="flex flex-col h-full p-6 space-y-6">
+          {/* Right: Audio Quality Specs & Fullscreen Toggle */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.06] border border-white/10 text-[11px] font-mono text-[#A1A1AA]">
+              <Radio className="w-3 h-3 text-[#1ED760] animate-pulse" />
+              <span>320 KBPS MASTER</span>
+            </div>
+
+            <button
+              onClick={toggleFullscreen}
+              className="p-1.5 sm:p-2 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 hover:border-white/20 text-[#A1A1AA] hover:text-white transition-all shadow-md active:scale-95"
+              title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+            >
+              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            </button>
+          </div>
+        </header>
+
+        {/* ========================================================= */}
+        {/* B. MAIN LISTENING STAGE — Balanced Viewport Utilization   */}
+        {/* ========================================================= */}
+        <main className="relative z-20 flex-1 min-h-0 w-full overflow-hidden flex items-center justify-center p-3 sm:p-6">
+          {/* TAB 1: TURNTABLE STUDIO (THE HERO 2-COLUMN EXPERIENCE) */}
+          {activeTab === 'turntable' && <TurntableStudioStage />}
+
+          {/* TAB 2: FULL VISUALIZER STUDIO */}
+          {activeTab === 'visualizer' && (
+            <div className="w-full h-full max-w-5xl mx-auto flex flex-col p-6 rounded-3xl bg-[#12141C]/80 border border-white/10 backdrop-blur-2xl shadow-2xl">
+              <div className="flex items-center justify-between pb-4 border-b border-white/10">
                 <div>
-                  <h3 className="text-sm font-bold text-white mb-1">Audio Equalizer & Enhancement</h3>
-                  <p className="text-xs text-[#A1A1AA]">
-                    Fine-tune the real-time BiquadFilter frequency response of your audio engine.
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-[#1ED760]" />
+                    Expanded Studio Audio Analyser
+                  </h2>
+                  <p className="text-xs text-[#A1A1AA] mt-0.5">
+                    Real-time 256-band Web Audio API Fast Fourier Transform
                   </p>
                 </div>
 
-                {/* EQ Presets */}
+                <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/40 border border-white/10">
+                  {visualizerModes.map(m => (
+                    <button
+                      key={m.id}
+                      onClick={() => setVisualizerMode(m.id)}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        visualizerMode === m.id
+                          ? 'bg-[#1ED760] text-[#08090B] shadow-md'
+                          : 'text-[#A1A1AA] hover:text-white'
+                      }`}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="relative flex-1 w-full mt-4 rounded-2xl bg-[#07080B] border border-white/[0.08] p-4 flex items-center justify-center overflow-hidden">
+                <AudioVisualizer mode={visualizerMode} accentColor="#1ED760" secondaryColor="#38BDF8" />
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: SYNCHRONIZED LYRICS PANEL */}
+          {activeTab === 'lyrics' && (
+            <div className="w-full h-full max-w-4xl mx-auto overflow-hidden rounded-3xl bg-[#12141C]/80 border border-white/10 backdrop-blur-2xl shadow-2xl p-6">
+              <LyricsPanel song={currentSong} currentTime={currentTime} onSeek={seek} />
+            </div>
+          )}
+
+          {/* TAB 4: QUEUE STUDIO */}
+          {activeTab === 'queue' && (
+            <div className="w-full h-full max-w-4xl mx-auto flex flex-col rounded-3xl bg-[#12141C]/80 border border-white/10 backdrop-blur-2xl shadow-2xl p-6 overflow-hidden">
+              <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
                 <div>
-                  <label className="text-xs uppercase font-bold tracking-wider text-[#A1A1AA] block mb-2">
-                    EQ Presets
-                  </label>
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                    {[
-                      { name: 'Flat', preset: 'flat', bass: 0, treble: 0 },
-                      { name: 'Bass Boost', preset: 'bass-boost', bass: 6, treble: 1 },
-                      { name: 'Electronic', preset: 'electronic', bass: 5, treble: 4 },
-                      { name: 'Vocal', preset: 'vocal', bass: -2, treble: 3 },
-                      { name: 'Rock', preset: 'rock', bass: 4, treble: 5 },
-                    ].map(p => (
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                    <ListMusic className="w-4 h-4 text-[#1ED760]" />
+                    Studio Playback Queue ({queue.length} Tracks)
+                  </h2>
+                  <p className="text-xs text-[#A1A1AA] mt-0.5">
+                    {upcomingQueue.length} tracks up next in listening room
+                  </p>
+                </div>
+
+                {queue.length > 1 && (
+                  <button
+                    onClick={clearQueue}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-rose-300 hover:text-rose-100 hover:bg-rose-500/20 border border-rose-500/30 transition-all"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Clear Queue</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                {/* Now Playing Row */}
+                <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#181B26] border border-[#1ED760]/40 shadow-md">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-11 h-11 rounded-xl overflow-hidden bg-zinc-900 shrink-0 border border-white/10 relative">
+                      {artworkUrl && <img src={artworkUrl} alt="" className="w-full h-full object-cover" />}
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <Activity className="w-4 h-4 text-[#1ED760] animate-pulse" />
+                      </div>
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-bold tracking-wider uppercase text-[#1ED760]">
+                        Now Playing
+                      </span>
+                      <p className="text-sm font-bold text-white truncate">{currentSong.title}</p>
+                      <p className="text-xs text-[#A1A1AA] truncate">{currentSong.artist}</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono text-[#1ED760] font-bold">
+                    {formatDuration(duration)}
+                  </span>
+                </div>
+
+                {/* Upcoming Queue Tracks */}
+                {upcomingQueue.map((song, idx) => {
+                  const actualIdx = queueIndex + 1 + idx;
+                  const trackArt = getArtworkObjectUrl(song);
+                  return (
+                    <div
+                      key={song.id + '_' + actualIdx}
+                      className="group flex items-center justify-between p-3 rounded-2xl bg-[#12141C]/60 hover:bg-[#12141C] border border-white/[0.06] hover:border-white/20 transition-all"
+                    >
+                      <div
+                        onClick={() => playSong(song)}
+                        className="flex items-center gap-3.5 min-w-0 flex-1 cursor-pointer"
+                      >
+                        <span className="text-xs font-mono text-zinc-500 w-5 text-center group-hover:hidden">
+                          {idx + 1}
+                        </span>
+                        <Play className="w-4 h-4 text-[#1ED760] hidden group-hover:block shrink-0" />
+                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-zinc-900 shrink-0 border border-white/10">
+                          {trackArt ? (
+                            <img src={trackArt} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <Disc className="w-5 h-5 text-zinc-600 m-auto mt-2.5" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs sm:text-sm font-bold text-white truncate">{song.title}</p>
+                          <p className="text-[11px] text-[#A1A1AA] truncate">{song.artist}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs font-mono text-zinc-400 mr-2">
+                          {formatDuration(song.duration)}
+                        </span>
+                        <button
+                          onClick={() => moveQueueItem(actualIdx, actualIdx - 1)}
+                          disabled={idx === 0}
+                          className="p-1.5 rounded-lg text-zinc-500 hover:text-white disabled:opacity-20"
+                          title="Move up"
+                        >
+                          <ArrowUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => moveQueueItem(actualIdx, actualIdx + 1)}
+                          disabled={idx === upcomingQueue.length - 1}
+                          className="p-1.5 rounded-lg text-zinc-500 hover:text-white disabled:opacity-20"
+                          title="Move down"
+                        >
+                          <ArrowDown className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => removeFromQueue(actualIdx)}
+                          className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400"
+                          title="Remove from queue"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: EQUALIZER STUDIO */}
+          {activeTab === 'eq' && (
+            <div className="w-full h-full max-w-4xl mx-auto flex flex-col rounded-3xl bg-[#12141C]/80 border border-white/10 backdrop-blur-2xl shadow-2xl p-6 overflow-hidden">
+              <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+                <div>
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                    <Sliders className="w-4 h-4 text-[#1ED760]" />
+                    Studio 5-Band Parametric Equalizer
+                  </h2>
+                  <p className="text-xs text-[#A1A1AA] mt-0.5">
+                    Active preset: <span className="font-semibold text-white capitalize">{eqPreset}</span>
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 p-1 rounded-xl bg-black/40 border border-white/10">
+                    {eqPresetsList.map(p => (
                       <button
-                        key={p.name}
-                        onClick={() => {
-                          updateSettings({
-                            eqPreset: p.preset as any,
-                            bassGain: p.bass,
-                            trebleGain: p.treble,
-                          });
-                        }}
-                        className={`p-2.5 rounded-xl text-xs font-semibold border transition-all text-center ${
-                          settings.eqPreset === p.preset
-                            ? 'bg-[var(--accent)] text-black border-transparent shadow-md'
-                            : 'bg-[#19191F] text-[#A1A1AA] border-[#303038] hover:text-white hover:bg-[#25252D]'
+                        key={p.preset}
+                        onClick={() => setEqPreset(p.preset)}
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                          eqPreset === p.preset
+                            ? 'bg-[#1ED760] text-[#08090B] shadow-md'
+                            : 'text-[#A1A1AA] hover:text-white'
                         }`}
                       >
                         {p.name}
                       </button>
                     ))}
                   </div>
-                </div>
 
-                {/* Sliders for Bass and Treble */}
-                <div className="space-y-4 pt-2">
-                  <div>
-                    <div className="flex justify-between text-xs font-medium text-white mb-1.5">
-                      <span>Low End / Bass (250Hz LowShelf)</span>
-                      <span className="font-mono text-[var(--accent)]">{settings.bassGain > 0 ? `+${settings.bassGain}` : settings.bassGain} dB</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="-10"
-                      max="10"
-                      step="1"
-                      value={settings.bassGain}
-                      onChange={e => updateSettings({ bassGain: parseInt(e.target.value) })}
-                      className="w-full accent-[var(--accent)]"
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-xs font-medium text-white mb-1.5">
-                      <span>High End / Treble (4000Hz HighShelf)</span>
-                      <span className="font-mono text-[var(--accent)]">{settings.trebleGain > 0 ? `+${settings.trebleGain}` : settings.trebleGain} dB</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="-10"
-                      max="10"
-                      step="1"
-                      value={settings.trebleGain}
-                      onChange={e => updateSettings({ trebleGain: parseInt(e.target.value) })}
-                      className="w-full accent-[var(--accent)]"
-                    />
-                  </div>
+                  <button
+                    onClick={resetEq}
+                    className="p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 text-zinc-400 hover:text-white"
+                    title="Reset Equalizer"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-            )}
-          </div>
+
+              {/* 5 Equalizer Sliders */}
+              <div className="flex-1 grid grid-cols-5 gap-4 items-center justify-center p-4">
+                {bandsConfig.map(b => {
+                  const val = eqBands[b.key];
+                  return (
+                    <div
+                      key={b.key}
+                      className="flex flex-col items-center justify-between h-full py-4 rounded-2xl bg-black/30 border border-white/[0.06]"
+                    >
+                      <span className="text-xs font-mono font-bold text-[#1ED760]">
+                        {val > 0 ? `+${val}` : val} dB
+                      </span>
+                      <div className="h-44 flex items-center justify-center">
+                        <input
+                          type="range"
+                          min="-12"
+                          max="12"
+                          step="1"
+                          value={val}
+                          onChange={e => setEqBand(b.key, parseInt(e.target.value))}
+                          className="h-36 accent-[#1ED760] cursor-pointer -rotate-90"
+                        />
+                      </div>
+                      <div className="text-center mt-2">
+                        <p className="text-xs font-bold text-white">{b.label}</p>
+                        <p className="text-[10px] text-zinc-400 font-mono">{b.freq}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </main>
 
-        {/* Bottom Playback Controls */}
-        <footer className="relative z-10 px-8 py-6 border-t border-[#303038]/60 bg-[#121216]/90 backdrop-blur-xl max-w-4xl mx-auto w-full">
-          {/* Progress Bar */}
-          <div className="flex items-center gap-3 w-full mb-4">
-            <span className="text-xs text-[#A1A1AA] font-mono w-10 text-right">
+        {/* ========================================================= */}
+        {/* C. BOTTOM PLAYBACK STATION — Fully Mobile Responsive      */}
+        {/* ========================================================= */}
+        <footer className="relative z-30 min-h-[5.5rem] md:h-22 py-2.5 md:py-0 px-3 sm:px-8 border-t border-white/[0.08] bg-[#0A0C11]/95 backdrop-blur-2xl shrink-0 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-0 shadow-[0_-12px_32px_rgba(0,0,0,0.85)]">
+          {/* Mobile Top Scrubber Timeline (Full width on mobile, hidden on desktop md:) */}
+          <div className="w-full flex md:hidden items-center gap-2.5 px-1">
+            <span className="text-[10px] font-mono text-[#A1A1AA] w-9 text-right shrink-0">
               {formatDuration(currentTime)}
             </span>
             <div className="relative flex-1 group">
@@ -410,36 +533,190 @@ export function NowPlayingModal() {
                 step="0.1"
                 value={currentTime}
                 onChange={e => seek(parseFloat(e.target.value))}
-                className="w-full cursor-pointer accent-[var(--accent)]"
+                className="w-full cursor-pointer accent-[#1ED760] h-1.5 rounded-full"
               />
             </div>
-            <span className="text-xs text-[#A1A1AA] font-mono w-10">
+            <span className="text-[10px] font-mono text-[#A1A1AA] w-9 text-left shrink-0">
               {formatDuration(duration)}
             </span>
           </div>
 
-          {/* Primary Controls */}
-          <div className="flex items-center justify-between">
-            {/* Shuffle & Volume */}
-            <div className="flex items-center gap-4">
+          {/* Main Controls Row on Mobile / 3-Group Container on Desktop */}
+          <div className="w-full md:w-auto flex items-center justify-between gap-2 md:gap-4 flex-1">
+            {/* LEFT GROUP: Small Album Thumbnail, Title, Artist & Favorite */}
+            <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 max-w-[140px] sm:max-w-[200px] md:max-w-xs shrink-0">
+              <div className="relative w-9 h-9 sm:w-12 sm:h-12 rounded-xl overflow-hidden bg-[#15171F] border border-white/10 shrink-0 shadow-md">
+                {artworkUrl ? (
+                  <img src={artworkUrl} alt={currentSong.title} className="w-full h-full object-cover" />
+                ) : (
+                  <Disc className="w-5 h-5 text-zinc-500 m-auto mt-2" />
+                )}
+                {isPlaying && (
+                  <div className="absolute inset-0 border border-[#1ED760]/40 rounded-xl pointer-events-none" />
+                )}
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <h3 className="text-xs sm:text-sm font-bold text-white truncate">
+                  {currentSong.title}
+                </h3>
+                <p className="text-[10px] sm:text-xs text-[#A1A1AA] truncate mt-0.5">
+                  {currentSong.artist}
+                </p>
+              </div>
+
               <button
-                onClick={toggleShuffle}
-                className={`p-2 rounded-lg transition-colors ${
-                  shuffle ? 'text-[var(--accent)]' : 'text-[#A1A1AA] hover:text-white'
-                }`}
-                title="Shuffle"
+                onClick={() => toggleFavorite(currentSong.id)}
+                className="hidden sm:block p-1.5 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-all active:scale-90 shrink-0"
+                title={currentSong.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
               >
-                <Shuffle className="w-5 h-5" />
+                <Heart
+                  className={`w-4 h-4 ${
+                    currentSong.isFavorite ? 'fill-rose-500 text-rose-500' : 'text-zinc-400'
+                  }`}
+                />
               </button>
-              <div className="hidden sm:flex items-center gap-2">
+            </div>
+
+            {/* CENTER GROUP: Playback Controls & Desktop Scrubber Timeline */}
+            <div className="flex-1 max-w-xl md:mx-4 flex flex-col items-center justify-center gap-1.5">
+              {/* Controls row */}
+              <div className="flex items-center gap-3 sm:gap-5 md:gap-6">
+                <button
+                  onClick={toggleShuffle}
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    shuffle ? 'text-[#1ED760]' : 'text-[#A1A1AA] hover:text-white'
+                  }`}
+                  title="Shuffle"
+                >
+                  <Shuffle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                </button>
+
+                <button
+                  onClick={prevTrack}
+                  className="p-1 text-[#A1A1AA] hover:text-white transition-transform active:scale-90"
+                  title="Previous Track"
+                >
+                  <SkipBack className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+
+                {/* Large Circular Play / Pause Button */}
+                <button
+                  onClick={togglePlay}
+                  className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#1ED760] text-[#08090B] flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(30,215,96,0.5)] cursor-pointer"
+                  title={isPlaying ? 'Pause' : 'Play'}
+                >
+                  {isPlaying ? (
+                    <Pause className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
+                  ) : (
+                    <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current ml-0.5" />
+                  )}
+                </button>
+
+                <button
+                  onClick={nextTrack}
+                  className="p-1 text-[#A1A1AA] hover:text-white transition-transform active:scale-90"
+                  title="Next Track"
+                >
+                  <SkipForward className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+
+                <button
+                  onClick={toggleRepeat}
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    repeat !== 'off' ? 'text-[#1ED760]' : 'text-[#A1A1AA] hover:text-white'
+                  }`}
+                  title={`Repeat: ${repeat}`}
+                >
+                  {repeat === 'one' ? (
+                    <Repeat1 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  ) : (
+                    <Repeat className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  )}
+                </button>
+              </div>
+
+              {/* Desktop-only Scrubber Timeline */}
+              <div className="hidden md:flex w-full items-center gap-3">
+                <span className="text-[11px] font-mono text-[#A1A1AA] w-10 text-right">
+                  {formatDuration(currentTime)}
+                </span>
+                <div className="relative flex-1 group">
+                  <input
+                    type="range"
+                    min="0"
+                    max={duration || 100}
+                    step="0.1"
+                    value={currentTime}
+                    onChange={e => seek(parseFloat(e.target.value))}
+                    className="w-full cursor-pointer accent-[#1ED760] h-1.5 hover:h-2 transition-all rounded-full"
+                  />
+                </div>
+                <span className="text-[11px] font-mono text-[#A1A1AA] w-10 text-left">
+                  {formatDuration(duration)}
+                </span>
+              </div>
+            </div>
+
+            {/* RIGHT GROUP: Volume, Speed & Quick Shortcuts */}
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+              {/* Mobile Favorite button */}
+              <button
+                onClick={() => toggleFavorite(currentSong.id)}
+                className="sm:hidden p-1.5 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-all active:scale-90"
+                title={currentSong.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+              >
+                <Heart
+                  className={`w-4 h-4 ${
+                    currentSong.isFavorite ? 'fill-rose-500 text-rose-500' : 'text-zinc-400'
+                  }`}
+                />
+              </button>
+
+              {/* Playback Speed Pill */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 text-xs font-mono font-semibold text-[#A1A1AA] hover:text-white transition-colors"
+                  title="Playback Speed"
+                >
+                  <Gauge className="w-3.5 h-3.5 text-[#1ED760]" />
+                  <span>{playbackRate}x</span>
+                </button>
+
+                {showSpeedMenu && (
+                  <div className="absolute bottom-full mb-2 right-0 p-1.5 rounded-2xl bg-[#171A20] border border-[#292D35] shadow-2xl flex flex-col gap-1 z-50">
+                    {speedOptions.map(s => (
+                      <button
+                        key={s}
+                        onClick={() => {
+                          setPlaybackRate(s);
+                          setShowSpeedMenu(false);
+                        }}
+                        className={`px-3 py-1 rounded-lg text-xs font-mono font-medium transition-colors text-left ${
+                          playbackRate === s
+                            ? 'bg-[#1ED760] text-[#08090B] font-bold'
+                            : 'text-[#A1A1AA] hover:text-white hover:bg-white/10'
+                        }`}
+                      >
+                        {s}x
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Volume Slider with Mute (Desktop only) */}
+              <div className="hidden lg:flex items-center gap-2">
                 <button
                   onClick={toggleMute}
-                  className="text-[#A1A1AA] hover:text-white transition-colors"
+                  className="text-[#A1A1AA] hover:text-white transition-colors p-1"
+                  title={isMuted ? 'Unmute' : 'Mute'}
                 >
                   {isMuted || volume === 0 ? (
-                    <VolumeX className="w-5 h-5 text-rose-400" />
+                    <VolumeX className="w-4 h-4 text-rose-400" />
                   ) : (
-                    <Volume2 className="w-5 h-5" />
+                    <Volume2 className="w-4 h-4" />
                   )}
                 </button>
                 <input
@@ -449,52 +726,22 @@ export function NowPlayingModal() {
                   step="0.01"
                   value={isMuted ? 0 : volume}
                   onChange={e => setVolume(parseFloat(e.target.value))}
-                  className="w-24 accent-[var(--accent)]"
+                  className="w-16 sm:w-20 accent-[#1ED760] h-1"
                 />
               </div>
-            </div>
 
-            {/* Play / Next / Prev */}
-            <div className="flex items-center gap-6">
+              {/* Queue Quick Toggle */}
               <button
-                onClick={prevTrack}
-                className="p-2 text-[#A1A1AA] hover:text-white transition-transform active:scale-95"
-                title="Previous Track"
-              >
-                <SkipBack className="w-7 h-7" />
-              </button>
-
-              <button
-                onClick={togglePlay}
-                className="w-14 h-14 rounded-full bg-[var(--accent)] text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl accent-glow"
-                title={isPlaying ? 'Pause' : 'Play'}
-              >
-                {isPlaying ? (
-                  <Pause className="w-7 h-7 fill-black" />
-                ) : (
-                  <Play className="w-7 h-7 fill-black ml-1" />
-                )}
-              </button>
-
-              <button
-                onClick={nextTrack}
-                className="p-2 text-[#A1A1AA] hover:text-white transition-transform active:scale-95"
-                title="Next Track"
-              >
-                <SkipForward className="w-7 h-7" />
-              </button>
-            </div>
-
-            {/* Repeat */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={toggleRepeat}
-                className={`p-2 rounded-lg transition-colors ${
-                  repeat !== 'off' ? 'text-[var(--accent)]' : 'text-[#A1A1AA] hover:text-white'
+                onClick={() => setActiveTab(activeTab === 'queue' ? 'turntable' : 'queue')}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
+                  activeTab === 'queue'
+                    ? 'bg-[#1ED760] text-[#08090B] border-transparent'
+                    : 'bg-white/[0.06] hover:bg-white/[0.1] text-[#A1A1AA] border-white/10 hover:text-white'
                 }`}
-                title={`Repeat: ${repeat}`}
+                title="Queue"
               >
-                {repeat === 'one' ? <Repeat1 className="w-5 h-5" /> : <Repeat className="w-5 h-5" />}
+                <ListMusic className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline font-mono">{upcomingQueue.length}</span>
               </button>
             </div>
           </div>

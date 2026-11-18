@@ -6,6 +6,7 @@ import { db, getArtworkObjectUrl, syncAlbumsAndArtists, repairLibraryArtworkAndT
 import { usePlayer } from '@/context/PlayerContext';
 import { useToast } from '@/context/ToastContext';
 import { formatDuration, formatDate } from '@/lib/utils';
+import { InteractiveSongCard } from '@/components/common/InteractiveSongCard';
 import {
   Play,
   Pause,
@@ -278,10 +279,10 @@ export function LibraryView({
 
       {/* List View */}
       {viewMode === 'list' && filteredSongs.length > 0 && (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-2xl glass-pure border border-white/10 p-2 shadow-xl">
           <table className="w-full text-left border-collapse text-xs select-none">
             <thead>
-              <tr className="border-b border-[#303038]/60 text-[#71717A] uppercase font-bold tracking-wider text-[10px]">
+              <tr className="border-b border-white/10 text-[#A1A1AA] uppercase font-bold tracking-wider text-[10px]">
                 <th className="py-2.5 px-3 w-10">
                   <button onClick={selectAll}>
                     {selectedIds.size > 0 && selectedIds.size === filteredSongs.length ? (
@@ -343,7 +344,7 @@ export function LibraryView({
                 <th className="py-2.5 px-3 w-16 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#303038]/30">
+            <tbody className="divide-y divide-white/5">
               {filteredSongs.map((song, idx) => {
                 const isCur = currentSong?.id === song.id;
                 const isSel = selectedIds.has(song.id);
@@ -354,24 +355,28 @@ export function LibraryView({
                     key={song.id}
                     onContextMenu={e => onSongContextMenu(e, song)}
                     onClick={() => (isCur ? togglePlay() : playSong(song, filteredSongs))}
-                    className={`group hover:bg-[#19191F]/90 cursor-pointer transition-colors ${
-                      isCur ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : ''
-                    } ${isSel ? 'bg-[#25252D]/80' : ''}`}
+                    className={`group hover:bg-white/10 cursor-pointer transition-colors ${
+                      isCur ? 'bg-[var(--accent)]/15 text-[var(--accent)]' : ''
+                    } ${isSel ? 'bg-white/10' : ''}`}
                   >
                     {/* Checkbox */}
                     <td className="py-2.5 px-3" onClick={e => toggleSelect(song.id, e)}>
                       {isSel ? (
                         <CheckSquare className="w-4 h-4 text-[var(--accent)]" />
                       ) : (
-                        <Square className="w-4 h-4 text-[#303038] group-hover:text-[#71717A]" />
+                        <Square className="w-4 h-4 text-[#71717A] group-hover:text-white" />
                       )}
                     </td>
 
-                    {/* Track Number / Play Icon */}
+                    {/* Track Number / Play Icon & Dynamic EQ */}
                     <td className="py-2.5 px-2 text-center text-[#71717A] font-mono">
                       <div className="flex items-center justify-center">
                         {isCur && isPlaying ? (
-                          <Pause className="w-3.5 h-3.5 fill-[var(--accent)] text-[var(--accent)]" />
+                          <div className="flex items-end gap-0.5 h-3.5" title="Playing">
+                            <span className="w-0.5 bg-[var(--accent)] rounded-full animate-eq-1 h-3.5" />
+                            <span className="w-0.5 bg-[var(--accent)] rounded-full animate-eq-2 h-2.5" />
+                            <span className="w-0.5 bg-[var(--accent)] rounded-full animate-eq-3 h-3" />
+                          </div>
                         ) : (
                           <>
                             <span className="group-hover:hidden">{idx + 1}</span>
@@ -461,58 +466,15 @@ export function LibraryView({
       {/* Grid View */}
       {viewMode === 'grid' && filteredSongs.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {filteredSongs.map(song => {
-            const isCur = currentSong?.id === song.id;
-            const artworkUrl = getArtworkObjectUrl(song);
-
-            return (
-              <div
-                key={song.id}
-                onContextMenu={e => onSongContextMenu(e, song)}
-                onClick={() => (isCur ? togglePlay() : playSong(song, filteredSongs))}
-                className="group p-3 rounded-2xl bg-[#19191F]/80 hover:bg-[#25252D] border border-transparent hover:border-[#303038] cursor-pointer transition-all shadow-md flex flex-col relative"
-              >
-                <div className="aspect-square rounded-xl overflow-hidden bg-[#25252D] relative mb-3 flex items-center justify-center">
-                  {artworkUrl ? (
-                    <img
-                      src={artworkUrl}
-                      alt=""
-                      onError={e => {
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 relative z-10"
-                    />
-                  ) : null}
-                  <div className="absolute inset-0 flex items-center justify-center bg-[#25252D] text-[#71717A] z-0">
-                    <Music2 className="w-10 h-10" />
-                  </div>
-
-                  <div
-                    className={`absolute bottom-2.5 right-2.5 w-10 h-10 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shadow-xl transition-all duration-200 transform ${
-                      isCur
-                        ? 'opacity-100 scale-100'
-                        : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
-                    }`}
-                  >
-                    {isCur && isPlaying ? (
-                      <Pause className="w-5 h-5 fill-black" />
-                    ) : (
-                      <Play className="w-5 h-5 fill-black ml-0.5" />
-                    )}
-                  </div>
-                </div>
-
-                <p
-                  className={`text-sm font-semibold truncate ${
-                    isCur ? 'text-[var(--accent)]' : 'text-white'
-                  }`}
-                >
-                  {song.title}
-                </p>
-                <p className="text-xs text-[#A1A1AA] truncate mt-0.5">{song.artist}</p>
-              </div>
-            );
-          })}
+          {filteredSongs.map((song, idx) => (
+            <InteractiveSongCard
+              key={song.id}
+              song={song}
+              queueList={filteredSongs}
+              index={idx}
+              onContextMenu={onSongContextMenu}
+            />
+          ))}
         </div>
       )}
     </div>

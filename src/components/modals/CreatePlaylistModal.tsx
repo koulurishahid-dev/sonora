@@ -118,10 +118,10 @@ export function CreatePlaylistModal({
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="relative w-full max-w-md bg-[#121216] border border-[#303038] rounded-2xl shadow-2xl overflow-hidden z-10 flex flex-col"
+          className="relative w-full max-w-md glass-modal border border-white/15 rounded-2xl shadow-2xl overflow-hidden z-10 flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[#303038]">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
             <div className="flex items-center gap-2.5">
               <ListMusic className="w-5 h-5 text-[var(--accent)]" />
               <h2 className="text-lg font-bold text-white">

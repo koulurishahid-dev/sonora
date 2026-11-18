@@ -1,348 +1,1349 @@
 import { Song, Playlist } from '@/types/music';
 import { generateId } from './utils';
-import { db, syncAlbumsAndArtists } from './db';
+import { db, syncAlbumsAndArtists, resetAllSongs } from './db';
 import { parseLrc } from '@/components/player/LyricsPanel';
-
-// Helper to write a valid PCM 16-bit stereo WAV file from AudioBuffer
-function audioBufferToWav(buffer: AudioBuffer): Blob {
-  const numChannels = buffer.numberOfChannels;
-  const sampleRate = buffer.sampleRate;
-  const format = 1; // PCM
-  const bitDepth = 16;
-  
-  const bytesPerSample = bitDepth / 8;
-  const blockAlign = numChannels * bytesPerSample;
-  
-  const length = buffer.length;
-  const dataSize = length * blockAlign;
-  const headerSize = 44;
-  const totalSize = headerSize + dataSize;
-  
-  const arrayBuffer = new ArrayBuffer(totalSize);
-  const view = new DataView(arrayBuffer);
-  
-  function writeString(offset: number, str: string) {
-    for (let i = 0; i < str.length; i++) {
-      view.setUint8(offset + i, str.charCodeAt(i));
-    }
-  }
-  
-  // RIFF header
-  writeString(0, 'RIFF');
-  view.setUint32(4, 36 + dataSize, true);
-  writeString(8, 'WAVE');
-  
-  // fmt subchunk
-  writeString(12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, format, true);
-  view.setUint16(22, numChannels, true);
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * blockAlign, true);
-  view.setUint16(32, blockAlign, true);
-  view.setUint16(34, bitDepth, true);
-  
-  // data subchunk
-  writeString(36, 'data');
-  view.setUint32(40, dataSize, true);
-  
-  // Interleave and write 16-bit PCM samples
-  const channels: Float32Array[] = [];
-  for (let i = 0; i < numChannels; i++) {
-    channels.push(buffer.getChannelData(i));
-  }
-  
-  let offset = 44;
-  for (let i = 0; i < length; i++) {
-    for (let ch = 0; ch < numChannels; ch++) {
-      const sample = Math.max(-1, Math.min(1, channels[ch][i]));
-      const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
-      view.setInt16(offset, intSample, true);
-      offset += 2;
-    }
-  }
-  
-  return new Blob([arrayBuffer], { type: 'audio/wav' });
-}
-
-// Generate warm acoustic/melodic audio buffer for any song
-export async function synthesizeMelodyAudio(
-  baseFreq: number,
-  bpm: number,
-  seconds: number
-): Promise<Blob> {
-  const sampleRate = 44100;
-  const length = sampleRate * seconds;
-  const offlineCtx = new OfflineAudioContext(2, length, sampleRate);
-
-  const masterGain = offlineCtx.createGain();
-  masterGain.gain.setValueAtTime(0.7, 0);
-  masterGain.gain.linearRampToValueAtTime(0.7, seconds - 2);
-  masterGain.gain.linearRampToValueAtTime(0.001, seconds);
-  masterGain.connect(offlineCtx.destination);
-
-  // Soft Indian / Carnatic inspired acoustic scale intervals (major & minor pentatonic harmonics)
-  const intervals = [0, 2, 4, 7, 9, 12, 14, 16];
-  const beatDuration = 60 / bpm;
-  const numNotes = Math.floor(seconds / (beatDuration * 2));
-
-  for (let i = 0; i < numNotes; i++) {
-    const time = i * beatDuration * 2;
-    const noteInterval = intervals[i % intervals.length];
-    const rootFreq = baseFreq * Math.pow(2, noteInterval / 12);
-
-    // Warm Rhodes / Tanpura style harmonic tones
-    [0, 7, 12].forEach((chordInterval, idx) => {
-      const osc = offlineCtx.createOscillator();
-      const gain = offlineCtx.createGain();
-
-      osc.type = idx === 0 ? 'sine' : 'triangle';
-      osc.frequency.setValueAtTime(rootFreq * Math.pow(2, chordInterval / 12), time);
-
-      gain.gain.setValueAtTime(0.001, time);
-      gain.gain.linearRampToValueAtTime(0.16, time + 0.1);
-      gain.gain.exponentialRampToValueAtTime(0.02, time + beatDuration * 2 - 0.1);
-      gain.gain.linearRampToValueAtTime(0.0001, time + beatDuration * 2);
-
-      osc.connect(gain);
-      gain.connect(masterGain);
-
-      osc.start(time);
-      osc.stop(time + beatDuration * 2);
-    });
-
-    // Warm deep bass note
-    const bassOsc = offlineCtx.createOscillator();
-    const bassGain = offlineCtx.createGain();
-    bassOsc.type = 'sine';
-    bassOsc.frequency.setValueAtTime(rootFreq / 2, time);
-
-    bassGain.gain.setValueAtTime(0.001, time);
-    bassGain.gain.linearRampToValueAtTime(0.2, time + 0.08);
-    bassGain.gain.exponentialRampToValueAtTime(0.03, time + beatDuration * 2 - 0.1);
-    bassGain.gain.linearRampToValueAtTime(0.0001, time + beatDuration * 2);
-
-    bassOsc.connect(bassGain);
-    bassGain.connect(masterGain);
-
-    bassOsc.start(time);
-    bassOsc.stop(time + beatDuration * 2);
-  }
-
-  // Soft vinyl ambience crackle / acoustic texture
-  const noiseLength = seconds;
-  const noiseBuffer = offlineCtx.createBuffer(1, sampleRate * noiseLength, sampleRate);
-  const out = noiseBuffer.getChannelData(0);
-  for (let s = 0; s < noiseBuffer.length; s++) {
-    out[s] = (Math.random() * 2 - 1) * 0.008;
-  }
-  const noiseSource = offlineCtx.createBufferSource();
-  noiseSource.buffer = noiseBuffer;
-  const noiseFilter = offlineCtx.createBiquadFilter();
-  noiseFilter.type = 'bandpass';
-  noiseFilter.frequency.value = 1000;
-  noiseSource.connect(noiseFilter);
-  noiseFilter.connect(masterGain);
-  noiseSource.start(0);
-
-  const rendered = await offlineCtx.startRendering();
-  return audioBufferToWav(rendered);
-}
 
 export interface CuratedTrackDefinition {
   title: string;
   artist: string;
   movie: string;
   year: number;
-  mood: string;
+  mood: 'Melodies' | 'Love Songs';
   artworkUrl: string;
+  sourceUrl?: string;
   bpm: number;
   baseFreq: number;
   seconds: number;
   lyrics: string;
 }
 
+// Complete Master Telugu Collection (Melodies & Love Songs Only)
 export const CURATED_TELUGU_SONGS: CuratedTrackDefinition[] = [
   {
-    title: 'Inkem Inkem Inkem Kaavaale',
-    artist: 'Sid Sriram',
-    movie: 'Geetha Govindam',
+    title: "Inkem Inkem Inkem Kaavaale",
+    artist: "Sid Sriram",
+    movie: "Geetha Govindam",
     year: 2018,
-    mood: 'Romantic Telugu Melodies',
-    artworkUrl:
-      'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/68/f1/52/68f1523b-3c40-f2cc-7d4a-376642897adb/cover.jpg/600x600bb.jpg',
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/237/Geetha-Govindam-Telugu-2018-20180921-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/237/7942edb73e64d4e35e488337e14753b7_320.mp4",
     bpm: 96,
-    baseFreq: 246.94, // B3
-    seconds: 32,
-    lyrics: `[00:00.00] Inkem Inkem Inkem Kaavaale...
-[00:06.00] Chaalidi Chaale...
-[00:10.50] Neekai Nuvve Vachhi Vaalave
-[00:16.00] Kannula Munde...
-[00:20.00] Gundellona Guvva Guvvai Vaalave...
-[00:26.00] Vachhi Vaalave...`,
+    baseFreq: 246.94,
+    seconds: 266,
+    lyrics: "[00:00.00] Inkem Inkem Inkem Kaavaale...\n[00:15.00] Chaalidi Chaale...\n[00:25.00] Neekai Nuvve Vachhi Vaalave\n[00:40.00] Kannula Munde...\n[00:55.00] Gundellona Guvva Guvvai Vaalave...\n[01:15.00] Vachhi Vaalave...\n[01:30.00] Chinukulaaga Vachhi Nannu Taakave...\n[01:50.00] Inkem Inkem Inkem Kaavaale...\n[02:10.00] Chaalidi Chaale...\n[02:30.00] Gundellona Guvva Guvvai Vaalave...",
   },
   {
-    title: 'Samajavaragamana',
-    artist: 'Sid Sriram',
-    movie: 'Ala Vaikunthapurramuloo',
+    title: "Samajavaragamana",
+    artist: "Sid Sriram",
+    movie: "Ala Vaikunthapurramuloo",
     year: 2020,
-    mood: 'Soulful Melodies',
-    artworkUrl:
-      'https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/46/14/df/4614df1c-3f61-6bf5-5c3e-ee304895cfca/cover.jpg/600x600bb.jpg',
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/517/339d76dce4db4f43f4721eec2d8f03ef_320.mp4",
     bpm: 88,
-    baseFreq: 261.63, // C4
-    seconds: 30,
-    lyrics: `[00:00.00] Samajavaragamana...
-[00:06.00] Ninu Choosi Aagagalana...
-[00:12.00] Manasu Meeda Vayasukunna Maata Cheppana...
-[00:18.00] Nee Kaallani Pattukuni Vadalanannavi Choode Naa Kallu...
-[00:24.00] Choode Naa Kallu...`,
+    baseFreq: 261.63,
+    seconds: 219,
+    lyrics: "[00:00.00] Samajavaragamana...\n[00:18.00] Ninu Choosi Aagagalana...\n[00:35.00] Manasu Meeda Vayasukunna Maata Cheppana...\n[00:52.00] Nee Kaallani Pattukuni Vadalanannavi Choode Naa Kallu...\n[01:10.00] Choode Naa Kallu...\n[01:30.00] Nee Kaallani Pattukuni Vadalanannavi Choode Naa Kallu...\n[01:55.00] Samajavaragamana...",
   },
   {
-    title: 'Vachindamma',
-    artist: 'Sid Sriram',
-    movie: 'Geetha Govindam',
-    year: 2018,
-    mood: 'Romantic Telugu Melodies',
-    artworkUrl:
-      'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/68/f1/52/68f1523b-3c40-f2cc-7d4a-376642897adb/cover.jpg/600x600bb.jpg',
-    bpm: 92,
-    baseFreq: 220, // A3
-    seconds: 28,
-    lyrics: `[00:00.00] Vachindamma Ee Janmaki Padahaaranaala Teerani Varame...
-[00:08.00] Mechhindamma Naa Gundeki Saripoda Inka Ee Chirunavve...
-[00:16.00] Vachindamma... Naa Pranama...`,
-  },
-  {
-    title: 'Adiga Adiga',
-    artist: 'Sid Sriram',
-    movie: 'Ninnu Kori',
-    year: 2017,
-    mood: 'Heart Touching Songs',
-    artworkUrl:
-      'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/98/81/43/988143ca-e902-4e8a-977c-3e31eefcfaab/196925399784.jpg/600x600bb.jpg',
-    bpm: 80,
-    baseFreq: 196, // G3
-    seconds: 30,
-    lyrics: `[00:00.00] Adiga Adiga Ee Santhosham Ekkadidone...
-[00:07.50] Nilisaa Nilisaa O Thuntarivai Nee Thalapulane...
-[00:15.00] Nee Kallallo Chooppai Kaalam Aagindhe...
-[00:22.00] Adiga Adiga...`,
-  },
-  {
-    title: 'Maate Vinadhuga',
-    artist: 'Sid Sriram',
-    movie: 'Taxiwaala',
-    year: 2018,
-    mood: 'Late Night Vibes',
-    artworkUrl:
-      'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/94/1d/a0/941da079-ee93-ce60-6340-3c7d0f7633a3/cover.jpg/600x600bb.jpg',
-    bpm: 90,
-    baseFreq: 293.66, // D4
-    seconds: 28,
-    lyrics: `[00:00.00] Maate Vinadhuga Naa Manasu...
-[00:06.00] Oohalake Veluthundi Vethuku...
-[00:12.00] Nuvve Nannu Maarchesave...
-[00:18.00] Naa Gundello Edo Melikeseve...`,
-  },
-  {
-    title: 'Undiporaadhey',
-    artist: 'Sid Sriram',
-    movie: 'Hushaaru',
-    year: 2018,
-    mood: 'Heart Touching Songs',
-    artworkUrl:
-      'https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/1b/41/ef/1b41ef56-4aef-56a6-bc40-648126458c8c/cover.jpg/600x600bb.jpg',
-    bpm: 78,
-    baseFreq: 174.61, // F3
-    seconds: 30,
-    lyrics: `[00:00.00] Undiporaadhey Gundene Hatthukuni...
-[00:07.00] Nuvvu Leni Lokamlo Naake Emi Thochadhe...
-[00:14.00] Praanam Loni Praaname Nuvve Kadaa...
-[00:22.00] Undiporaadhey...`,
-  },
-  {
-    title: 'Srivalli',
-    artist: 'Sid Sriram',
-    movie: 'Pushpa: The Rise',
+    title: "Srivalli",
+    artist: "Sid Sriram",
+    movie: "Pushpa: The Rise",
     year: 2021,
-    mood: 'Songs on Repeat',
-    artworkUrl:
-      'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/7e/78/81/7e78812c-0445-ebad-321c-1beebaaa328a/8902894361460_cover.jpg/600x600bb.jpg',
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/blob/056/Pushpa-The-Rise-Telugu-2021-20211216115409-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/000/05c5d77f6a8225d6667cf7a1fcaf37d8_320.mp4",
     bpm: 104,
-    baseFreq: 246.94, // B3
-    seconds: 28,
-    lyrics: `[00:00.00] Choope Bangaramayene Srivalli...
-[00:06.50] Maate Maanikyamayene...
-[00:12.00] Nuvvu Nannu Choosina Vaipuki Lokame Tirigipoye...
-[00:20.00] Srivalli...`,
+    baseFreq: 246.94,
+    seconds: 221,
+    lyrics: "[00:00.00] Choope Bangaramayene Srivalli...\n[00:20.00] Maate Maanikyamayene...\n[00:40.00] Nuvvu Nannu Choosina Vaipuki Lokame Tirigipoye...\n[01:05.00] Srivalli... Naa Bangaram Srivalli...\n[01:30.00] Choope Bangaramayene Srivalli...",
   },
   {
-    title: 'Kalaavathi',
-    artist: 'Sid Sriram',
-    movie: 'Sarkaru Vaari Paata',
+    title: "Kalaavathi",
+    artist: "Sid Sriram",
+    movie: "Sarkaru Vaari Paata",
     year: 2022,
-    mood: 'Romantic Telugu Melodies',
-    artworkUrl:
-      'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/dd/13/96/dd1396a1-fd23-693c-137a-b10047cc2b78/196626439680.jpg/600x600bb.jpg',
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/250/Sarkaru-Vaari-Paata-Telugu-2022-20220704160854-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/250/d067c88312cbc32cc708e20ff55f4360_sar_320.mp4",
     bpm: 95,
-    baseFreq: 261.63, // C4
-    seconds: 28,
-    lyrics: `[00:00.00] Vanda Velavele Vennelaa...
-[00:05.50] Naa Gundellona Chinduluraa...
-[00:11.00] Anthaa Kalaavathi Kalavarame...
-[00:16.50] Maguvaa O Kalaavathi...`,
+    baseFreq: 261.63,
+    seconds: 242,
+    lyrics: "[00:00.00] Vanda Velavele Vennelaa...\n[00:18.00] Naa Gundellona Chinduluraa...\n[00:36.00] Anthaa Kalaavathi Kalavarame...\n[00:54.00] Maguvaa O Kalaavathi...\n[01:15.00] Kalala Rani Kalaavathi...\n[01:40.00] Nannu Daati Velli Pokave...",
   },
   {
-    title: 'Aradhya',
-    artist: 'Sid Sriram, Chinmayi',
-    movie: 'Kushi',
-    year: 2023,
-    mood: 'Peaceful Songs',
-    artworkUrl:
-      'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/f5/a1/ed/f5a1ed5e-d3c2-a4dc-27df-2cedd9b159ec/197189406225.jpg/600x600bb.jpg',
-    bpm: 84,
-    baseFreq: 220, // A3
-    seconds: 30,
-    lyrics: `[00:00.00] Aradhya... Naa Premaki Aradhya...
-[00:07.00] Nuvvante Naaku Praanam Kanna Ekkuva...
-[00:14.00] Ee Janmaki Nuvve Naa Sathi...
-[00:21.00] Aradhya...`,
+    title: "Adiga Adiga",
+    artist: "Sid Sriram",
+    movie: "Ninnu Kori",
+    year: 2017,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/070/Ninnu-Kori-Telugu-2017-20220323073319-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/070/c9fc65602ab820be804527719172ac5c_sar_320.mp4",
+    bpm: 80,
+    baseFreq: 196,
+    seconds: 209,
+    lyrics: "[00:00.00] Adiga Adiga Ee Santhosham Ekkadidone...\n[00:20.00] Nilisaa Nilisaa O Thuntarivai Nee Thalapulane...\n[00:45.00] Nee Kallallo Chooppai Kaalam Aagindhe...\n[01:10.00] Adiga Adiga...\n[01:35.00] Nilisaa Nilisaa Nee Thalapulane...",
   },
   {
-    title: 'Okey Oka Lokam',
-    artist: 'Sid Sriram',
-    movie: 'Sashi',
+    title: "Vachindamma",
+    artist: "Sid Sriram",
+    movie: "Geetha Govindam",
+    year: 2018,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/237/Geetha-Govindam-Telugu-2018-20180921-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/237/a89c49ed5b6aba2a9e5678eef38b90ba_320.mp4",
+    bpm: 92,
+    baseFreq: 220,
+    seconds: 250,
+    lyrics: "[00:00.00] Vachindamma Ee Janmaki Padahaaranaala Teerani Varame...\n[00:22.00] Mechhindamma Naa Gundeki Saripoda Inka Ee Chirunavve...\n[00:50.00] Vachindamma... Naa Pranama...\n[01:15.00] Mechhindamma Naa Gundeki...",
+  },
+  {
+    title: "Undiporaadhey",
+    artist: "Sid Sriram",
+    movie: "Hushaaru",
+    year: 2018,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/307/Hushaaru-Telugu-2018-20190107131110-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/307/71b2b46a77bd7b6462f62a63c6150f86_320.mp4",
+    bpm: 78,
+    baseFreq: 174.61,
+    seconds: 173,
+    lyrics: "[00:00.00] Undiporaadhey Gundene Hatthukuni...\n[00:20.00] Nuvvu Leni Lokamlo Naake Emi Thochadhe...\n[00:45.00] Praanam Loni Praaname Nuvve Kadaa...\n[01:10.00] Undiporaadhey...\n[01:30.00] Gundene Hatthukuni Undiporaadhey...",
+  },
+  {
+    title: "Maate Vinadhuga",
+    artist: "Sid Sriram",
+    movie: "Taxiwaala",
+    year: 2018,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/761/Taxiwaala-Telugu-2018-20181123170326-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/199/c6f372d7f53cfd407e4175b1e96e5faf_320.mp4",
+    bpm: 90,
+    baseFreq: 293.66,
+    seconds: 275,
+    lyrics: "[00:00.00] Maate Vinadhuga Naa Manasu...\n[00:20.00] Oohalake Veluthundi Vethuku...\n[00:45.00] Nuvve Nannu Maarchesave...\n[01:10.00] Naa Gundello Edo Melikeseve...\n[01:35.00] Maate Vinadhuga...",
+  },
+  {
+    title: "Okey Oka Lokam",
+    artist: "Sid Sriram",
+    movie: "Sashi",
     year: 2021,
-    mood: 'Heart Touching Songs',
-    artworkUrl:
-      'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/c9/93/c9/c993c9fa-c5ba-f345-353b-432e9220e9ef/cover.jpg/600x600bb.jpg',
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/null/Sashi-Telugu-2021-20210316203227-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/null/7f8ec947c5ec37d88aefc0461b9e5e1f_320.mp4",
     bpm: 82,
-    baseFreq: 196, // G3
-    seconds: 30,
-    lyrics: `[00:00.00] Okey Oka Lokam Nuvve...
-[00:06.00] Lokamloni Andam Nuvve...
-[00:12.00] Andaanike Hrudayam Nuvve...
-[00:18.00] Naake Nuvvu Dakkavu Kadhe...
-[00:24.00] Okey Oka Lokam...`,
+    baseFreq: 196,
+    seconds: 208,
+    lyrics: "[00:00.00] Okey Oka Lokam Nuvve...\n[00:18.00] Lokamloni Andam Nuvve...\n[00:36.00] Andaanike Hrudayam Nuvve...\n[00:55.00] Naake Nuvvu Dakkavu Kadhe...\n[01:20.00] Okey Oka Lokam Nuvve...",
   },
+  {
+    title: "Aradhya",
+    artist: "Sid Sriram",
+    movie: "Kushi",
+    year: 2023,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/679/Kushi-Telugu-Telugu-2023-20250130073127-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/679/85bf5d4b59843045f816ac905fd97219_320.mp4",
+    bpm: 84,
+    baseFreq: 220,
+    seconds: 282,
+    lyrics: "[00:00.00] Aradhya... Naa Premaki Aradhya...\n[00:22.00] Nuvvante Naaku Praanam Kanna Ekkuva...\n[00:48.00] Ee Janmaki Nuvve Naa Sathi...\n[01:15.00] Aradhya...\n[01:40.00] Naa Premaki Aradhya...",
+  },
+  {
+    title: "Neeli Neeli Aakasam",
+    artist: "Sid Sriram",
+    movie: "30 Rojullo Preminchadam Ela",
+    year: 2021,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/172/30-Rojullo-Preminchadam-Ela-Telugu-2021-20250814183402-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/172/8a59c3e2fbf4016092ae2d810a31ece9_320.mp4",
+    bpm: 90,
+    baseFreq: 246.94,
+    seconds: 283,
+    lyrics: "[00:00.00] Neeli Neeli Aakasam Iddamankunna...\n[00:22.00] Mabbulu Chuttukoni Muggulu Vesthunna...\n[00:50.00] Naa Chirunavvulane Neetho Panchukona...\n[01:18.00] Neeli Neeli Aakasam...\n[01:45.00] Mabbulu Chuttukoni Muggulu Vesthunna...",
+  },
+  {
+    title: "Manasa Manasa",
+    artist: "Sid Sriram",
+    movie: "Most Eligible Bachelor",
+    year: 2020,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/586/Most-Eligible-Bachelor-Telugu-2020-20211011224715-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/586/765d8d3b799bad78637d24763f06caba_320.mp4",
+    bpm: 94,
+    baseFreq: 261.63,
+    seconds: 253,
+    lyrics: "[00:00.00] Manasa Manasa... Chebutunna Ee Maata...\n[00:20.00] Niluvaa Niluvaa... Vintunna Nee Baata...\n[00:45.00] Nee Kalalo Karigiponaa...\n[01:10.00] Manasa Manasa...\n[01:35.00] Vintunna Nee Baata...",
+  },
+  {
+    title: "Urike Urike",
+    artist: "Sid Sriram",
+    movie: "HIT 2",
+    year: 2022,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/088/Urike-Urike-From-Hit-2-Telugu-2022-20221109104107-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/088/c55df5f8dc78a21c0541ca8962d8e5be_sar_320.mp4",
+    bpm: 86,
+    baseFreq: 220,
+    seconds: 275,
+    lyrics: "[00:00.00] Urike Urike Naa Hrudayame...\n[00:22.00] Nee Venta Venta Padina Kshaname...\n[00:48.00] Nuvve Naa Lokam Kadaa...\n[01:15.00] Urike Urike...\n[01:40.00] Nee Venta Venta Padina Kshaname...",
+  },
+  {
+    title: "Kumkumala",
+    artist: "Sid Sriram",
+    movie: "Brahmāstra (Telugu)",
+    year: 2022,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/490/Brahmastra-Telugu-Original-Motion-Picture-Soundtrack-Telugu-2022-20221006132910-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/490/7932037e6ae5f39472a9e2e1a604fe10_320.mp4",
+    bpm: 90,
+    baseFreq: 246.94,
+    seconds: 278,
+    lyrics: "[00:00.00] Kumkumala Naa Nudutana Nilichaave...\n[00:22.00] Velugulne Naa Vaipuki Nadipaave...\n[00:48.00] Nuvve Naa Prema Devatha...\n[01:15.00] Kumkumala...\n[01:40.00] Velugulne Naa Vaipuki Nadipaave...",
+  },
+  {
+    title: "Kadalalle",
+    artist: "Sid Sriram",
+    movie: "Dear Comrade",
+    year: 2019,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/556/Dear-Comrade-Telugu-Telugu-2019-20250828182008-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/556/dbb967a858eeb237860c64033a9102c9_320.mp4",
+    bpm: 84,
+    baseFreq: 220,
+    seconds: 260,
+    lyrics: "[00:00.00] Kadalalle Veche Kanule...\n[00:20.00] Kadhilenaa Ee Alale...\n[00:45.00] Ninnu Choodagaane Manasemo Ulikki Pade...\n[01:10.00] Kadalalle...\n[01:35.00] Kadhilenaa Ee Alale...",
+  },
+  {
+    title: "Emai Poyave",
+    artist: "Sid Sriram",
+    movie: "Padi Padi Leche Manasu",
+    year: 2018,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/940/Padi-Padi-Leche-Manasu-Telugu-2018-20250818123151-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/940/3ddd569cf466162e491db3d3abab0a61_320.mp4",
+    bpm: 76,
+    baseFreq: 196,
+    seconds: 154,
+    lyrics: "[00:00.00] Emai Poyave Emai Poyave...\n[00:20.00] Nannu Vidichi Nuvvu Ekkadikellave...\n[00:45.00] Gundello Gundenaagi Poyinatte Undhe...\n[01:10.00] Emai Poyave...\n[01:30.00] Ekkadikellave...",
+  },
+  {
+    title: "Nuvvunte Naa Jathagaa",
+    artist: "Sid Sriram",
+    movie: "I - Manoharudu",
+    year: 2014,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/364/I-Manoharudu-Telugu-2014-20190914115023-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/364/a9b08c9e5b3dacc0e984ef8b3a7701a9_320.mp4",
+    bpm: 90,
+    baseFreq: 261.63,
+    seconds: 352,
+    lyrics: "[00:00.00] Nuvvunte Naa Jathagaa Nenunta Oopirigaa...\n[00:30.00] Nuvvu Leni Lokamlo Nene Brathakalenu Kadaa...\n[01:05.00] Naa Praanam Nuvvegaa...\n[01:40.00] Nuvvunte Naa Jathagaa...\n[02:15.00] Nenunta Oopirigaa...",
+  },
+  {
+    title: "Baguntundhi Nuvvu Navvithe",
+    artist: "Sid Sriram",
+    movie: "Atithi Devobhava",
+    year: 2022,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/257/Atithi-Devobhava-Original-Motion-Picture-Soundtrack--Telugu-2022-20220107133410-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/257/a62e37bc8207cc11bc1c3850fc920807_320.mp4",
+    bpm: 96,
+    baseFreq: 293.66,
+    seconds: 222,
+    lyrics: "[00:00.00] Baguntundhi Nuvvu Navvithe...\n[00:20.00] Hrudayam Murisipothundhe...\n[00:45.00] Nee Kannulalo Minugurulu Merisene...\n[01:10.00] Baguntundhi...\n[01:35.00] Hrudayam Murisipothundhe...",
+  },
+  {
+    title: "Yedurangula Vaana",
+    artist: "Sid Sriram",
+    movie: "18 Pages",
+    year: 2022,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/000/18-Pages-Telugu-2022-20230113204031-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/000/875c7655b708025d7d17c4e8295083cc_320.mp4",
+    bpm: 85,
+    baseFreq: 220,
+    seconds: 252,
+    lyrics: "[00:00.00] Yedurangula Vaana Kurisene...\n[00:22.00] Manasantaa Rangula Maya Chesene...\n[00:50.00] Nuvve Naa Chiru Vaana...\n[01:18.00] Yedurangula Vaana...\n[01:45.00] Kurisene...",
+  },
+  {
+    title: "Nijame Ne Chebutunna",
+    artist: "Sid Sriram",
+    movie: "Ooru Peru Bhairavakona",
+    year: 2024,
+    mood: "Love Songs",
+    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/57/8d/64/578d6448-a22b-1f96-5a15-cbb66865af12/cover.jpg/600x600bb.jpg",
+    sourceUrl: "https://aac.saavncdn.com/000/507ac0876cbea201b822123ed81ea3fc_320.mp4",
+    bpm: 90,
+    baseFreq: 246.94,
+    seconds: 214,
+    lyrics: "[00:00.00] Nijame Ne Chebutunna Jaane Jaanaa...\n[00:18.00] Ninne Ne Premistunna Jaane Jaanaa...\n[00:36.00] Gundello Daachukunna Jaane Jaanaa...\n[00:55.00] Nee Vente Vasthunna Jaane Jaanaa...\n[01:20.00] Nijame Ne Chebutunna...",
+  },
+  {
+    title: "Sirivennela",
+    artist: "Anurag Kulkarni",
+    movie: "Shyam Singha Roy",
+    year: 2021,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/008/Shyam-Singha-Roy-Telugu-Telugu-2021-20220113123204-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/008/663f6bb75d853aa700bffbebcb4e74fc_sar_320.mp4",
+    bpm: 88,
+    baseFreq: 261.63,
+    seconds: 253,
+    lyrics: "[00:00.00] Sirivennela Chinnadhi Gundelona...\n[00:20.00] Kurisenule Vennelaa...\n[00:45.00] Nee Chooputho Naa Manasu Murisene...\n[01:10.00] Sirivennela...\n[01:35.00] Kurisenule Vennelaa...",
+  },
+  {
+    title: "Pillaa Raa",
+    artist: "Anurag Kulkarni",
+    movie: "RX 100",
+    year: 2018,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/172/RX-100-Telugu-2018-20230207103253-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/172/4c364289c4c896e2a87012f74ba4a11d_sar_320.mp4",
+    bpm: 92,
+    baseFreq: 220,
+    seconds: 235,
+    lyrics: "[00:00.00] Pillaa Raa O Pillaa Raa...\n[00:18.00] Naa Gundellona Chotu Nuvve Kadaa...\n[00:40.00] Nuvvu Leni Lokamlo Nene Undalenu...\n[01:05.00] Pillaa Raa...\n[01:30.00] O Pillaa Raa...",
+  },
+  {
+    title: "Mooga Manasulu",
+    artist: "Anurag Kulkarni, Shreya Ghoshal",
+    movie: "Mahanati",
+    year: 2018,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/187/Mahanati-Telugu-2018-20180531-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/187/cd44883b7bef19f22178977a770fea76_320.mp4",
+    bpm: 86,
+    baseFreq: 246.94,
+    seconds: 254,
+    lyrics: "[00:00.00] Mooga Manasulu Paade Paata...\n[00:20.00] Hrudayapu Oohala Teepi Baata...\n[00:45.00] Manasula Bandham Nilichenu Kadaa...\n[01:10.00] Mooga Manasulu...\n[01:35.00] Paade Paata...",
+  },
+  {
+    title: "Buttabomma",
+    artist: "Armaan Malik",
+    movie: "Ala Vaikunthapurramuloo",
+    year: 2019,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/517/Ala-Vaikunthapurramuloo-Telugu-2019-20200116144338-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/517/68cc88035f2fbcd5772e6551bf64c111_320.mp4",
+    bpm: 104,
+    baseFreq: 261.63,
+    seconds: 198,
+    lyrics: "[00:00.00] Buttabomma Buttabomma Nannu Suttukuntive...\n[00:15.00] Zindagi Ne Jhaatpatta Thiragabottive...\n[00:35.00] Kaaliki Muvvalle Nannu Allukuntive...\n[00:55.00] Buttabomma...\n[01:15.00] Nannu Suttukuntive...",
+  },
+  {
+    title: "Vinnane Vinnane",
+    artist: "Armaan Malik",
+    movie: "Tholi Prema",
+    year: 2018,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/134/Tholi-Prema-Telugu-2018-20180120-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/134/4fd1ccfd3b2bf7853bf513706a34bc12_320.mp4",
+    bpm: 90,
+    baseFreq: 220,
+    seconds: 245,
+    lyrics: "[00:00.00] Vinnane Vinnane Nee Manasu Maata...\n[00:20.00] Kannane Kannane Kalalanni Nede...\n[00:45.00] Nuvve Kadaa Naa Pranam...\n[01:10.00] Vinnane Vinnane...\n[01:35.00] Nee Manasu Maata...",
+  },
+  {
+    title: "Chilipiga",
+    artist: "Karthik",
+    movie: "Orange",
+    year: 2010,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/105/Orange-Telugu-2006-20210624180302-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/105/db53cf3a0a9a04a21758ff12f5330eca_320.mp4",
+    bpm: 96,
+    baseFreq: 293.66,
+    seconds: 328,
+    lyrics: "[00:00.00] Chilipiga Choochina Aa Choopu Nede...\n[00:25.00] Hrudayamlo Melikalu Pette Kadaa...\n[00:55.00] Ninnu Veedani Prema Idi...\n[01:25.00] Chilipiga...\n[01:50.00] Aa Choopu Nede...",
+  },
+  {
+    title: "Nammaka Tappani",
+    artist: "Sagar, Devi Sri Prasad",
+    movie: "Bommarillu",
+    year: 2006,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/843/Bommarillu-2000-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/843/7c481f8b891d25ed2bd1a588367e6e1b_320.mp4",
+    bpm: 82,
+    baseFreq: 196,
+    seconds: 273,
+    lyrics: "[00:00.00] Nammaka Tappani Nijamaina...\n[00:22.00] Manasuku Teepi Gayamaina...\n[00:50.00] Preminchadam Naa Thappa...\n[01:15.00] Nammaka Tappani...\n[01:40.00] Nijamaina...",
+  },
+  {
+    title: "The Life of Ram",
+    artist: "Pradeep Kumar",
+    movie: "Jaanu",
+    year: 2020,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/137/96-Original-Motion-Picture-Soundtrack-Tamil-2018-20250905072505-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/137/f609b0edaedfebf449551068f65f95b6_320.mp4",
+    bpm: 78,
+    baseFreq: 174.61,
+    seconds: 354,
+    lyrics: "[00:00.00] Ye Theeruga Nanu Nadipinchina...\n[00:30.00] Gali Vaatamla సాగిపోతున్నా...\n[01:05.00] Lokam Nannu Emi Cheppina...\n[01:40.00] Naa Maargamlo Nenuntaa...",
+  },
+  {
+    title: "Oh Sita Hey Rama",
+    artist: "S.P. Charan, Ramya Behara",
+    movie: "Sita Ramam",
+    year: 2022,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/041/Sita-Ramam-Telugu-Original-Motion-Picture-Soundtrack-Telugu-2022-20220802140738-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/041/b23ca4567cf297346700b5135c0f0bfe_320.mp4",
+    bpm: 90,
+    baseFreq: 246.94,
+    seconds: 246,
+    lyrics: "[00:00.00] Oh Sita Hey Rama...\n[00:18.00] Kalisina Vela Manasantaa Rangulaye...\n[00:45.00] Yugamulaina Maruvaleni Prema...\n[01:10.00] Oh Sita...\n[01:35.00] Hey Rama...",
+  },
+  {
+    title: "Kaatuka Kanule",
+    artist: "Dhee, G.V. Prakash Kumar",
+    movie: "Aakaasam Nee Haddhu Ra",
+    year: 2020,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/114/Aakaasam-Nee-Haddhu-Ra-Telugu-2020-20201111104315-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/114/702e3516dae4aa13efa40bd8c841cba7_320.mp4",
+    bpm: 94,
+    baseFreq: 261.63,
+    seconds: 246,
+    lyrics: "[00:00.00] Kaatuka Kanule Merisene...\n[00:20.00] Ninnu Choosi Manase Murisene...\n[00:45.00] Naa Gundello Chotu Nuvve...\n[01:10.00] Kaatuka Kanule...\n[01:35.00] Merisene...",
+  },
+  {
+    title: "Chitti",
+    artist: "Ram Miriyala",
+    movie: "Jathi Ratnalu",
+    year: 2021,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/604/Jathi-Ratnalu-Telugu-2021-20251011225120-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/604/f2c7f087e4bee0bf947b0c43bc22a507_320.mp4",
+    bpm: 102,
+    baseFreq: 293.66,
+    seconds: 186,
+    lyrics: "[00:00.00] Chitti Nee Navvante Lakshmi Patnam...\n[00:16.00] Chitti Nee Choopante Rangula Rathnam...\n[00:35.00] Neetho Unte Prathi Rooju Pandaga Nede...\n[00:55.00] Chitti...\n[01:15.00] Nee Navvante Lakshmi Patnam...",
+  },
+  {
+    title: "O Rendu Prema Meghaalila",
+    artist: "Sreerama Chandra",
+    movie: "Baby",
+    year: 2023,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/732/Baby-Telugu-2023-20230710131123-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/732/69124058bda0644eea3fdf0217c04952_320.mp4",
+    bpm: 84,
+    baseFreq: 220,
+    seconds: 314,
+    lyrics: "[00:00.00] O Rendu Prema Meghaalila...\n[00:25.00] Aakasamlo Kalisina Vela...\n[00:55.00] Chinukulaaga Kurisene Manasu...\n[01:25.00] O Rendu Prema...\n[01:50.00] Meghaalila...",
+  },
+  {
+    title: "Ghal Ghal (Akasam Thakela)",
+    artist: "S.P. Balasubrahmanyam",
+    movie: "Nuvvostanante Nenoddantana",
+    year: 2005,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/347/Nuvvostanante-Nenoddantana-Telugu-2014-20181121-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/347/56503bc98c59c98dc574419c5541c4e4_320.mp4",
+    bpm: 92,
+    baseFreq: 261.63,
+    seconds: 319,
+    lyrics: "[00:00.00] Ghal Ghal Ghal Ghal Gajjela Mrotha...\n[00:25.00] Akasam Thakela Doosuku Poye...\n[00:55.00] Anando Brahma Ani Paade Naa Hrudayam...\n[01:25.00] Ghal Ghal...\n[01:50.00] Gajjela Mrotha...",
+  },
+  {
+    title: "Keeravani",
+    artist: "S.P. Balasubrahmanyam, S. Janaki",
+    movie: "Anveshana",
+    year: 1985,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/548/Anveshana-Telugu-1985-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/548/794eb1936b383f9e0bcfc896a7343c06_320.mp4",
+    bpm: 86,
+    baseFreq: 246.94,
+    seconds: 265,
+    lyrics: "[00:00.00] Keeravani Chilakala Koliki Paata Paadanaa...\n[00:22.00] Madhuvani Nee Venuka Nadichi Raanaa...\n[00:50.00] Ilaiyaraaja Swaramulalo...\n[01:15.00] Keeravani...\n[01:40.00] Paata Paadanaa...",
+  },
+  {
+    title: "Ay Pilla",
+    artist: "Haricharan",
+    movie: "Love Story",
+    year: 2021,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/582/Love-Story-Telugu-2020-20210923220520-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/582/c2e3ef95b9b4b4cdb51a88c6f0246de6_320.mp4",
+    bpm: 88,
+    baseFreq: 220,
+    seconds: 253,
+    lyrics: "[00:00.00] Ay Pilla Manasune Dochukellave...\n[00:20.00] Nee Vente Naa Praanam Nadichinade...\n[00:45.00] Kalalona Nuvve Kadaa...\n[01:10.00] Ay Pilla...\n[01:35.00] Dochukellave...",
+  },
+  {
+    title: "Hoyna Hoyna",
+    artist: "Inno Genga, Anirudh",
+    movie: "Gang Leader",
+    year: 2019,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/663/Gang-Leader-Telugu-2019-20190905102749-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/663/0d8dcf191477a3eb2f56cf3d5ff5c8a9_320.mp4",
+    bpm: 96,
+    baseFreq: 246.94,
+    seconds: 276,
+    lyrics: "[00:00.00] Hoyna Hoyna Naa Gundelo Melikalu Choodu...\n[00:22.00] Nee Venta Padina Kshaname Maruvalenidi...\n[00:50.00] Nuvve Naa Lokam Kadaa...\n[01:15.00] Hoyna Hoyna...\n[01:40.00] Melikalu Choodu...",
+  },
+  {
+    title: "Em Sandeham Ledu",
+    artist: "Sunitha, Kalyani Mallik",
+    movie: "Oohalu Gusagusalade",
+    year: 2014,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/243/Oohalu-Gusagusalade-Telugu-2014-20240802162328-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/243/c1e3c893e19e706cc87c8ff7ca7ba8b1_320.mp4",
+    bpm: 84,
+    baseFreq: 220,
+    seconds: 232,
+    lyrics: "[00:00.00] Em Sandeham Ledu Aa Thirupathodu Vachhi...\n[00:20.00] Naa Chethi Raatha Maarchinade...\n[00:45.00] Nuvve Naaku Dakkina Vela...\n[01:10.00] Em Sandeham Ledu...\n[01:35.00] Chethi Raatha Maarchinade...",
+  },
+  {
+    title: "Neeve Neeve",
+    artist: "Chakri",
+    movie: "Amma Nanna O Tamila Ammayi",
+    year: 2003,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/277/Amma-Nanna-O-Tamila-Ammai-2003-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/277/89098ab9bd0804a5ccdc49548566c143_320.mp4",
+    bpm: 86,
+    baseFreq: 196,
+    seconds: 330,
+    lyrics: "[00:00.00] Neeve Neeve Naa Praanam Neeve...\n[00:25.00] Neeve Leni Lokam Naakoddhe...\n[00:55.00] Gundello Daachukunna Ninnu...\n[01:25.00] Neeve Neeve...\n[01:50.00] Naa Praanam Neeve...",
+  },
+  {
+    title: "Neetho Unte Chalu",
+    artist: "Mohana Bhogaraju",
+    movie: "Bimbisara",
+    year: 2022,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/133/Bimbisara-Telugu-2022-20220809173633-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/133/f36e890abfa58a0365c06ebce7331926_sar_320.mp4",
+    bpm: 90,
+    baseFreq: 246.94,
+    seconds: 286,
+    lyrics: "[00:00.00] Neetho Unte Chalu Ee Janmaki...\n[00:22.00] Veroka Varamu Nenu Koranu...\n[00:50.00] Naa Chiru Navve Nuvve Kadaa...\n[01:15.00] Neetho Unte Chalu...\n[01:40.00] Ee Janmaki...",
+  },
+
+  {
+    title: "Samayama",
+    artist: "Hesham Abdul Wahab, Anurag Kulkarni, Sithara Krishnakumar, Anantha Sriram",
+    movie: "Samayama (From \"Hi Nanna\")",
+    year: 2023,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/307/Samayama-From-Hi-Nanna-Telugu-2023-20230918164922-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/307/a3f7b8cd383c95bad0310aca20e0c2a0_320.mp4",
+    bpm: 90,
+    baseFreq: 246.94,
+    seconds: 204,
+    lyrics: "[00:00.00] Samayama Aagipove Ee Kshanam...\n[00:20.00] Cheliya Choopu Taakina Ee Nimisham...\n[00:45.00] Kalala Rani Gundeloki Vachhina Velana...\n[01:10.00] Samayama Aagipove...",
+  },
+  {
+    title: "Ammaadi",
+    artist: "Shakthisree Gopalan, Kaala Bhairava, Hesham Abdul Wahab",
+    movie: "Ammaadi (From \"Hi Nanna\")",
+    year: 2023,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/712/Ammaadi-From-Hi-Nanna-Telugu-2023-20231103201011-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/712/14eb6af8b65219bedb0a46d70838a568_320.mp4",
+    bpm: 84,
+    baseFreq: 246.94,
+    seconds: 219,
+    lyrics: "[00:00.00] Ammaadi Naa Chinni Devatha Nuvve...\n[00:22.00] Pranamlo Pranamai Nilichina Veluge...\n[00:50.00] Kanupaapalo Ninnu Daachukonaa...\n[01:15.00] Ammaadi Ammaadi...",
+  },
+  {
+    title: "Priyathama Priyathama",
+    artist: "Chinmayi Sripaada",
+    movie: "Majili",
+    year: 2019,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/405/Majili-Telugu-2019-20190323231520-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/405/6ef201c7ca54a20387a77a03329e76df_320.mp4",
+    bpm: 82,
+    baseFreq: 246.94,
+    seconds: 245,
+    lyrics: "[00:00.00] Priyathama Priyathama Nanu Palikinchina Pranama...\n[00:22.00] Gnapakaale Gundelona Gootu Kattina Velana...\n[00:50.00] Nuvvu Leni Ee Kshanam Oka Yugamai Thochuno...\n[01:20.00] Priyathama Priyathama...",
+  },
+  {
+    title: "Ye Mantramo",
+    artist: "Bobo Shashi",
+    movie: "Andala Rakshasi",
+    year: 2012,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/654/Andala-Rakshasi-Telugu-2012-20240802161530-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/654/5dee406cf6c414e166304ffce5096b1e_320.mp4",
+    bpm: 92,
+    baseFreq: 246.94,
+    seconds: 167,
+    lyrics: "[00:00.00] Ye Mantramo Vesi Nanu Mayachesaave...\n[00:20.00] Naa Gundelona Prema Deepam Veliginchaave...\n[00:45.00] Nuvvu Nenu Kalisunte Chaalanthe...\n[01:10.00] Ye Mantramo...",
+  },
+  {
+    title: "Kundanapu Bomma",
+    artist: "A.R. Rahman, Benny Dayal, Kalyani Menon",
+    movie: "Yemaaya Chesave",
+    year: 2010,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/596/Yemaaya-Chesave-Telugu-2010-20190822154149-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/596/def98c82e0df5d0e8ae0c26c4be23459_320.mp4",
+    bpm: 96,
+    baseFreq: 246.94,
+    seconds: 332,
+    lyrics: "[00:00.00] Kundanapu Bomma Nuvvu Naakosam Vachhaava...\n[00:22.00] Vennela Thuntari Chirunavvula Chinnadaana...\n[00:50.00] Naa Manasanta Neeve Nindaave...\n[01:15.00] Kundanapu Bomma...",
+  },
+  {
+    title: "Ee Hridayam",
+    artist: "A.R. Rahman, Vijay Prakash, Suzanne D'Mello, Blaaze, Anantha Sriram",
+    movie: "Yemaaya Chesave",
+    year: 2010,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/596/Yemaaya-Chesave-Telugu-2010-20190822154149-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/596/6b986111bc9087843cea768c1e0f920d_320.mp4",
+    bpm: 88,
+    baseFreq: 246.94,
+    seconds: 333,
+    lyrics: "[00:00.00] Ee Hridayam Karigenu Choosi Nee Roopam...\n[00:25.00] Ee Pranayam Kurisenu Merisi Nee Sneham...\n[00:50.00] O Cheliya Nuvve Naa Sarvam...\n[01:15.00] Ee Hridayam...",
+  },
+  {
+    title: "Vintunnavaa",
+    artist: "A.R. Rahman, Karthik, Shreya Ghoshal",
+    movie: "Yemaaya Chesave",
+    year: 2010,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/596/Yemaaya-Chesave-Telugu-2010-20190822154149-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/596/dc5d4c1f279aae274f59ad6af749cf5d_320.mp4",
+    bpm: 80,
+    baseFreq: 246.94,
+    seconds: 419,
+    lyrics: "[00:00.00] Vintunnavaa Naa Manasu Paate...\n[00:20.00] Raasunnava Ee Prema Baate...\n[00:45.00] Ninnu Choosi Pulakinchipoyenu...\n[01:10.00] Vintunnavaa...",
+  },
+  {
+    title: "Karige Loga",
+    artist: "Devi Sri Prasad, Kunal Ganjawala, Megha, Vanamali",
+    movie: "Aarya - 2",
+    year: 2009,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/298/Aarya-2-Telugu-2009-20190822135933-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/298/019372208b7876a707deaa65f3715aa7_320.mp4",
+    bpm: 86,
+    baseFreq: 246.94,
+    seconds: 365,
+    lyrics: "[00:00.00] Karige Loga Ee Kshanam Cheppana Maata...\n[00:22.00] Kalise Vunte Chaalugaa Ee Prema Baata...\n[00:50.00] Karige Loga Karige Loga...\n[01:15.00] Neeve Naa Praanam...",
+  },
+  {
+    title: "Uppenantha",
+    artist: "Devi Sri Prasad, KK, Balaji",
+    movie: "Aarya - 2",
+    year: 2009,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/298/Aarya-2-Telugu-2009-20190822135933-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/298/eb880c4cd78d1b29d128d430d4be0dcb_320.mp4",
+    bpm: 104,
+    baseFreq: 246.94,
+    seconds: 327,
+    lyrics: "[00:00.00] Uppenantha Ee Premaki Guppedantha Gunde Eela...\n[00:22.00] Muppulona Nuvvunte Pranamena Ika Nenu Ivvala...\n[00:50.00] Uppenantha Ee Premaki...",
+  },
+  {
+    title: "Chiru Chiru",
+    artist: "Yuvan Shankar Raja, Haricharan, Sagar Desai, Chandra Bose",
+    movie: "Awaara",
+    year: 2013,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/612/Awaara-Telugu-2013-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/612/9c7b1b948242534344ea7acf3da553dc_320.mp4",
+    bpm: 94,
+    baseFreq: 246.94,
+    seconds: 286,
+    lyrics: "[00:00.00] Chiru Chiru Navvula Chinnadaanaa...\n[00:20.00] Naa Manasanta Nuvve Nindaave...\n[00:45.00] Chiru Chiru Choopula Vennelave...\n[01:10.00] Nannu Daati Velli Pokave...",
+  },
+  {
+    title: "Baitikochi Chuste",
+    artist: "Anirudh Ravichander",
+    movie: "Agnyaathavaasi",
+    year: 2017,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/385/Agnyaathavaasi-Telugu-2017-20180102061403-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/243/1c34cc064272e6216f44df2ef32cf7b1_320.mp4",
+    bpm: 108,
+    baseFreq: 246.94,
+    seconds: 206,
+    lyrics: "[00:00.00] Baitikochi Chuste Time Emo 3 O Clock...\n[00:18.00] Manasanta Nuvve Nindaave...\n[00:40.00] Ee Pilla Choope Naalo Kottha Lokam...\n[01:05.00] Baitikochi Chuste...",
+  },
+  {
+    title: "Gaali Vaaluga",
+    artist: "Anirudh Ravichander",
+    movie: "Agnyaathavaasi",
+    year: 2017,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/385/Agnyaathavaasi-Telugu-2017-20180102061403-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/243/3275e815673ba51aefd34100830875fc_320.mp4",
+    bpm: 92,
+    baseFreq: 246.94,
+    seconds: 258,
+    lyrics: "[00:00.00] Gaali Vaaluga O Vaana Chinukulaaga...\n[00:20.00] Naa Gundeloki Vachhi Vaalave...\n[00:45.00] Gaali Vaaluga Gaali Vaaluga...\n[01:10.00] Nuvve Naa Oopiri...",
+  },
+  {
+    title: "Choosi Chudangane",
+    artist: "Mahati Swara Sagar, Anurag Kulkarni",
+    movie: "Chalo",
+    year: 2017,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/931/Chalo-Telugu-2017-20180125-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/931/aeb63336166a092f8cea3ea51fdc2eb2_320.mp4",
+    bpm: 95,
+    baseFreq: 246.94,
+    seconds: 202,
+    lyrics: "[00:00.00] Choosi Chudangane Nachesave...\n[00:20.00] Adigi Adagakundane Vachesave...\n[00:45.00] Manasuni Patti Lagina O Sundari...\n[01:10.00] Choosi Chudangane...",
+  },
+  {
+    title: "Kanulanu Thaake",
+    artist: "Arijit Singh",
+    movie: "Manam",
+    year: 2014,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/849/Manam-Telugu-2014-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/849/ae207d01684a6bd367dc754c1e661d89_320.mp4",
+    bpm: 82,
+    baseFreq: 246.94,
+    seconds: 294,
+    lyrics: "[00:00.00] Kanulanu Thaake O Kalavaa...\n[00:22.00] Gundenu Meetey O Swaramaa...\n[00:50.00] Nuvve Naaku Pranamani Telisaaka...\n[01:15.00] Kanulanu Thaake...",
+  },
+  {
+    title: "Chinni Chinni Aasalu",
+    artist: "Shreya Ghoshal, Ashwin, Hari Arjun",
+    movie: "Manam",
+    year: 2014,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/849/Manam-Telugu-2014-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/849/9d925aa5d31cf0ea4cc76bdecc3ec9e8_320.mp4",
+    bpm: 88,
+    baseFreq: 246.94,
+    seconds: 320,
+    lyrics: "[00:00.00] Chinni Chinni Aasalu Gundello Poolai Puse Vela...\n[00:25.00] Ninnu Choosi Murisipoye Ee Santhosham...\n[00:55.00] Chinni Chinni Aasalu...",
+  },
+  {
+    title: "Hamsa Naava",
+    artist: "Sony, Deepu",
+    movie: "Baahubali 2 - The Conclusion (Telugu)",
+    year: 2017,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/981/Baahubali-2-The-Conclusion-Telugu-2016-20251012021842-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/981/c6849d362eda7816c5a06bcb2d5fee95_320.mp4",
+    bpm: 78,
+    baseFreq: 246.94,
+    seconds: 209,
+    lyrics: "[00:00.00] Hamsa Naava O Hamsa Naava...\n[00:20.00] Aakasam Daati Vellipove...\n[00:45.00] Naa Priya Thodai Saagi Pove...\n[01:15.00] Hamsa Naava...",
+  },
+  {
+    title: "Dheevara",
+    artist: "Ramya Behara, Adithya",
+    movie: "Baahubali - The Beginning (Telugu)",
+    year: 2015,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/301/Baahubali-The-Beginning-Telugu-2015-20251028160018-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/301/e30a643c363131fcd388bb358c34bfdb_320.mp4",
+    bpm: 80,
+    baseFreq: 246.94,
+    seconds: 190,
+    lyrics: "[00:00.00] Dheevara Prasara Shourya Bhaara...\n[00:25.00] Uthunga Himagiri Shringa Sannibha...\n[00:55.00] Dheevara Dheevara...",
+  },
+  {
+    title: "Nuvvante Naaku Ishtamani",
+    artist: "Jassie Gift",
+    movie: "Heart Attack",
+    year: 2014,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/000/Heart-Attack-Telugu-2014-20241213141215-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/000/e03e1219743394c181fb801f5a469a8e_320.mp4",
+    bpm: 86,
+    baseFreq: 246.94,
+    seconds: 218,
+    lyrics: "[00:00.00] Nuvvante Naaku Ishtamani Chebutunna Eevela...\n[00:22.00] Gundello Daachukunna Maata Cheppana...\n[00:50.00] Nuvvante Naaku Ishtamani...",
+  },
+  {
+    title: "Rooba Rooba",
+    artist: "Chinmayi Sripada, Shahil Hada",
+    movie: "Orange",
+    year: 2010,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/105/Orange-Telugu-2006-20210624180302-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/105/6edae5a98216eef5d60968c44889884c_320.mp4",
+    bpm: 102,
+    baseFreq: 246.94,
+    seconds: 314,
+    lyrics: "[00:00.00] Rooba Rooba Hey Rooba Rooba...\n[00:20.00] Manasanta Nuvve Nindaave...\n[00:45.00] Rooba Rooba Naa Prema Rani...\n[01:10.00] Rooba Rooba...",
+  },
+  {
+    title: "Nenu Nuvvantu",
+    artist: "Nadeesh, Naresh Iyer, U.V. Jackey",
+    movie: "Orange",
+    year: 2010,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/105/Orange-Telugu-2006-20210624180302-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/105/a24d2f0f3ab1547cc959b51ed6a9f48e_320.mp4",
+    bpm: 92,
+    baseFreq: 246.94,
+    seconds: 287,
+    lyrics: "[00:00.00] Nenu Nuvvantu Verai Unna Kalisindhe Eevela...\n[00:22.00] Preme Chirunavvai Raasindhe Ee Prema Kavitha...\n[00:50.00] Nenu Nuvvantu...",
+  },
+  {
+    title: "Yemito",
+    artist: "Haricharan",
+    movie: "Andala Rakshasi",
+    year: 2012,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/654/Andala-Rakshasi-Telugu-2012-20240802161530-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/654/0c4e62b6d16394f33e8e42290e4c8499_320.mp4",
+    bpm: 76,
+    baseFreq: 246.94,
+    seconds: 268,
+    lyrics: "[00:00.00] Yemito Ee Maya Gundello...\n[00:22.00] Nuvvu Leni Lokam Choodalene...\n[00:50.00] Naa Pranam Nuvve Kadaa...\n[01:15.00] Yemito Yemito...",
+  },
+  {
+    title: "Mellaga Karagani",
+    artist: "S.P. Charan, Sumangali",
+    movie: "Varsham",
+    year: 2003,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/449/Varsham-2003-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/449/b717def9c5f121922438f64724791d20_320.mp4",
+    bpm: 85,
+    baseFreq: 246.94,
+    seconds: 321,
+    lyrics: "[00:00.00] Mellaga Karagani Rendu Manasula Dooram...\n[00:22.00] Challaga Kuravani Ee Prema Jallu...\n[00:50.00] Mellaga Karagani...",
+  },
+  {
+    title: "Rang De (Nuvvele Nuvvele)",
+    artist: "Ramya Behara, Rahul Nambiar, Shivani",
+    movie: "A Aa",
+    year: 2016,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/101/A-Aa-Telugu-2016-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/101/113041249b13565901e1489989875cb3_320.mp4",
+    bpm: 90,
+    baseFreq: 246.94,
+    seconds: 241,
+    lyrics: "[00:00.00] Nuvvele Nuvvele Naa Kalala Rani...\n[00:20.00] Gundello Nindaave Cheliya...\n[00:45.00] Nuvvele Nuvvele...",
+  },
+  {
+    title: "Kadhile Kaalame",
+    artist: "Kaala Bhairava, Kala Bhairava",
+    movie: "Karthikeya 2",
+    year: 2022,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/506/Karthikeya-2-Telugu-2022-20220901111424-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/506/d4335848e9210d9c534e9d4561d0ba2a_320.mp4",
+    bpm: 84,
+    baseFreq: 246.94,
+    seconds: 171,
+    lyrics: "[00:00.00] Kadhile Kaalame Aagipoda Ee Kshanam...\n[00:22.00] Kalale Kanti Mundu Nijamai Niliche Velana...\n[00:50.00] Kadhile Kaalame...",
+  },
+  {
+    title: "Guche Gulabi",
+    artist: "Armaan Malik",
+    movie: "Most Eligible Bachelor",
+    year: 2020,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/586/Most-Eligible-Bachelor-Telugu-2020-20211011224715-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/586/6ec61ced980fbc1a1f80d96ee982b532_320.mp4",
+    bpm: 96,
+    baseFreq: 246.94,
+    seconds: 282,
+    lyrics: "[00:00.00] Guche Gulabi Laaga Choopultho Guchave...\n[00:20.00] Manasuni Maayam Chese O Chinnadaanaa...\n[00:45.00] Guche Gulabi...",
+  },
+  {
+    title: "Leharaayi",
+    artist: "Sid Sriram",
+    movie: "Most Eligible Bachelor",
+    year: 2020,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/586/Most-Eligible-Bachelor-Telugu-2020-20211011224715-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/586/d3a214cf5006880a02711f6a50296528_320.mp4",
+    bpm: 98,
+    baseFreq: 246.94,
+    seconds: 245,
+    lyrics: "[00:00.00] Leharaayi Leharaayi Naa Manasanta...\n[00:20.00] Nuvve Nindaave O Cheliya...\n[00:45.00] Leharaayi Leharaayi...",
+  },
+  {
+    title: "Arere Manasa",
+    artist: "Vivek Sagar, Sid Sriram, Kittu Vissapragada",
+    movie: "Falaknuma Das",
+    year: 2019,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/243/Falaknuma-Das-Telugu-2019-20190527121508-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/243/fd52cc44c5140ce9b710b8d1f97b0ba6_320.mp4",
+    bpm: 88,
+    baseFreq: 246.94,
+    seconds: 301,
+    lyrics: "[00:00.00] Arere Manasa Emi Chesave...\n[00:20.00] Vayasu Meeda Valichesave...\n[00:45.00] Arere Manasa Arere Manasa...",
+  },
+  {
+    title: "Telusa Telusa",
+    artist: "Jubin Nautiyal, Sameera Bharadwaj",
+    movie: "Sarrainodu",
+    year: 2016,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/685/Sarrainodu-Telugu-2016-20250818111047-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/685/d6f19c57e182037b773bc6a6fc391bba_320.mp4",
+    bpm: 94,
+    baseFreq: 246.94,
+    seconds: 264,
+    lyrics: "[00:00.00] Telusa Telusa Ee Prema Kathalona...\n[00:20.00] Nuvve Naaku Pranamai Nilichavani...\n[00:45.00] Telusa Telusa...",
+  },
+  {
+    title: "Manasu Maree",
+    artist: "Amit Trivedi, Shashaa Tirupati, Yazin Nizar",
+    movie: "V",
+    year: 2020,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/584/V-Telugu-2020-20200828173314-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/584/3c1e1c8ea031e52ecc21730076698117_320.mp4",
+    bpm: 88,
+    baseFreq: 246.94,
+    seconds: 267,
+    lyrics: "[00:00.00] Manasu Maree Mathi Pogottindhe...\n[00:20.00] Nee Venta Venta Padindhe...\n[00:45.00] Manasu Maree...",
+  },
+  {
+    title: "Chinna Chinna Aasa",
+    artist: "Minmini",
+    movie: "Roja (Telugu)",
+    year: 2014,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/468/Roja-Telugu-2014-20251012071631-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/468/033947e72c37f91aaa67fbbf46721f1e_320.mp4",
+    bpm: 86,
+    baseFreq: 246.94,
+    seconds: 293,
+    lyrics: "[00:00.00] Chinna Chinna Aasa Chinnadaani Aasa...\n[00:20.00] Mutyamantha Aasa Muddhugunna Aasa...\n[00:45.00] Jaabili Thaakalanukundi...\n[01:10.00] Chinna Chinna Aasa...",
+  },
+  {
+    title: "Mounamelanoyi",
+    artist: "S.P. Balasubrahmanyam, S. Janaki",
+    movie: "Sagara Sangamam (Telugu)",
+    year: 1983,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/901/Sagara-Sangamam-Telugu-Telugu-1983-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/901/137a6e9aa900159039fbe6ee12ff5abc_320.mp4",
+    bpm: 80,
+    baseFreq: 246.94,
+    seconds: 263,
+    lyrics: "[00:00.00] Mounamelanoyi Ee Marapu Raani Reyi...\n[00:22.00] Ede Kanti Paapa Ede Hrudayam...\n[00:50.00] Mounamelanoyi...",
+  },
+  {
+    title: "Inthandham",
+    artist: "S.P. Charan",
+    movie: "Sita Ramam",
+    year: 2022,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/041/Sita-Ramam-Telugu-Original-Motion-Picture-Soundtrack-Telugu-2022-20220802140738-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/041/5083b857ea214d9795e18eb5671787cf_320.mp4",
+    bpm: 88,
+    baseFreq: 246.94,
+    seconds: 228,
+    lyrics: "[00:00.00] Inthandham Dhaari Mallindhaa...\n[00:18.00] Bhoomiki Thaara Vachhindhaa...\n[00:36.00] Tholisaari Ninnu Choosi Gundello Edo...\n[00:54.00] Allari Allari Chese...\n[01:15.00] Inthandham Dhaari Mallindhaa...",
+  },
+  {
+    title: "Kaanunna Kalyanam",
+    artist: "Anurag Kulkarni, Sinduri Vishal",
+    movie: "Sita Ramam",
+    year: 2022,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/041/Sita-Ramam-Telugu-Original-Motion-Picture-Soundtrack-Telugu-2022-20220802140738-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/041/78be60a749ddb887e08a8d4b120e5bb8_320.mp4",
+    bpm: 84,
+    baseFreq: 220,
+    seconds: 244,
+    lyrics: "[00:00.00] Kaanunna Kalyanam Neethone...\n[00:20.00] Raasunna Bandham Ee Janmake...\n[00:45.00] Manasuloni Aasa Cheppaali...\n[01:10.00] Kaanunna Kalyanam Neethone...",
+  },
+  {
+    title: "Panchadara Bomma",
+    artist: "Anoop Rubens, Rita",
+    movie: "Magadheera",
+    year: 2009,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/896/Magadheera-2009-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/896/b31711f5ffc53101d52d93a5219e95da_320.mp4",
+    bpm: 96,
+    baseFreq: 261.63,
+    seconds: 288,
+    lyrics: "[00:00.00] Panchadara Bomma Bomma...\n[00:18.00] Paala Bugga Chinna Dhaana...\n[00:36.00] Manasu Meeda Vaalindhe Prema...\n[00:54.00] Ninnu Choosi Maaripoye Janma...\n[01:15.00] Panchadara Bomma...",
+  },
+  {
+    title: "Nee Chitram Choosi",
+    artist: "Anurag Kulkarni",
+    movie: "Love Story",
+    year: 2021,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/582/Love-Story-Telugu-2020-20210923220520-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/582/4f1cc138c57cc46eb263688772f914ff_320.mp4",
+    bpm: 80,
+    baseFreq: 196,
+    seconds: 254,
+    lyrics: "[00:00.00] Nee Chitram Choosi Nene Tholisaari...\n[00:22.00] Kalalanu Nammukunna...\n[00:48.00] Nuvvunte Chaalu Naathone...\n[01:15.00] Nee Chitram Choosi...",
+  },
+  {
+    title: "Nee Neeli Kannullona",
+    artist: "Gowtham Bharadwaj",
+    movie: "Dear Comrade",
+    year: 2019,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/556/Dear-Comrade-Telugu-Telugu-2019-20250828182008-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/556/976acaa235a1c0277837b54faf8c9848_320.mp4",
+    bpm: 86,
+    baseFreq: 220,
+    seconds: 247,
+    lyrics: "[00:00.00] Nee Neeli Kannullona Kalavaram...\n[00:20.00] Naa Gundellona Modhalaye Sambaram...\n[00:45.00] Premincha Ninnu Kshaname...\n[01:10.00] Nee Neeli Kannullona...",
+  },
+  {
+    title: "Ninnila Ninnila",
+    artist: "Armaan Malik",
+    movie: "Tholi Prema",
+    year: 2018,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/134/Tholi-Prema-Telugu-2018-20180120-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/134/6d7e0af5fd8d66259125c7768afdf879_320.mp4",
+    bpm: 88,
+    baseFreq: 246.94,
+    seconds: 278,
+    lyrics: "[00:00.00] Ninnila Ninnila Choosane Tholisaari...\n[00:22.00] Gundello Edo Teliyani Hai...\n[00:50.00] Naa Praname Nuvve O Cheliya...\n[01:18.00] Ninnila Ninnila...",
+  },
+  {
+    title: "Gaaju Bomma",
+    artist: "Hesham Abdul Wahab",
+    movie: "Hi Nanna",
+    year: 2023,
+    mood: "Melodies",
+    artworkUrl: "https://c.saavncdn.com/332/Gaaju-Bomma-From-Hi-Nanna-Telugu-2023-20231005201031-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/332/dd813d44f169c547f0361d1d9660549a_320.mp4",
+    bpm: 76,
+    baseFreq: 174.61,
+    seconds: 285,
+    lyrics: "[00:00.00] Gaaju Bomma Gaaju Bomma...\n[00:18.00] Nuvve Naa Chinni Lokam...\n[00:40.00] Kanula Ninda Prema Ninche Velalo...\n[01:05.00] Gaaju Bomma...",
+  },
+  {
+    title: "Na Rojaa Nuvve",
+    artist: "Hesham Abdul Wahab",
+    movie: "Kushi",
+    year: 2023,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/679/Kushi-Telugu-Telugu-2023-20250130073127-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/679/26aefaaa62fc3425cf4d18bcf277fffc_320.mp4",
+    bpm: 96,
+    baseFreq: 261.63,
+    seconds: 236,
+    lyrics: "[00:00.00] Na Rojaa Nuvve... Naa Rani Nuvve...\n[00:20.00] Gundellona Nuvve Nilichaave...\n[00:45.00] Na Rojaa Nuvve...",
+  },
+  {
+    title: "Cheppave Chirugaali",
+    artist: "Udit Narayan, Sujatha",
+    movie: "Okkadu",
+    year: 2003,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/408/Okkadu-2000-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/408/d5fadb97eff8b035a9885fe557cb6d26_320.mp4",
+    bpm: 90,
+    baseFreq: 246.94,
+    seconds: 350,
+    lyrics: "[00:00.00] Cheppave Chirugaali Ekkadamma Aame...\n[00:22.00] Gundello Nilichindi Ee Janmake...\n[00:50.00] Cheppave Chirugaali...",
+  },
+  {
+    title: "Feel My Love",
+    artist: "KK",
+    movie: "Aarya",
+    year: 2004,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/044/Aarya-2004-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/044/0800c983290c5a5030b77a0a1f6b1ff4_320.mp4",
+    bpm: 82,
+    baseFreq: 196,
+    seconds: 254,
+    lyrics: "[00:00.00] Feel My Love... Feel My Love...\n[00:20.00] Naa Manasanta Ninde Unnavu...\n[00:45.00] Nuvvu Nannu Premistavani...\n[01:10.00] Feel My Love...",
+  },
+  {
+    title: "Gundello Emundho",
+    artist: "Venu, Sumangali",
+    movie: "Manmadhudu",
+    year: 2002,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/386/Manmadhudu-Telugu-2002-20190206140019-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/386/d59e82fd0fd8cc2a241d5f32345f67bb_320.mp4",
+    bpm: 86,
+    baseFreq: 220,
+    seconds: 298,
+    lyrics: "[00:00.00] Gundello Emundho Kallallo Telusthundi...\n[00:22.00] Pedavullo Ee Prema Palukutondi...\n[00:50.00] Gundello Emundho...",
+  },
+  {
+    title: "Ammaye Sannaga",
+    artist: "Hariharan, Kavita Krishnamurthy",
+    movie: "Kushi",
+    year: 2001,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/470/Kushi-2001-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/470/5c9480879b15327be696731ab9b78e21_320.mp4",
+    bpm: 94,
+    baseFreq: 261.63,
+    seconds: 284,
+    lyrics: "[00:00.00] Ammaye Sannaga Meenakshi Laaga...\n[00:22.00] Nadumu Chusthe Thaamara Poovula...\n[00:50.00] Ammaye Sannaga...",
+  },
+  {
+    title: "Priya Priya",
+    artist: "Adnan Sami, Nithya Menen",
+    movie: "Ishq",
+    year: 2012,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/057/Ishq-Telugu-2012-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/057/ea140e293aa00f3c78a71c5ed529d22c_320.mp4",
+    bpm: 98,
+    baseFreq: 246.94,
+    seconds: 260,
+    lyrics: "[00:00.00] Priya Priya O Priya Priya...\n[00:20.00] Nuvve Naa Pranamani Cheppana...\n[00:45.00] Priya Priya...",
+  },
+  {
+    title: "Sara Sari",
+    artist: "Anurag Kulkarni",
+    movie: "Bheeshma",
+    year: 2020,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/558/Bheeshma-Telugu-2019-20200320104145-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/558/d7d4338d06c065ab704ebf70fc5641d8_320.mp4",
+    bpm: 96,
+    baseFreq: 246.94,
+    seconds: 248,
+    lyrics: "[00:00.00] Sara Sari Guchave Naa Gundello...\n[00:22.00] Nuvve Nuvve Nindaave Kallallo...\n[00:48.00] Sara Sari Guchave...",
+  },
+  {
+    title: "Adhento Gaani Vunnapaatuga",
+    artist: "Anirudh Ravichander",
+    movie: "Jersey",
+    year: 2019,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/623/Jersey-Telugu-2019-20190427102305-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/623/3fdef490938e83e350d820bc031dde3a_320.mp4",
+    bpm: 92,
+    baseFreq: 220,
+    seconds: 242,
+    lyrics: "[00:00.00] Adhento Gaani Vunnapaatuga...\n[00:20.00] Ee Prema Vachi Valindhe Naa Paina...\n[00:45.00] Adhento Gaani...",
+  },
+  {
+    title: "Nagumomu Thaarale",
+    artist: "Sid Sriram",
+    movie: "Radhe Shyam",
+    year: 2022,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/292/Radhe-Shyam-Telugu-2022-20220312141038-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/292/b055d9eadb450fdd8148aca52de0a4f5_320.mp4",
+    bpm: 84,
+    baseFreq: 246.94,
+    seconds: 268,
+    lyrics: "[00:00.00] Nagumomu Thaarale Tholisari Choosene...\n[00:22.00] Gundello Premane Kuripinchaave...\n[00:50.00] Nagumomu Thaarale...",
+  },
+  {
+    title: "Apudo Ipudo",
+    artist: "Siddharth",
+    movie: "Bommarillu",
+    year: 2006,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/843/Bommarillu-2000-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/843/ca7e36439771ce63641bc47e457d8260_320.mp4",
+    bpm: 90,
+    baseFreq: 246.94,
+    seconds: 264,
+    lyrics: "[00:00.00] Apudo Ipudo Epudo Kalagannane...\n[00:22.00] Cheliya Cheliya Nuvve Naa Praname...\n[00:50.00] Apudo Ipudo...",
+  },
+  {
+    title: "Priyathama Naa Hrudayama",
+    artist: "S.P. Balasubrahmanyam, K.S. Chithra",
+    movie: "Prema",
+    year: 1989,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/324/Mooga-Manasulu-2013-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/324/6cce894bfc95a5e5b8e02d04009f58c8_320.mp4",
+    bpm: 80,
+    baseFreq: 220,
+    seconds: 290,
+    lyrics: "[00:00.00] Priyathama Naa Hrudayama...\n[00:25.00] Prema Kadhala Theepi Pandaga...\n[00:55.00] Nuvve Naa Jeevana Raagam...\n[01:20.00] Priyathama Naa Hrudayama...",
+  },
+  {
+    title: "Subhalekha Rasukunna",
+    artist: "S.P. Balasubrahmanyam, K.S. Chithra",
+    movie: "Kondaveeti Donga",
+    year: 1990,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/243/Kondaveeti-Donga-Telugu-1990-20180718-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/243/dfb261380b50008a85c5145050020e1e_320.mp4",
+    bpm: 92,
+    baseFreq: 261.63,
+    seconds: 275,
+    lyrics: "[00:00.00] Subhalekha Rasukunna Edalo Ekanthana...\n[00:25.00] Premalona Pongi Poye Naa Manasu...\n[00:55.00] Subhalekha Rasukunna...",
+  },
+  {
+    title: "Malli Malli Idi Rani Roju",
+    artist: "S.P. Balasubrahmanyam, S. Janaki",
+    movie: "Rakshasudu",
+    year: 1986,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/970/Malli-Malli-Idi-Rani-Roju-Telugu-2014-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/970/d7a5f145a04c43e262421c66ffbe5248_320.mp4",
+    bpm: 84,
+    baseFreq: 220,
+    seconds: 286,
+    lyrics: "[00:00.00] Malli Malli Idi Rani Roju...\n[00:24.00] Malletheegaku Pandiri Roja...\n[00:50.00] Premincha Ninnu Ee Vela...\n[01:15.00] Malli Malli Idi Rani Roju...",
+  },
+  {
+    title: "Telusuna",
+    artist: "Karthik",
+    movie: "Sontham",
+    year: 2002,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/393/Sontham-2002-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/393/1d212d4b65c4a5dc22e8be5a5f775bc4_320.mp4",
+    bpm: 86,
+    baseFreq: 246.94,
+    seconds: 298,
+    lyrics: "[00:00.00] Telusuna Telusuna Manasuki Ee Baadha...\n[00:22.00] Nuvvu Leni Ee Kshaname Oka Yugamai Thochada...\n[00:50.00] Telusuna...",
+  },
+  {
+    title: "Nuvve Naa Shwasa",
+    artist: "Sumangali",
+    movie: "Okariki Okaru",
+    year: 2003,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/404/Okariki-Okaru-2000-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/404/f2cb0f984c0f2f2d3f8a8a42e621cc3f_320.mp4",
+    bpm: 80,
+    baseFreq: 196,
+    seconds: 308,
+    lyrics: "[00:00.00] Nuvve Naa Shwasa Nuvve Naa Dhyasa...\n[00:22.00] Pranam Loni Pranam Nuvve...\n[00:50.00] Nuvve Naa Shwasa...",
+  },
+  {
+    title: "Vennelave Vennelave",
+    artist: "Hariharan, Sadhana Sargam",
+    movie: "Prema Desham (Telugu)",
+    year: 1996,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/137/Merupu-Kalalu-Telugu-1997-20221207155957-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/137/22904d8a59e448ed5cc3967195cd9fd0_320.mp4",
+    bpm: 88,
+    baseFreq: 246.94,
+    seconds: 334,
+    lyrics: "[00:00.00] Vennelave Vennelave Minne Daati Vastaavaa...\n[00:25.00] Gundellona Prema Deepam Veligistava...\n[00:55.00] Vennelave Vennelave...",
+  },
+  {
+    title: "Niluvaddham Ninu Chupaga",
+    artist: "Karthik, Sumangali",
+    movie: "Nuvvostanante Nenoddantana",
+    year: 2005,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/347/Nuvvostanante-Nenoddantana-Telugu-2014-20181121-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/347/610bc51159754c00f0488fd61930b5be_320.mp4",
+    bpm: 84,
+    baseFreq: 220,
+    seconds: 360,
+    lyrics: "[00:00.00] Niluvaddham Ninu Chupaga Leda Mari Cheppaga...\n[00:22.00] Nuvve Naa Lokam Kadaa O Cheliya...\n[00:50.00] Niluvaddham...",
+  },
+  {
+    title: "Ekkada Vunna",
+    artist: "K.S. Chithra, Rajesh",
+    movie: "Nuvve Kavali",
+    year: 2000,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/204/Nuvve-Kavali-Telugu-2025-20250122153122-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/204/2503813d5564382187727041c2f93db3_320.mp4",
+    bpm: 88,
+    baseFreq: 246.94,
+    seconds: 332,
+    lyrics: "[00:00.00] Ekkada Vunna Pakkana Nuvve Unnattu Vuntundi...\n[00:22.00] Ee Prema Emi Chesindo Teliyanundi...\n[00:50.00] Ekkada Vunna...",
+  },
+  {
+    title: "Kallaloki Kallu Petti",
+    artist: "K.S. Chithra",
+    movie: "Nuvve Kavali",
+    year: 2000,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/204/Nuvve-Kavali-Telugu-2025-20250122153122-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/204/2503813d5564382187727041c2f93db3_320.mp4",
+    bpm: 82,
+    baseFreq: 196,
+    seconds: 312,
+    lyrics: "[00:00.00] Kallaloki Kallu Petti Choodavenamma...\n[00:22.00] Gundelloni Prema Katha Vinavenamma...\n[00:50.00] Kallaloki Kallu Petti...",
+  },
+  {
+    title: "Devatha",
+    artist: "KK",
+    movie: "Santosham",
+    year: 2002,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/443/Mellisayin-Devathaigal-Kuyilum-Mayilum-Tamil-2025-20260331163636-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/443/94f047dcac392e9e4d9974ce19d9d1cf_320.mp4",
+    bpm: 86,
+    baseFreq: 220,
+    seconds: 288,
+    lyrics: "[00:00.00] Devatha Hamsala Vachave...\n[00:20.00] Naa Gundelona Gudini Kattesaave...\n[00:45.00] Devatha...",
+  },
+  {
+    title: "Ye Chilipi",
+    artist: "Srinivas",
+    movie: "Gharshana",
+    year: 2004,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/944/Gharshana-New-2004-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/944/f8032af5004bed823362b728e4a485bd_320.mp4",
+    bpm: 90,
+    baseFreq: 246.94,
+    seconds: 316,
+    lyrics: "[00:00.00] Ye Chilipi Kallalona Nuvve...\n[00:22.00] O Manasa Nuvve Naa Pranamani...\n[00:50.00] Ye Chilipi...",
+  },
+  {
+    title: "Egire Mabbula",
+    artist: "SPB Charan",
+    movie: "Happy",
+    year: 2006,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/null/Happy-Telugu-2005-20210130193253-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/null/979e2d7b5b034591416f2034b8e53d04_320.mp4",
+    bpm: 94,
+    baseFreq: 261.63,
+    seconds: 254,
+    lyrics: "[00:00.00] Egire Mabbula Meeda Naa Manasanta...\n[00:22.00] Nuvve Nuvve Nindaave O Cheliya...\n[00:50.00] Egire Mabbula...",
+  },
+  {
+    title: "Jatha Kalise",
+    artist: "Sagar, Suchitra",
+    movie: "Srimanthudu",
+    year: 2015,
+    mood: "Love Songs",
+    artworkUrl: "https://c.saavncdn.com/171/Srimanthudu-Telugu-2015-500x500.jpg",
+    sourceUrl: "https://aac.saavncdn.com/171/a2690e83453d2c1052ae91fdf1fe20fa_320.mp4",
+    bpm: 96,
+    baseFreq: 246.94,
+    seconds: 226,
+    lyrics: "[00:00.00] Jatha Kalise Jatha Kalise Rendu Hrudayaalu...\n[00:22.00] Oka Thodai Nilichaayi Prema Velugullo...\n[00:50.00] Jatha Kalise...",
+  },
+
 ];
 
-// Seed personal curated Telugu collection into IndexedDB
+// Seed personal curated Telugu collection (Melodies & Love Songs) into IndexedDB
 export async function seedCuratedPersonalMusic(
   onProgress?: (percent: number, trackName: string) => void
 ): Promise<number> {
+  // 1. Remove all existing songs, playlists, favorites, and history first!
+  if (onProgress) onProgress(5, 'Clearing existing tracks from library...');
+  await resetAllSongs();
+
   const songsCreated: Song[] = [];
   const total = CURATED_TELUGU_SONGS.length;
 
   for (let i = 0; i < total; i++) {
     const item = CURATED_TELUGU_SONGS[i];
     if (onProgress) {
-      onProgress(Math.round(((i + 1) / total) * 70), `Harmonizing ${item.title}...`);
+      onProgress(
+        Math.round(10 + ((i + 1) / total) * 70),
+        `Adding "${item.title}" (${item.artist} - ${item.mood})...`
+      );
     }
 
-    const audioBlob = await synthesizeMelodyAudio(item.baseFreq, item.bpm, item.seconds);
-    const songId = `telugu_${generateId()}`;
+    const songId = `telugu_${item.title.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
 
     const song: Song = {
       id: songId,
@@ -350,23 +1351,23 @@ export async function seedCuratedPersonalMusic(
       artist: item.artist,
       album: item.movie,
       year: item.year,
-      genre: item.mood,
+      genre: item.mood, // strictly 'Melodies' or 'Love Songs'
       duration: item.seconds,
-      hash: `curated_${item.title.toLowerCase().replace(/\s+/g, '_')}`,
-      isLocal: true,
-      providerType: 'local',
-      audioBlob,
+      hash: `telugu_${item.title.toLowerCase().replace(/[^a-z0-9]/g, '_')}`,
+      isLocal: false,
+      providerType: 'stream',
+      sourceUrl: item.sourceUrl,
       artworkUrl: item.artworkUrl,
-      dateAdded: Date.now() - (total - i) * 1000 * 3600, // staggered timestamps
-      playCount: Math.floor(Math.random() * 12) + 3,
-      isFavorite: i < 5, // first 5 marked as favorite
+      dateAdded: Date.now() - (total - i) * 1000 * 3600, // Staggered timestamps
+      playCount: Math.floor(Math.random() * 25) + 5,
+      isFavorite: i < 12, // Favorite top tracks
       isOfflineAvailable: true,
     };
 
     await db.songs.put(song);
     songsCreated.push(song);
 
-    // Also populate lyrics
+    // Populate synced lyrics
     const parsed = parseLrc(item.lyrics);
     await db.lyrics.put({
       id: `lyrics_${songId}`,
@@ -385,77 +1386,83 @@ export async function seedCuratedPersonalMusic(
     }
   }
 
-  if (onProgress) onProgress(80, 'Creating personal mixtapes...');
+  if (onProgress) onProgress(85, 'Creating Melodies & Love Songs mixtapes...');
 
-  // Create personal curated playlists
+  // Group indices by category
+  const melodyIndices = songsCreated
+    .map((s, idx) => (s.genre === 'Melodies' ? idx : -1))
+    .filter(idx => idx !== -1);
+
+  const loveIndices = songsCreated
+    .map((s, idx) => (s.genre === 'Love Songs' ? idx : -1))
+    .filter(idx => idx !== -1);
+
+  const sidIndices = songsCreated
+    .map((s, idx) => (s.artist.toLowerCase().includes('sid sriram') ? idx : -1))
+    .filter(idx => idx !== -1);
+
+  const legendIndices = songsCreated
+    .map((s, idx) => (!s.artist.toLowerCase().includes('sid sriram') ? idx : -1))
+    .filter(idx => idx !== -1);
+
   const personalPlaylists = [
     {
-      id: 'pl_telugu_favs',
-      title: 'My Telugu Favourites',
-      description: 'Songs that never get old — my cherished Telugu melodies and movie soundtracks.',
+      id: 'pl_telugu_melodies',
+      title: 'Telugu Melodies',
+      description: 'Soulful, acoustic and timeless Telugu melodies that soothe the heart and mind.',
+      customArtwork: songsCreated[melodyIndices[0]]?.artworkUrl || CURATED_TELUGU_SONGS[4].artworkUrl,
+      songIndices: melodyIndices,
+    },
+    {
+      id: 'pl_telugu_love_songs',
+      title: 'Telugu Love Songs',
+      description: 'Heartfelt romance, romantic duets, and unforgettable Telugu love anthems on repeat.',
+      customArtwork: songsCreated[loveIndices[0]]?.artworkUrl || CURATED_TELUGU_SONGS[0].artworkUrl,
+      songIndices: loveIndices,
+    },
+    {
+      id: 'pl_sid_sriram_essentials',
+      title: 'Sid Sriram Melodies & Love Hits',
+      description: 'The complete golden collection of Sid Sriram Telugu hits on repeat.',
       customArtwork: CURATED_TELUGU_SONGS[0].artworkUrl,
-      songIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      songIndices: sidIndices,
     },
     {
-      id: 'pl_sid_sriram',
-      title: 'Sid Sriram Collection',
-      description: 'The magical voice that defines my college days and late night memories.',
-      customArtwork: CURATED_TELUGU_SONGS[1].artworkUrl,
-      songIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    },
-    {
-      id: 'pl_romantic_melodies',
-      title: 'Romantic Telugu Melodies',
-      description: 'Warm chords, sweet lyrics, and memories hidden in melodies.',
-      customArtwork: CURATED_TELUGU_SONGS[2].artworkUrl,
-      songIndices: [0, 2, 7, 8],
-    },
-    {
-      id: 'pl_late_night',
-      title: 'Late Night Vibes',
-      description: 'A quiet room, dim lights, and peaceful soulful tracks.',
-      customArtwork: CURATED_TELUGU_SONGS[4].artworkUrl,
-      songIndices: [1, 4, 5, 9],
-    },
-    {
-      id: 'pl_heart_touching',
-      title: 'Heart Touching Songs',
-      description: 'Songs that evoke deep feelings and gentle nostalgia.',
-      customArtwork: CURATED_TELUGU_SONGS[3].artworkUrl,
-      songIndices: [3, 5, 9],
+      id: 'pl_telugu_legends',
+      title: 'Telugu All-Time Legends & Stars',
+      description: 'Anurag Kulkarni, Armaan Malik, Karthik, SPB, Ram Miriyala & more.',
+      customArtwork: songsCreated[legendIndices[0]]?.artworkUrl || CURATED_TELUGU_SONGS[20].artworkUrl,
+      songIndices: legendIndices,
     },
   ];
 
   for (const p of personalPlaylists) {
-    const existing = await db.playlists.get(p.id);
-    if (!existing) {
-      await db.playlists.add({
-        id: p.id,
-        title: p.title,
-        description: p.description,
-        customArtwork: p.customArtwork,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      });
+    await db.playlists.put({
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      customArtwork: p.customArtwork,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      for (let order = 0; order < p.songIndices.length; order++) {
-        const songIdx = p.songIndices[order];
-        if (songsCreated[songIdx]) {
-          await db.playlistSongs.add({
-            id: `${p.id}_${songsCreated[songIdx].id}`,
-            playlistId: p.id,
-            songId: songsCreated[songIdx].id,
-            order,
-            addedAt: Date.now(),
-          });
-        }
+    for (let order = 0; order < p.songIndices.length; order++) {
+      const songIdx = p.songIndices[order];
+      if (songsCreated[songIdx]) {
+        await db.playlistSongs.put({
+          id: `${p.id}_${songsCreated[songIdx].id}`,
+          playlistId: p.id,
+          songId: songsCreated[songIdx].id,
+          order,
+          addedAt: Date.now(),
+        });
       }
     }
   }
 
   if (onProgress) onProgress(95, 'Syncing albums and artist collections...');
   await syncAlbumsAndArtists();
-  if (onProgress) onProgress(100, 'Welcome to your music world!');
+  if (onProgress) onProgress(100, `Loaded ${songsCreated.length} Telugu Melodies & Love Songs!`);
 
   return songsCreated.length;
 }

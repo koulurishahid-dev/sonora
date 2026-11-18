@@ -1,9 +1,17 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
-import { Song, VisualizerMode } from '@/types/music';
-import { db, getAudioObjectUrl } from '@/lib/db';
+import { Song, VisualizerMode, EqBands, EqPresetName } from '@/types/music';
+import { db, getAudioObjectUrl, getArtworkObjectUrl } from '@/lib/db';
 import { useTheme } from './ThemeContext';
+
+export const EQ_PRESETS: Record<Exclude<EqPresetName, 'custom'>, EqBands> = {
+  'normal': { band60: 0, band250: 0, band1k: 0, band4k: 0, band12k: 0 },
+  'bass-boost': { band60: 6, band250: 4, band1k: 0, band4k: -1, band12k: -2 },
+  'treble-boost': { band60: -2, band250: -1, band1k: 1, band4k: 4, band12k: 6 },
+  'vocal': { band60: -3, band250: 1, band1k: 4, band4k: 3, band12k: 1 },
+  'classical': { band60: 4, band250: 2, band1k: -1, band4k: 2, band12k: 4 },
+};
 
 interface PlayerContextType {
   currentSong: Song | null;
@@ -19,8 +27,12 @@ interface PlayerContextType {
   isNowPlayingOpen: boolean;
   isQueueOpen: boolean;
   isLyricsOpen: boolean;
+  isSideViewOpen: boolean;
   visualizerMode: VisualizerMode;
   audioError: string | null;
+  playbackRate: number;
+  eqBands: EqBands;
+  eqPreset: EqPresetName;
 
   // Actions
   playSong: (song: Song, newQueue?: Song[]) => Promise<void>;
@@ -32,6 +44,10 @@ interface PlayerContextType {
   toggleMute: () => void;
   toggleShuffle: () => void;
   toggleRepeat: () => void;
+  setPlaybackRate: (rate: number) => void;
+  setEqBand: (band: keyof EqBands, val: number) => void;
+  setEqPreset: (preset: Exclude<EqPresetName, 'custom'>) => void;
+  resetEq: () => void;
   addToQueue: (song: Song) => void;
   playNext: (song: Song) => void;
   removeFromQueue: (index: number) => void;
@@ -41,6 +57,8 @@ interface PlayerContextType {
   setIsNowPlayingOpen: (open: boolean) => void;
   setIsQueueOpen: (open: boolean) => void;
   setIsLyricsOpen: (open: boolean) => void;
+  setIsSideViewOpen: (open: boolean) => void;
+  toggleSideView: () => void;
   setVisualizerMode: (mode: VisualizerMode) => void;
   getFrequencyData: () => Uint8Array | null;
   getTimeDomainData: () => Uint8Array | null;
@@ -64,19 +82,34 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [isNowPlayingOpen, setIsNowPlayingOpen] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
+  const [isSideViewOpen, setIsSideViewOpen] = useState(true);
   const [visualizerMode, setVisualizerMode] = useState<VisualizerMode>('bars');
   const [audioError, setAudioError] = useState<string | null>(null);
+  const [playbackRate, setPlaybackRateState] = useState<number>(1);
+  const [eqPreset, setEqPresetState] = useState<EqPresetName>('normal');
+  const [eqBands, setEqBands] = useState<EqBands>({
+    band60: 0,
+    band250: 0,
+    band1k: 0,
+    band4k: 0,
+    band12k: 0,
+  });
 
   // Audio elements and Web Audio API nodes
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const bassFilterRef = useRef<BiquadFilterNode | null>(null);
-  const trebleFilterRef = useRef<BiquadFilterNode | null>(null);
+  const band60Ref = useRef<BiquadFilterNode | null>(null);
+  const band250Ref = useRef<BiquadFilterNode | null>(null);
+  const band1kRef = useRef<BiquadFilterNode | null>(null);
+  const band4kRef = useRef<BiquadFilterNode | null>(null);
+  const band12kRef = useRef<BiquadFilterNode | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
   const isSwitchingTrackRef = useRef(false);
+  const nextTrackRef = useRef<() => void>(() => {});
+  const prevTrackRef = useRef<() => void>(() => {});
 
-  // Initialize Web Audio API nodes
+  // Initialize Web Audio API 5-Band Equalizer nodes
   const initWebAudio = useCallback(() => {
     if (!audioRef.current || audioCtxRef.current) return;
     try {
@@ -84,71 +117,205 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       const ctx = new AudioCtx();
       audioCtxRef.current = ctx;
 
+      // Auto-resume AudioContext if the browser attempts to suspend it during screen off or background tabs
+      ctx.onstatechange = () => {
+        if (ctx.state === 'suspended' && audioRef.current && !audioRef.current.paused) {
+          ctx.resume().catch(() => {});
+        }
+      };
+
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 256;
       analyser.smoothingTimeConstant = 0.8;
       analyserRef.current = analyser;
 
-      const bassFilter = ctx.createBiquadFilter();
-      bassFilter.type = 'lowshelf';
-      bassFilter.frequency.value = 250;
-      bassFilter.gain.value = settings.bassGain || 0;
-      bassFilterRef.current = bassFilter;
+      // 60 Hz Sub-bass (lowshelf)
+      const f60 = ctx.createBiquadFilter();
+      f60.type = 'lowshelf';
+      f60.frequency.value = 60;
+      f60.gain.value = eqBands.band60;
+      band60Ref.current = f60;
 
-      const trebleFilter = ctx.createBiquadFilter();
-      trebleFilter.type = 'highshelf';
-      trebleFilter.frequency.value = 4000;
-      trebleFilter.gain.value = settings.trebleGain || 0;
-      trebleFilterRef.current = trebleFilter;
+      // 250 Hz Bass (peaking)
+      const f250 = ctx.createBiquadFilter();
+      f250.type = 'peaking';
+      f250.frequency.value = 250;
+      f250.Q.value = 1.0;
+      f250.gain.value = eqBands.band250;
+      band250Ref.current = f250;
 
-      // Connect: audio source -> bass -> treble -> analyser -> destination
+      // 1000 Hz Midrange (peaking)
+      const f1k = ctx.createBiquadFilter();
+      f1k.type = 'peaking';
+      f1k.frequency.value = 1000;
+      f1k.Q.value = 1.0;
+      f1k.gain.value = eqBands.band1k;
+      band1kRef.current = f1k;
+
+      // 4000 Hz Treble / Presence (peaking)
+      const f4k = ctx.createBiquadFilter();
+      f4k.type = 'peaking';
+      f4k.frequency.value = 4000;
+      f4k.Q.value = 1.0;
+      f4k.gain.value = eqBands.band4k;
+      band4kRef.current = f4k;
+
+      // 12000 Hz Brilliance / Air (highshelf)
+      const f12k = ctx.createBiquadFilter();
+      f12k.type = 'highshelf';
+      f12k.frequency.value = 12000;
+      f12k.gain.value = eqBands.band12k;
+      band12kRef.current = f12k;
+
+      // Connect 5-band filter pipeline:
+      // source -> 60Hz -> 250Hz -> 1kHz -> 4kHz -> 12kHz -> analyser -> destination
       const source = ctx.createMediaElementSource(audioRef.current);
       sourceNodeRef.current = source;
-      source.connect(bassFilter);
-      bassFilter.connect(trebleFilter);
-      trebleFilter.connect(analyser);
+      source.connect(f60);
+      f60.connect(f250);
+      f250.connect(f1k);
+      f1k.connect(f4k);
+      f4k.connect(f12k);
+      f12k.connect(analyser);
       analyser.connect(ctx.destination);
     } catch (e) {
       console.warn('Web Audio initialization error (may already be bound):', e);
     }
-  }, [settings.bassGain, settings.trebleGain]);
+  }, [eqBands]);
 
-  // Adjust EQ gain when settings change
-  useEffect(() => {
-    if (bassFilterRef.current) {
-      bassFilterRef.current.gain.value = settings.bassGain || 0;
-    }
-    if (trebleFilterRef.current) {
-      trebleFilterRef.current.gain.value = settings.trebleGain || 0;
-    }
-  }, [settings.bassGain, settings.trebleGain]);
+  // Apply changes to EQ bands in real-time
+  const setEqBand = useCallback((band: keyof EqBands, val: number) => {
+    setEqBands(prev => {
+      const next = { ...prev, [band]: val };
+      if (band === 'band60' && band60Ref.current) band60Ref.current.gain.value = val;
+      if (band === 'band250' && band250Ref.current) band250Ref.current.gain.value = val;
+      if (band === 'band1k' && band1kRef.current) band1kRef.current.gain.value = val;
+      if (band === 'band4k' && band4kRef.current) band4kRef.current.gain.value = val;
+      if (band === 'band12k' && band12kRef.current) band12kRef.current.gain.value = val;
+      return next;
+    });
+    setEqPresetState('custom');
+  }, []);
 
-  // Create persistent Audio Element
+  const setEqPreset = useCallback((preset: Exclude<EqPresetName, 'custom'>) => {
+    const target = EQ_PRESETS[preset];
+    if (!target) return;
+    setEqPresetState(preset);
+    setEqBands(target);
+    if (band60Ref.current) band60Ref.current.gain.value = target.band60;
+    if (band250Ref.current) band250Ref.current.gain.value = target.band250;
+    if (band1kRef.current) band1kRef.current.gain.value = target.band1k;
+    if (band4kRef.current) band4kRef.current.gain.value = target.band4k;
+    if (band12kRef.current) band12kRef.current.gain.value = target.band12k;
+  }, []);
+
+  const resetEq = useCallback(() => {
+    setEqPreset('normal');
+  }, [setEqPreset]);
+
+  const setPlaybackRate = useCallback((rate: number) => {
+    setPlaybackRateState(rate);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = rate;
+    }
+  }, []);
+
+  // Helper to sync MediaSession position state for lock screen / recent tabs
+  const syncPositionState = useCallback(() => {
+    if (typeof window === 'undefined' || !('mediaSession' in navigator) || !('setPositionState' in navigator.mediaSession)) return;
+    if (!audioRef.current) return;
+    const d = audioRef.current.duration;
+    if (!isNaN(d) && isFinite(d) && d > 0) {
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: d,
+          playbackRate: audioRef.current.playbackRate || 1,
+          position: Math.min(Math.max(0, audioRef.current.currentTime), d),
+        });
+      } catch (err) {}
+    }
+  }, []);
+
+  // Create persistent Audio Element configured for background playback & screen-off persistence
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const audio = new Audio();
-    audio.preload = 'auto';
-    audio.crossOrigin = 'anonymous';
+    let audio = document.getElementById('sonora-core-audio') as HTMLAudioElement | null;
+    if (!audio) {
+      audio = new Audio();
+      audio.id = 'sonora-core-audio';
+      audio.preload = 'auto';
+      audio.crossOrigin = 'anonymous';
+      // Attributes for background audio playback on mobile browsers (iOS & Android)
+      audio.setAttribute('playsinline', 'true');
+      audio.setAttribute('webkit-playsinline', 'true');
+      audio.setAttribute('x-webkit-airplay', 'allow');
+      audio.style.display = 'none';
+      if (document.body) {
+        document.body.appendChild(audio);
+      }
+    }
     audioRef.current = audio;
 
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
+    const onPlay = () => {
+      setIsPlaying(true);
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'playing';
+      }
+      syncPositionState();
+    };
+
+    const onPause = () => {
+      setIsPlaying(false);
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'paused';
+      }
+      syncPositionState();
+    };
+
     const onTimeUpdate = () => {
       if (audioRef.current && !isSwitchingTrackRef.current) {
         setCurrentTime(audioRef.current.currentTime);
+        syncPositionState();
       }
     };
+
     const onDurationChange = () => {
       if (audioRef.current) {
         const d = audioRef.current.duration;
-        if (!isNaN(d) && d > 0) setDuration(d);
+        if (!isNaN(d) && d > 0) {
+          setDuration(d);
+          syncPositionState();
+        }
       }
     };
+
     const onError = (e: Event) => {
-      console.error('Audio playback error:', e);
-      setAudioError('Failed to play audio source. The file may be corrupt or link unavailable.');
+      console.warn('Audio playback notice (source link temporarily unavailable or interrupted):', e);
+      setAudioError('Audio stream unavailable. Skipping to next playable track...');
       setIsPlaying(false);
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'none';
+      }
+      setTimeout(() => {
+        nextTrackRef.current();
+      }, 1200);
+    };
+
+    // Auto-resume AudioContext when app is placed in recent tabs or screen turns off/on
+    const onVisibilityChange = async () => {
+      if (audioRef.current && !audioRef.current.paused) {
+        if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+          try {
+            await audioCtxRef.current.resume();
+          } catch (e) {
+            console.warn('Auto-resuming AudioContext on visibility change:', e);
+          }
+        }
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.playbackState = 'playing';
+        }
+      }
     };
 
     audio.addEventListener('play', onPlay);
@@ -156,6 +323,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('durationchange', onDurationChange);
     audio.addEventListener('error', onError);
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     // Restore last played track and position from local storage
     const restoreSavedSession = async () => {
@@ -164,12 +332,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         const lastTime = parseFloat(localStorage.getItem('sonora_last_time') || '0');
         const lastVol = parseFloat(localStorage.getItem('sonora_volume') || '0.8');
 
-        audio.volume = lastVol;
+        if (audio) {
+          audio.volume = lastVol;
+        }
         setVolumeState(lastVol);
 
         if (lastSongId) {
           const song = await db.songs.get(lastSongId);
-          if (song) {
+          if (song && audio) {
             setCurrentSong(song);
             setQueue([song]);
             setQueueIndex(0);
@@ -194,9 +364,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('durationchange', onDurationChange);
       audio.removeEventListener('error', onError);
-      audio.pause();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
-  }, []);
+  }, [syncPositionState]);
 
   // Save current time and track to localStorage periodically
   useEffect(() => {
@@ -206,42 +376,95 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
   }, [currentSong, currentTime]);
 
-  // Update Media Session API for lock screen and native media controls
+  // Update Media Session API for lock screen and native media controls (Android, iOS, Windows, macOS)
   useEffect(() => {
     if (typeof window === 'undefined' || !('mediaSession' in navigator) || !currentSong) return;
 
     try {
+      const artworkSrc = getArtworkObjectUrl(currentSong);
+      const artworkList: MediaImage[] = [];
+
+      if (artworkSrc) {
+        artworkList.push(
+          { src: artworkSrc, sizes: '96x96', type: 'image/jpeg' },
+          { src: artworkSrc, sizes: '128x128', type: 'image/jpeg' },
+          { src: artworkSrc, sizes: '192x192', type: 'image/jpeg' },
+          { src: artworkSrc, sizes: '256x256', type: 'image/jpeg' },
+          { src: artworkSrc, sizes: '384x384', type: 'image/jpeg' },
+          { src: artworkSrc, sizes: '512x512', type: 'image/jpeg' }
+        );
+      } else {
+        artworkList.push({ src: '/icon.svg', sizes: '512x512', type: 'image/svg+xml' });
+      }
+
       navigator.mediaSession.metadata = new MediaMetadata({
         title: currentSong.title,
         artist: currentSong.artist,
-        album: currentSong.album,
-        artwork: currentSong.artworkUrl
-          ? [{ src: currentSong.artworkUrl, sizes: '512x512', type: 'image/jpeg' }]
-          : [],
+        album: currentSong.album || 'Sonora Studio',
+        artwork: artworkList,
       });
 
-      navigator.mediaSession.setActionHandler('play', () => {
-        audioRef.current?.play();
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+
+      // Full action handlers for native lock screen & notification controls
+      navigator.mediaSession.setActionHandler('play', async () => {
+        if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+          audioCtxRef.current.resume().catch(() => {});
+        }
+        try {
+          await audioRef.current?.play();
+        } catch (e) {}
       });
+
       navigator.mediaSession.setActionHandler('pause', () => {
         audioRef.current?.pause();
       });
+
       navigator.mediaSession.setActionHandler('previoustrack', () => {
-        prevTrack();
+        prevTrackRef.current();
       });
+
       navigator.mediaSession.setActionHandler('nexttrack', () => {
-        nextTrack();
+        nextTrackRef.current();
       });
+
       navigator.mediaSession.setActionHandler('seekto', (details) => {
         if (details.seekTime !== undefined && audioRef.current) {
           audioRef.current.currentTime = details.seekTime;
           setCurrentTime(details.seekTime);
+          syncPositionState();
         }
       });
+
+      navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+        if (audioRef.current) {
+          const offset = details.seekOffset || 10;
+          const target = Math.max(0, audioRef.current.currentTime - offset);
+          audioRef.current.currentTime = target;
+          setCurrentTime(target);
+          syncPositionState();
+        }
+      });
+
+      navigator.mediaSession.setActionHandler('seekforward', (details) => {
+        if (audioRef.current) {
+          const offset = details.seekOffset || 10;
+          const maxD = audioRef.current.duration || 0;
+          const target = Math.min(maxD, audioRef.current.currentTime + offset);
+          audioRef.current.currentTime = target;
+          setCurrentTime(target);
+          syncPositionState();
+        }
+      });
+
+      navigator.mediaSession.setActionHandler('stop', () => {
+        audioRef.current?.pause();
+        setIsPlaying(false);
+      });
     } catch (e) {
-      console.warn('MediaSession error:', e);
+      console.warn('MediaSession configuration error:', e);
     }
-  }, [currentSong]);
+  }, [currentSong, isPlaying, syncPositionState]);
 
   // Visualizer data extractors
   const getFrequencyData = useCallback((): Uint8Array | null => {
@@ -263,9 +486,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     setAudioError(null);
     if (!audioRef.current) return;
 
-    // Resume AudioContext if suspended (browser autoplay policy)
+    // Resume AudioContext non-blockingly so playback start is instantaneous even in background tabs
     if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-      await audioCtxRef.current.resume();
+      audioCtxRef.current.resume().catch(() => {});
     } else {
       initWebAudio();
     }
@@ -409,6 +632,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     playSong(queue[nextIdx]);
   }, [queue, queueIndex, repeat, shuffle, currentSong]);
 
+  // Keep refs synchronized for native MediaSession background callbacks
+  useEffect(() => {
+    nextTrackRef.current = nextTrack;
+  }, [nextTrack]);
+
   // Previous Track
   const prevTrack = useCallback(() => {
     if (!audioRef.current) return;
@@ -426,6 +654,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
     playSong(queue[prevIdx]);
   }, [queue, queueIndex, repeat]);
+
+  useEffect(() => {
+    prevTrackRef.current = prevTrack;
+  }, [prevTrack]);
 
   // Handle Track Ended
   useEffect(() => {
@@ -600,6 +832,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentTime, duration, volume, nextTrack, prevTrack, currentSong, isPlaying]);
 
+  const toggleSideView = useCallback(() => {
+    setIsSideViewOpen(prev => !prev);
+  }, []);
+
   return (
     <PlayerContext.Provider
       value={{
@@ -616,8 +852,12 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         isNowPlayingOpen,
         isQueueOpen,
         isLyricsOpen,
+        isSideViewOpen,
         visualizerMode,
         audioError,
+        playbackRate,
+        eqBands,
+        eqPreset,
         playSong,
         togglePlay,
         nextTrack,
@@ -627,6 +867,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         toggleMute,
         toggleShuffle,
         toggleRepeat,
+        setPlaybackRate,
+        setEqBand,
+        setEqPreset,
+        resetEq,
         addToQueue,
         playNext,
         removeFromQueue,
@@ -636,6 +880,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         setIsNowPlayingOpen,
         setIsQueueOpen,
         setIsLyricsOpen,
+        setIsSideViewOpen,
+        toggleSideView,
         setVisualizerMode,
         getFrequencyData,
         getTimeDomainData,

@@ -5,6 +5,7 @@ import { Song, Album, Artist, Playlist, ViewType } from '@/types/music';
 import { db, getArtworkObjectUrl } from '@/lib/db';
 import { usePlayer } from '@/context/PlayerContext';
 import { formatDuration } from '@/lib/utils';
+import { InteractiveSongCard } from '@/components/common/InteractiveSongCard';
 import {
   Search,
   Music2,
@@ -15,13 +16,35 @@ import {
   Pause,
   X,
   Sparkles,
+  TrendingUp,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface SearchViewProps {
   initialQuery?: string;
   onNavigate: (view: ViewType, param?: string) => void;
   onSongContextMenu: (e: React.MouseEvent, song: Song) => void;
 }
+
+function HighlightText({ text, query }: { text: string; query: string }) {
+  if (!query.trim()) return <span>{text}</span>;
+  const parts = text.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+  return (
+    <span>
+      {parts.map((part, i) =>
+        part.toLowerCase() === query.toLowerCase() ? (
+          <mark key={i} className="bg-[var(--accent)]/30 text-[var(--accent)] rounded px-0.5 font-bold">
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </span>
+  );
+}
+
+const POPULAR_SEARCHES = ['Sid Sriram', 'Melodies', 'Love Songs', 'A.R. Rahman', 'Anirudh', 'Rock', 'Acoustic'];
 
 export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }: SearchViewProps) {
   const { playSong, currentSong, isPlaying, togglePlay } = usePlayer();
@@ -90,69 +113,94 @@ export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }:
     results.playlists.length;
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
-      {/* Search Input Bar */}
-      <div className="relative max-w-2xl">
-        <Search className="w-5 h-5 text-[#71717A] absolute left-4 top-1/2 -translate-y-1/2" />
+    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto select-none">
+      {/* Search Input Bar with Focus Glow */}
+      <div className="relative max-w-2xl group">
+        <Search className="w-5 h-5 text-zinc-500 group-focus-within:text-[var(--accent)] transition-colors absolute left-4 top-1/2 -translate-y-1/2" />
         <input
           type="text"
           autoFocus
           placeholder="Search songs, artists, albums, or playlists..."
           value={query}
           onChange={e => setQuery(e.target.value)}
-          className="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-[#19191F] border border-[#303038] text-white text-sm focus:border-[var(--accent)] outline-none shadow-xl"
+          className="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-[#12141C] border border-white/10 text-white text-sm focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 outline-none shadow-2xl transition-all"
         />
         {query && (
           <button
             onClick={() => setQuery('')}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-[#71717A] hover:text-white"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         )}
       </div>
 
+      {/* Suggested Search Chips */}
+      {!query && (
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <span className="text-xs font-semibold text-zinc-500 flex items-center gap-1.5 mr-1">
+            <TrendingUp className="w-3.5 h-3.5 text-[var(--accent)]" />
+            Popular:
+          </span>
+          {POPULAR_SEARCHES.map(item => (
+            <button
+              key={item}
+              onClick={() => setQuery(item)}
+              className="px-3 py-1 rounded-full text-xs font-medium bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-zinc-300 hover:text-white transition-all active:scale-95"
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Filter Chips */}
-      <div className="flex flex-wrap items-center gap-2">
-        {[
-          { id: 'all' as const, label: 'All Results' },
-          { id: 'songs' as const, label: `Songs (${results.songs.length})` },
-          { id: 'albums' as const, label: `Albums (${results.albums.length})` },
-          { id: 'artists' as const, label: `Artists (${results.artists.length})` },
-          { id: 'playlists' as const, label: `Playlists (${results.playlists.length})` },
-        ].map(chip => (
-          <button
-            key={chip.id}
-            onClick={() => setFilterType(chip.id)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
-              filterType === chip.id
-                ? 'bg-[var(--accent)] text-black shadow-md'
-                : 'bg-[#19191F] text-[#A1A1AA] hover:text-white border border-[#303038]'
-            }`}
-          >
-            {chip.label}
-          </button>
-        ))}
-      </div>
+      {query && (
+        <div className="flex flex-wrap items-center gap-2">
+          {[
+            { id: 'all' as const, label: 'All Results' },
+            { id: 'songs' as const, label: `Songs (${results.songs.length})` },
+            { id: 'albums' as const, label: `Albums (${results.albums.length})` },
+            { id: 'artists' as const, label: `Artists (${results.artists.length})` },
+            { id: 'playlists' as const, label: `Playlists (${results.playlists.length})` },
+          ].map(chip => (
+            <button
+              key={chip.id}
+              onClick={() => setFilterType(chip.id)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                filterType === chip.id
+                  ? 'bg-[var(--accent)] text-black shadow-md'
+                  : 'bg-white/[0.05] text-[#A1A1AA] hover:text-white border border-white/10 hover:bg-white/[0.08]'
+              }`}
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Empty Query State */}
       {!query && (
-        <div className="text-center py-20 text-[#A1A1AA] space-y-4">
-          <Search className="w-12 h-12 text-[#303038] mx-auto" />
-          <h2 className="text-lg font-bold text-white">Find anything in your music universe</h2>
-          <p className="text-xs text-[#71717A] max-w-sm mx-auto">
-            Search songs by title, artists by name, albums, genres, or custom playlists.
+        <div className="text-center py-20 text-zinc-400 space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center mx-auto shadow-xl">
+            <Search className="w-8 h-8 text-[var(--accent)] opacity-80" />
+          </div>
+          <h2 className="text-lg font-bold text-white">Explore your personal music universe</h2>
+          <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+            Search across Telugu melodies, master recordings, albums, playlists, and artists.
           </p>
         </div>
       )}
 
       {/* No Results Found */}
       {query && totalResults === 0 && (
-        <div className="text-center py-20 text-[#A1A1AA] space-y-3">
-          <Search className="w-12 h-12 text-[#303038] mx-auto" />
+        <div className="text-center py-20 text-zinc-400 space-y-3">
+          <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center mx-auto shadow-xl">
+            <Music2 className="w-8 h-8 text-zinc-600" />
+          </div>
           <h2 className="text-lg font-bold text-white">No results found for &quot;{query}&quot;</h2>
-          <p className="text-xs text-[#71717A]">
-            Check for spelling errors or try searching for another artist or track name.
+          <p className="text-xs text-zinc-500">
+            Check for spelling or try searching for a different keyword or genre.
           </p>
         </div>
       )}
@@ -160,51 +208,34 @@ export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }:
       {/* Search Results Display */}
       {query && totalResults > 0 && (
         <div className="space-y-8">
-          {/* Top Songs */}
+          {/* Top Songs as Interactive Cards */}
           {(filterType === 'all' || filterType === 'songs') && results.songs.length > 0 && (
-            <div>
-              <h2 className="text-base font-bold text-white mb-3">Songs</h2>
-              <div className="divide-y divide-[#303038]/40 border border-[#303038] rounded-2xl bg-[#19191F]/60 overflow-hidden">
-                {results.songs.map(song => {
-                  const isCur = currentSong?.id === song.id;
-                  const artworkUrl = getArtworkObjectUrl(song);
-
-                  return (
-                    <div
-                      key={song.id}
-                      onContextMenu={e => onSongContextMenu(e, song)}
-                      onClick={() => (isCur ? togglePlay() : playSong(song, results.songs))}
-                      className={`flex items-center justify-between p-3 hover:bg-[#25252D] cursor-pointer transition-colors ${
-                        isCur ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : ''
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#25252D] shrink-0 flex items-center justify-center relative">
-                          {artworkUrl ? (
-                            <img src={artworkUrl} alt={song.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <Music2 className="w-5 h-5 text-[#71717A]" />
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold truncate text-white">{song.title}</p>
-                          <p className="text-xs text-[#A1A1AA] truncate">{song.artist} • {song.album}</p>
-                        </div>
-                      </div>
-                      <span className="text-xs font-mono text-[#A1A1AA] shrink-0">
-                        {formatDuration(song.duration)}
-                      </span>
-                    </div>
-                  );
-                })}
+            <section className="space-y-3">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <Music2 className="w-4 h-4 text-[var(--accent)]" />
+                Matched Songs ({results.songs.length})
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5">
+                {results.songs.map((song, idx) => (
+                  <InteractiveSongCard
+                    key={song.id}
+                    song={song}
+                    queueList={results.songs}
+                    index={idx}
+                    onContextMenu={onSongContextMenu}
+                  />
+                ))}
               </div>
-            </div>
+            </section>
           )}
 
           {/* Artists */}
           {(filterType === 'all' || filterType === 'artists') && results.artists.length > 0 && (
-            <div>
-              <h2 className="text-base font-bold text-white mb-3">Artists</h2>
+            <section className="space-y-3">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <User className="w-4 h-4 text-[var(--accent)]" />
+                Artists ({results.artists.length})
+              </h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
                 {results.artists.map(art => {
                   const artUrl = getArtworkObjectUrl(art);
@@ -212,82 +243,58 @@ export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }:
                     <div
                       key={art.id}
                       onClick={() => onNavigate('artist-detail', art.name)}
-                      className="p-3 rounded-2xl bg-[#19191F] hover:bg-[#25252D] cursor-pointer transition-all flex flex-col items-center text-center group border border-[#303038]/60"
+                      className="p-3.5 rounded-2xl bg-[#12141C] hover:bg-[#181B26] cursor-pointer transition-all flex flex-col items-center text-center group border border-white/10 hover:border-white/20 shadow-md hover:-translate-y-1"
                     >
-                      <div className="w-20 h-20 rounded-full overflow-hidden bg-[#25252D] mb-2.5 flex items-center justify-center">
+                      <div className="w-20 h-20 rounded-full overflow-hidden bg-zinc-900 mb-2.5 flex items-center justify-center border border-white/10 group-hover:border-[var(--accent)] transition-colors">
                         {artUrl ? (
-                          <img src={artUrl} alt={art.name} className="w-full h-full object-cover" />
+                          <img src={artUrl} alt={art.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                         ) : (
-                          <User className="w-8 h-8 text-[#71717A]" />
+                          <User className="w-8 h-8 text-zinc-500" />
                         )}
                       </div>
-                      <p className="text-xs font-bold text-white truncate w-full group-hover:text-[var(--accent)]">
-                        {art.name}
+                      <p className="text-xs font-bold text-white group-hover:text-[var(--accent)] transition-colors truncate w-full">
+                        <HighlightText text={art.name} query={query} />
                       </p>
-                      <p className="text-[11px] text-[#A1A1AA]">{art.songCount} songs</p>
+                      <span className="text-[10px] text-zinc-500 mt-0.5">Artist</span>
                     </div>
                   );
                 })}
               </div>
-            </div>
+            </section>
           )}
 
           {/* Albums */}
           {(filterType === 'all' || filterType === 'albums') && results.albums.length > 0 && (
-            <div>
-              <h2 className="text-base font-bold text-white mb-3">Albums</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <section className="space-y-3">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <Disc className="w-4 h-4 text-[var(--accent)]" />
+                Albums ({results.albums.length})
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 {results.albums.map(alb => {
-                  const artUrl = getArtworkObjectUrl(alb);
+                  const albUrl = getArtworkObjectUrl(alb);
                   return (
                     <div
                       key={alb.id}
-                      onClick={() => onNavigate('album-detail', alb.title)}
-                      className="p-3 rounded-2xl bg-[#19191F] hover:bg-[#25252D] cursor-pointer transition-all flex flex-col group border border-[#303038]/60"
+                      onClick={() => onNavigate('album-detail', alb.id)}
+                      className="p-3.5 rounded-2xl bg-[#12141C] hover:bg-[#181B26] cursor-pointer transition-all group border border-white/10 hover:border-white/20 shadow-md hover:-translate-y-1"
                     >
-                      <div className="aspect-square rounded-xl overflow-hidden bg-[#25252D] mb-2.5 flex items-center justify-center">
-                        {artUrl ? (
-                          <img src={artUrl} alt={alb.title} className="w-full h-full object-cover" />
+                      <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 mb-2.5 flex items-center justify-center border border-white/10">
+                        {albUrl ? (
+                          <img src={albUrl} alt={alb.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                         ) : (
-                          <Disc className="w-8 h-8 text-[#71717A]" />
+                          <Disc className="w-10 h-10 text-zinc-500" />
                         )}
                       </div>
-                      <p className="text-xs font-bold text-white truncate">{alb.title}</p>
-                      <p className="text-[11px] text-[#A1A1AA] truncate">{alb.artist}</p>
+                      <p className="text-xs font-bold text-white group-hover:text-[var(--accent)] transition-colors truncate">
+                        <HighlightText text={alb.title} query={query} />
+                      </p>
+                      <p className="text-[11px] text-zinc-400 truncate mt-0.5">{alb.artist}</p>
                     </div>
                   );
                 })}
               </div>
-            </div>
-          )}
-
-          {/* Playlists */}
-          {(filterType === 'all' || filterType === 'playlists') && results.playlists.length > 0 && (
-            <div>
-              <h2 className="text-base font-bold text-white mb-3">Playlists</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {results.playlists.map(pl => {
-                  const artUrl = getArtworkObjectUrl(pl);
-                  return (
-                    <div
-                      key={pl.id}
-                      onClick={() => onNavigate('playlist-detail', pl.id)}
-                      className="p-3 rounded-2xl bg-[#19191F] hover:bg-[#25252D] cursor-pointer transition-all flex flex-col group border border-[#303038]/60"
-                    >
-                      <div className="aspect-square rounded-xl overflow-hidden bg-[#25252D] mb-2.5 flex items-center justify-center">
-                        {artUrl ? (
-                          <img src={artUrl} alt={pl.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <ListMusic className="w-8 h-8 text-[#71717A]" />
-                        )}
-                      </div>
-                      <p className="text-xs font-bold text-white truncate">{pl.title}</p>
-                      <p className="text-[11px] text-[#A1A1AA] truncate">Playlist</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            </section>
           )}
         </div>
       )}

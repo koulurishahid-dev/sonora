@@ -51,10 +51,10 @@ export function QueueDrawer() {
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="relative w-full max-w-md h-full bg-[#121216] border-l border-[#303038] shadow-2xl flex flex-col z-10 text-white"
+          className="relative w-full max-w-md h-full glass-modal border-l border-white/15 shadow-2xl flex flex-col z-10 text-white"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-[#303038]">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
             <div>
               <h2 className="text-lg font-bold text-white">Play Queue</h2>
               <p className="text-xs text-[#A1A1AA]">{queue.length} {queue.length === 1 ? 'track' : 'tracks'} queued</p>

@@ -45,7 +45,7 @@ export function VinylCover({
         transition={{
           x: { type: 'spring', damping: 20, stiffness: 120 },
           rotate: isPlaying
-            ? { repeat: Infinity, duration: 8, ease: 'linear' }
+            ? { repeat: Infinity, duration: 6, ease: 'linear' }
             : { duration: 0.5 },
         }}
         className={`absolute top-0 left-0 ${dimensions.vinyl} rounded-full bg-[#0D0D11] border-2 border-[#202028] shadow-2xl flex items-center justify-center pointer-events-none z-0`}
@@ -53,6 +53,11 @@ export function VinylCover({
           boxShadow: '0 10px 25px -5px rgba(0,0,0,0.8), inset 0 0 12px rgba(255,255,255,0.06)',
         }}
       >
+        {/* Acoustic Shockwave Ripple when playing */}
+        {isPlaying && (
+          <div className="absolute inset-0 rounded-full border-2 border-[var(--accent)]/60 animate-sound-ripple pointer-events-none" />
+        )}
+
         {/* Concentric vinyl groove circles */}
         <div className="absolute inset-1.5 rounded-full border border-white/5 opacity-60" />
         <div className="absolute inset-3 rounded-full border border-white/5 opacity-40" />
@@ -78,9 +83,9 @@ export function VinylCover({
         </div>
       </motion.div>
 
-      {/* Front Album Jacket / Sleeve */}
+      {/* Front Album Jacket / Sleeve with pure glassy specular gloss */}
       <div
-        className={`relative z-10 ${dimensions.sleeve} rounded-2xl overflow-hidden bg-[#181820] border border-white/10 shadow-2xl transition-all duration-300 group-hover:shadow-[0_15px_35px_-5px_rgba(0,0,0,0.9)]`}
+        className={`relative z-10 ${dimensions.sleeve} rounded-2xl overflow-hidden glass-pure border border-white/15 shadow-2xl transition-all duration-300 group-hover:shadow-[0_15px_35px_-5px_rgba(0,0,0,0.9)]`}
       >
         {artworkUrl && !imgError ? (
           <img

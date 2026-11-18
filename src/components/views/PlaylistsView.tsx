@@ -66,24 +66,24 @@ export function PlaylistsView({
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
+    <div className="p-3.5 sm:p-6 md:p-8 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white">Personal Mixtapes & Playlists</h1>
-          <p className="text-xs text-[#A1A1AA] mt-1">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white">Personal Mixtapes & Playlists</h1>
+          <p className="text-xs text-[#A1A1AA] mt-0.5 sm:mt-1">
             Handcrafted collections of memories, moods, and repeat favourites
           </p>
         </div>
 
         <button
           onClick={onOpenCreatePlaylist}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--accent)] text-black text-xs font-bold hover:scale-105 transition-all shadow-md"
+          className="flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[var(--accent)] text-black text-xs font-bold hover:scale-105 transition-all shadow-md self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" /> Create Mixtape
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
         {/* Create Card */}
         <div
           onClick={onOpenCreatePlaylist}
@@ -105,34 +105,49 @@ export function PlaylistsView({
             <div
               key={pl.id}
               onClick={() => onNavigate('playlist-detail', pl.id)}
-              className="group p-3 rounded-2xl bg-[#19191F]/80 hover:bg-[#25252D] border border-transparent hover:border-[#303038] cursor-pointer transition-all shadow-md flex flex-col relative"
+              className="group p-3 rounded-2xl bg-[#12141C] hover:bg-[#181B26] border border-white/10 hover:border-[var(--accent)]/50 cursor-pointer transition-all duration-300 shadow-md hover:shadow-2xl hover:-translate-y-1.5 flex flex-col relative select-none"
             >
-              <div className="aspect-square rounded-xl overflow-hidden bg-[#25252D] relative mb-3 flex items-center justify-center">
+              <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 relative mb-3 flex items-center justify-center border border-white/10">
                 {artUrl ? (
                   <img
                     src={artUrl}
                     alt={pl.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
                   />
                 ) : (
-                  <ListMusic className="w-12 h-12 text-[#71717A]" />
+                  <ListMusic className="w-12 h-12 text-zinc-500" />
                 )}
 
+                {/* Spotify Badge */}
+                {pl.id.startsWith('pl_spotify_') && (
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-[#1ED760]/40 text-[9px] font-mono font-bold tracking-wider text-[#1ED760] z-20 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1ED760] animate-pulse" />
+                    SPOTIFY
+                  </div>
+                )}
+
+                {/* Floating Play Button on Hover */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300">
+                  <div className="w-11 h-11 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shadow-xl group-hover:scale-105 transition-transform">
+                    <Play className="w-5 h-5 fill-black ml-0.5" />
+                  </div>
+                </div>
+
                 {/* Edit & Delete Action Buttons */}
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                   <button
                     onClick={e => {
                       e.stopPropagation();
                       onEditPlaylist(pl);
                     }}
-                    className="p-1.5 rounded-lg bg-black/60 hover:bg-black/90 text-white backdrop-blur-md"
+                    className="p-1.5 rounded-lg bg-black/60 hover:bg-black/90 text-white backdrop-blur-md transition-transform active:scale-90"
                     title="Edit Playlist"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={e => handleDelete(e, pl)}
-                    className="p-1.5 rounded-lg bg-black/60 hover:bg-rose-900/90 text-rose-300 backdrop-blur-md"
+                    className="p-1.5 rounded-lg bg-black/60 hover:bg-rose-900/90 text-rose-300 backdrop-blur-md transition-transform active:scale-90"
                     title="Delete Playlist"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -140,8 +155,10 @@ export function PlaylistsView({
                 </div>
               </div>
 
-              <p className="text-sm font-semibold text-white truncate">{pl.title}</p>
-              <p className="text-xs text-[#A1A1AA] truncate mt-0.5">
+              <p className="text-xs sm:text-sm font-bold text-white group-hover:text-[var(--accent)] transition-colors truncate">
+                {pl.title}
+              </p>
+              <p className="text-[11px] text-[#A1A1AA] truncate mt-0.5 font-medium">
                 {count} {count === 1 ? 'song' : 'songs'}
               </p>
             </div>

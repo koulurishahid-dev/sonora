@@ -50,15 +50,22 @@ export function SongContextMenu({
     db.playlists.toArray().then(setPlaylists);
   }, []);
 
-  // Close when clicking outside
+  // Close when clicking outside or pressing Escape
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         onClose();
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
     window.addEventListener('mousedown', handleOutsideClick);
-    return () => window.removeEventListener('mousedown', handleOutsideClick);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('mousedown', handleOutsideClick);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [onClose]);
 
   // Adjust coordinates if menu would overflow screen edges
@@ -110,7 +117,7 @@ export function SongContextMenu({
     <div
       ref={menuRef}
       style={{ top: `${adjustedY}px`, left: `${adjustedX}px` }}
-      className="fixed z-50 w-56 rounded-xl bg-[#18181F]/95 backdrop-blur-xl border border-[#303038] shadow-2xl p-1.5 text-xs text-white select-none animate-in fade-in zoom-in-95 duration-100"
+      className="fixed z-50 w-56 rounded-xl glass-modal border border-white/15 shadow-2xl p-1.5 text-xs text-white select-none animate-in fade-in zoom-in-95 duration-100"
     >
       {/* Play Now */}
       <button

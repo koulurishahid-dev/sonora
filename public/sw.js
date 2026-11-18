@@ -26,10 +26,13 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Pass through audio streaming, chrome-extension, or external URLs directly
+  // Pass through audio streaming, range requests, audio media elements, chrome-extensions directly
   if (
     event.request.url.startsWith('blob:') ||
     event.request.url.startsWith('chrome-extension:') ||
+    event.request.destination === 'audio' ||
+    event.request.headers.has('range') ||
+    event.request.url.match(/\.(mp3|m4a|wav|ogg|flac|aac)(\?.*)?$/i) ||
     event.request.method !== 'GET'
   ) {
     return;

@@ -13,8 +13,11 @@ export interface Song {
   hash: string; // for duplicate detection
   isLocal: boolean;
   sourceUrl?: string; // for stream/external links or object URLs
-  providerType?: 'local' | 'stream' | 'external' | 'youtube';
+  providerType?: 'local' | 'stream' | 'external' | 'youtube' | 'spotify';
   youtubeId?: string; // extracted YouTube video ID for official embed
+  spotifyId?: string; // extracted Spotify ID
+  spotifyUrl?: string;
+  category?: string; // e.g. 'Love Songs', 'Melodies', 'Mass & Beats', 'Golden Classics'
   artworkUrl?: string; // base64 or blob URL
   artworkBlob?: Blob;
   audioBlob?: Blob;
@@ -108,6 +111,8 @@ export interface AppSettings {
   listenerName?: string;
   listenerAvatar?: string;
   listenerBio?: string;
+  atmosphere?: 'night' | 'focus' | 'relax' | 'energy';
+  hapticSoundEnabled?: boolean;
 }
 
 export interface DownloadItem {
@@ -135,4 +140,14 @@ export type ViewType =
   | 'now-playing'
   | 'settings';
 
-export type VisualizerMode = 'bars' | 'wave' | 'circle' | 'pulse';
+export type VisualizerMode = 'bars' | 'wave' | 'radial' | 'aura' | 'circle' | 'pulse';
+
+export type EqPresetName = 'normal' | 'bass-boost' | 'treble-boost' | 'vocal' | 'classical' | 'custom';
+
+export interface EqBands {
+  band60: number;
+  band250: number;
+  band1k: number;
+  band4k: number;
+  band12k: number;
+}
