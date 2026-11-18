@@ -46,16 +46,20 @@ export function TurntableStudioStage() {
   const [bassEnergy, setBassEnergy] = useState(0);
   const animFrameRef = useRef<number | null>(null);
 
-  // Audio-reactive bass energy for subtle stylus needle micro-bounce & ambient glow
+  // Audio-reactive bass energy for subtle stylus needle micro-bounce (throttled for mobile 60fps performance)
   useEffect(() => {
     let active = true;
-    const updateVibe = () => {
+    let lastTime = 0;
+    const updateVibe = (now: number) => {
       if (!active) return;
       if (isPlaying) {
-        const freq = getFrequencyData();
-        if (freq && freq.length > 8) {
-          const bass = (freq[0] + freq[1] + freq[2] + freq[3]) / 4;
-          setBassEnergy(bass / 255);
+        if (now - lastTime > 120) {
+          lastTime = now;
+          const freq = getFrequencyData();
+          if (freq && freq.length > 8) {
+            const bass = (freq[0] + freq[1] + freq[2] + freq[3]) / 4;
+            setBassEnergy(bass / 255);
+          }
         }
       } else {
         setBassEnergy(0);

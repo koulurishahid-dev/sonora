@@ -46,6 +46,11 @@ export function LibraryView({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [showBulkPlaylistDropdown, setShowBulkPlaylistDropdown] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(36);
+
+  useEffect(() => {
+    setVisibleCount(36);
+  }, [filterText, sortBy, sortOrder]);
 
   const loadSongs = async () => {
     const all = await db.songs.toArray();
@@ -156,7 +161,7 @@ export function LibraryView({
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-3.5 sm:p-6 md:p-8 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -394,6 +399,8 @@ export function LibraryView({
                             <img
                               src={artworkUrl}
                               alt=""
+                              loading="lazy"
+                              decoding="async"
                               onError={e => {
                                 (e.target as HTMLElement).style.display = 'none';
                               }}
@@ -465,16 +472,35 @@ export function LibraryView({
 
       {/* Grid View */}
       {viewMode === 'grid' && filteredSongs.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {filteredSongs.map((song, idx) => (
-            <InteractiveSongCard
-              key={song.id}
-              song={song}
-              queueList={filteredSongs}
-              index={idx}
-              onContextMenu={onSongContextMenu}
-            />
-          ))}
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5 sm:gap-4">
+            {filteredSongs.slice(0, visibleCount).map((song, idx) => (
+              <InteractiveSongCard
+                key={song.id}
+                song={song}
+                queueList={filteredSongs}
+                index={idx}
+                onContextMenu={onSongContextMenu}
+              />
+            ))}
+          </div>
+
+          {filteredSongs.length > visibleCount && (
+            <div className="flex flex-col items-center justify-center pt-2 pb-6 gap-2">
+              <button
+                onClick={() => setVisibleCount(prev => prev + 36)}
+                className="px-6 py-2.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] active:scale-95 border border-white/10 text-white text-xs font-bold transition-all shadow-md hover:border-[#1ED760]/40 flex items-center gap-2 group"
+              >
+                <span>Load More Tracks</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1ED760]/20 text-[#1ED760] font-bold">
+                  +{Math.min(36, filteredSongs.length - visibleCount)}
+                </span>
+              </button>
+              <p className="text-[11px] text-white/40 font-mono">
+                Showing {Math.min(visibleCount, filteredSongs.length)} of {filteredSongs.length} songs
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

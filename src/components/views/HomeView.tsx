@@ -92,13 +92,15 @@ function ShelfSongCard({
     <div
       onClick={() => (isThisCurrent ? onTogglePlay() : onPlaySong(song, songs))}
       onContextMenu={e => onSongContextMenu(e, song)}
-      className="w-40 sm:w-46 shrink-0 p-3 rounded-2xl bg-[#12141C]/90 hover:bg-[#181B26] border border-white/[0.07] hover:border-[#1ED760]/40 cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1 group flex flex-col select-none"
+      className="w-32 sm:w-44 shrink-0 snap-start p-2.5 sm:p-3 rounded-2xl bg-[#12141C]/90 hover:bg-[#181B26] border border-white/[0.07] hover:border-[#1ED760]/40 cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1 group flex flex-col select-none"
     >
-      <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 relative mb-3 flex items-center justify-center border border-white/[0.08]">
+      <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 relative mb-2 sm:mb-3 flex items-center justify-center border border-white/[0.08]">
         {!hasFailed ? (
           <img
             src={currentSrc}
             alt=""
+            loading="lazy"
+            decoding="async"
             referrerPolicy="no-referrer"
             crossOrigin="anonymous"
             onError={handleImgError}
@@ -113,22 +115,22 @@ function ShelfSongCard({
 
         {/* Spotify Green Play Circle that rises on hover */}
         <div
-          className={`absolute right-2.5 bottom-2.5 w-11 h-11 rounded-full bg-[#1ED760] text-black flex items-center justify-center shadow-2xl transition-all duration-300 ${
+          className={`absolute right-2 bottom-2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#1ED760] text-black flex items-center justify-center shadow-2xl transition-all duration-300 ${
             isThisPlaying
               ? 'opacity-100 scale-100'
               : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-105 active:scale-95'
           }`}
         >
           {isThisPlaying ? (
-            <Pause className="w-5 h-5 fill-black" />
+            <Pause className="w-4 h-4 sm:w-5 sm:h-5 fill-black" />
           ) : (
-            <Play className="w-5 h-5 fill-black ml-0.5" />
+            <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-black ml-0.5" />
           )}
         </div>
 
         {/* Genre Tag */}
         {song.category && (
-          <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider bg-black/70 backdrop-blur-md border border-white/10 text-amber-300">
+          <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] font-mono font-bold tracking-wider bg-black/70 backdrop-blur-md border border-white/10 text-amber-300">
             {song.category}
           </div>
         )}
@@ -142,11 +144,11 @@ function ShelfSongCard({
         >
           {song.title}
         </h3>
-        <p className="text-[11px] text-white/50 truncate mt-0.5 font-medium">
+        <p className="text-[10px] sm:text-[11px] text-white/50 truncate mt-0.5 font-medium">
           {song.artist}
         </p>
         {song.album && (
-          <p className="text-[10px] text-white/30 truncate mt-0.5 font-mono">
+          <p className="text-[9px] sm:text-[10px] text-white/30 truncate mt-0.5 font-mono">
             {song.album}
           </p>
         )}
@@ -179,24 +181,28 @@ function SpotifyShelf({
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return;
-    const offset = direction === 'left' ? -420 : 420;
+    const offset = direction === 'left' ? -320 : 320;
     scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
   };
 
   if (songs.length === 0) return null;
+  const displaySongs = songs.slice(0, 24);
 
   return (
-    <section className="space-y-3.5 select-none">
+    <section className="space-y-2.5 sm:space-y-3.5 select-none">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+        <div className="min-w-0 pr-2">
+          <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-white tracking-tight flex items-center gap-2 truncate">
             {title}
           </h2>
-          <p className="text-xs text-white/50 mt-0.5">{subtitle}</p>
+          <p className="text-[11px] sm:text-xs text-white/50 mt-0.5 truncate">{subtitle}</p>
         </div>
 
         {/* Scroll Arrows */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-[10px] font-mono text-white/40 mr-1.5 hidden sm:inline">
+            {songs.length} tracks
+          </span>
           <button
             onClick={() => scroll('left')}
             className="p-1.5 rounded-full bg-white/[0.05] hover:bg-white/[0.12] text-white/70 hover:text-white transition-colors"
@@ -214,12 +220,12 @@ function SpotifyShelf({
         </div>
       </div>
 
-      {/* Shelf Track Row */}
+      {/* Shelf Track Row with smooth native momentum scrolling */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto pb-2 scrollbar-none scroll-smooth -mx-1 px-1"
+        className="flex gap-2.5 sm:gap-4 overflow-x-auto pb-2 scrollbar-none scroll-smooth snap-x snap-mandatory touch-pan-x -mx-3 px-3 sm:mx-0 sm:px-0"
       >
-        {songs.map(song => (
+        {displaySongs.map(song => (
           <ShelfSongCard
             key={song.id}
             song={song}
@@ -255,6 +261,7 @@ export function HomeView({
     percent: 0,
     status: '',
   });
+  const [visibleCount, setVisibleCount] = useState(36);
 
   const loadData = async () => {
     const songs = await db.songs.toArray();
@@ -276,10 +283,11 @@ export function HomeView({
     repairLibraryArtworkAndTitles().then(count => {
       if (count > 0) loadData();
     });
-
-    const interval = setInterval(loadData, 4000);
-    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    setVisibleCount(36);
+  }, [activeCategory, searchQuery]);
 
   const handleSeedAllSpotify = async () => {
     setIsSeeding(true);
@@ -473,7 +481,7 @@ export function HomeView({
         </div>
       )}
 
-      {/* 2. SPOTIFY SIGNATURE QUICK ACCESS TILES (ALL 10 GENRES) */}
+      {/* 2. SPOTIFY SIGNATURE QUICK ACCESS TILES (9 CURATED GENRES) */}
       <section className="space-y-2.5 sm:space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm sm:text-base md:text-lg font-black text-white tracking-tight flex items-center gap-2">
@@ -511,6 +519,8 @@ export function HomeView({
                   <img
                     src={cat.coverImage}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     referrerPolicy="no-referrer"
                     crossOrigin="anonymous"
                     onError={(e) => {
@@ -730,15 +740,35 @@ export function HomeView({
             <p className="text-xs">Try searching another title, singer or category</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5">
-            {filteredCatalog.map(song => (
-              <InteractiveSongCard
-                key={song.id}
-                song={song}
-                queueList={filteredCatalog}
-                onContextMenu={e => onSongContextMenu(e, song)}
-              />
-            ))}
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5 sm:gap-3.5">
+              {filteredCatalog.slice(0, visibleCount).map((song, idx) => (
+                <InteractiveSongCard
+                  key={song.id}
+                  song={song}
+                  queueList={filteredCatalog}
+                  index={idx}
+                  onContextMenu={e => onSongContextMenu(e, song)}
+                />
+              ))}
+            </div>
+
+            {filteredCatalog.length > visibleCount && (
+              <div className="flex flex-col items-center justify-center pt-2 pb-6 gap-2">
+                <button
+                  onClick={() => setVisibleCount(prev => prev + 36)}
+                  className="px-6 py-2.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] active:scale-95 border border-white/10 text-white text-xs font-bold transition-all shadow-md hover:border-[#1ED760]/40 flex items-center gap-2 group"
+                >
+                  <span>Load More Tracks</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1ED760]/20 text-[#1ED760] font-bold">
+                    +{Math.min(36, filteredCatalog.length - visibleCount)}
+                  </span>
+                </button>
+                <p className="text-[11px] text-white/40 font-mono">
+                  Showing {Math.min(visibleCount, filteredCatalog.length)} of {filteredCatalog.length} songs
+                </p>
+              </div>
+            )}
           </div>
         )}
       </section>

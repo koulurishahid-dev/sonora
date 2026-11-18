@@ -17,7 +17,7 @@ export function ArtistsView({ onNavigate }: ArtistsViewProps) {
   }, []);
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-3.5 sm:p-6 md:p-8 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
       <div>
         <h1 className="text-2xl md:text-3xl font-extrabold text-white">Artists I Love</h1>
         <p className="text-xs text-[#A1A1AA] mt-1">
@@ -49,6 +49,8 @@ export function ArtistsView({ onNavigate }: ArtistsViewProps) {
                     <img
                       src={artUrl}
                       alt={art.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (

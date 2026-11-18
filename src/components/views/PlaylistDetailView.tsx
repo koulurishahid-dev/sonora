@@ -485,7 +485,7 @@ export function PlaylistDetailView({
                       }`}
                     >
                       {/* # or Live Bouncing EQ / Play on Hover */}
-                      <td className="py-3 px-4 text-center text-zinc-500 font-mono">
+                      <td className="py-2.5 sm:py-3 px-2 sm:px-4 text-center text-zinc-500 font-mono">
                         <div className="flex items-center justify-center">
                           {isCur && isPlaying ? (
                             <div className="flex items-end gap-0.5 h-3.5" title="Playing">
@@ -503,13 +503,13 @@ export function PlaylistDetailView({
                       </td>
 
                       {/* Artwork Thumbnail, Title & Artist */}
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3.5">
-                          <div className="w-10 h-10 rounded-xl overflow-hidden bg-zinc-900 shrink-0 border border-white/10 relative">
+                      <td className="py-2.5 sm:py-3 px-2 sm:px-4">
+                        <div className="flex items-center gap-2.5 sm:gap-3.5">
+                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden bg-zinc-900 shrink-0 border border-white/10 relative">
                             {trackArt ? (
-                              <img src={trackArt} alt={song.title} className="w-full h-full object-cover" />
+                              <img src={trackArt} alt={song.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             ) : (
-                              <Music2 className="w-4 h-4 text-zinc-500 m-auto mt-3" />
+                              <Music2 className="w-4 h-4 text-zinc-500 m-auto mt-2.5 sm:mt-3" />
                             )}
                           </div>
                           <div className="min-w-0">
@@ -520,23 +520,23 @@ export function PlaylistDetailView({
                             >
                               {song.title}
                             </p>
-                            <p className="text-[11px] text-zinc-400 truncate mt-0.5">{song.artist}</p>
+                            <p className="text-[10px] sm:text-[11px] text-zinc-400 truncate mt-0.5">{song.artist}</p>
                           </div>
                         </div>
                       </td>
 
                       {/* Album Name */}
-                      <td className="py-3 px-4 hidden md:table-cell text-zinc-400 truncate max-w-xs">
+                      <td className="py-2.5 sm:py-3 px-2 sm:px-4 hidden md:table-cell text-zinc-400 truncate max-w-xs">
                         {song.album}
                       </td>
 
                       {/* Duration */}
-                      <td className="py-3 px-4 text-right text-zinc-400 font-mono text-[11px]">
+                      <td className="py-2.5 sm:py-3 px-2 sm:px-4 text-right text-zinc-400 font-mono text-[10px] sm:text-[11px]">
                         {formatDuration(song.duration)}
                       </td>
 
                       {/* Actions Column (Favorite, Up/Down reorder, Remove, More) */}
-                      <td className="py-3 px-4" onClick={e => e.stopPropagation()}>
+                      <td className="py-2.5 sm:py-3 px-2 sm:px-4" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
                           {/* Favorite Heart Button */}
                           <Tooltip content={song.isFavorite ? 'Remove Favorite' : 'Add to Favorites'}>

@@ -52,10 +52,10 @@ export function LikedSongsView({
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto">
+    <div className="p-3.5 sm:p-6 md:p-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto">
       {/* Hero Banner */}
-      <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 pb-6 border-b border-[#303038]/60">
-        <div className="w-44 h-44 sm:w-52 sm:h-52 rounded-2xl overflow-hidden shrink-0 shadow-2xl relative border border-white/10 group">
+      <div className="flex flex-col sm:flex-row items-center sm:items-end gap-5 sm:gap-6 pb-6 border-b border-[#303038]/60">
+        <div className="w-36 h-36 sm:w-52 sm:h-52 rounded-2xl overflow-hidden shrink-0 shadow-2xl relative border border-white/10 group">
           {topArt ? (
             <>
               <img src={topArt} alt="Top favorite" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -128,11 +128,11 @@ export function LikedSongsView({
             <table className="w-full text-left border-collapse text-xs select-none">
               <thead>
                 <tr className="border-b border-[#303038]/60 text-[#71717A] uppercase font-bold tracking-wider text-[10px]">
-                  <th className="py-2.5 px-3 w-12 text-center">#</th>
-                  <th className="py-2.5 px-3">Title</th>
-                  <th className="py-2.5 px-3 hidden md:table-cell">Album</th>
-                  <th className="py-2.5 px-3 w-20 text-right">Duration</th>
-                  <th className="py-2.5 px-3 w-16 text-center">Actions</th>
+                  <th className="py-2.5 px-2 sm:px-3 w-8 sm:w-12 text-center">#</th>
+                  <th className="py-2.5 px-2 sm:px-3">Title</th>
+                  <th className="py-2.5 px-2 sm:px-3 hidden md:table-cell">Album</th>
+                  <th className="py-2.5 px-2 sm:px-3 w-16 sm:w-20 text-right">Duration</th>
+                  <th className="py-2.5 px-2 sm:px-3 w-14 sm:w-16 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#303038]/30">
@@ -149,7 +149,7 @@ export function LikedSongsView({
                         isCur ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : ''
                       }`}
                     >
-                      <td className="py-2.5 px-3 text-center text-[#71717A] font-mono">
+                      <td className="py-2.5 px-2 sm:px-3 text-center text-[#71717A] font-mono text-xs">
                         <div className="flex items-center justify-center">
                           {isCur && isPlaying ? (
                             <Pause className="w-3.5 h-3.5 fill-[var(--accent)] text-[var(--accent)]" />
@@ -162,11 +162,11 @@ export function LikedSongsView({
                         </div>
                       </td>
 
-                      <td className="py-2.5 px-3">
-                        <div className="flex items-center gap-3">
+                      <td className="py-2.5 px-2 sm:px-3">
+                        <div className="flex items-center gap-2.5 sm:gap-3">
                           <div className="w-9 h-9 rounded-lg overflow-hidden bg-[#25252D] shrink-0 flex items-center justify-center">
                             {artworkUrl ? (
-                              <img src={artworkUrl} alt={song.title} className="w-full h-full object-cover" />
+                              <img src={artworkUrl} alt={song.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             ) : (
                               <Music2 className="w-4 h-4 text-[#71717A]" />
                             )}
@@ -184,15 +184,15 @@ export function LikedSongsView({
                         </div>
                       </td>
 
-                      <td className="py-2.5 px-3 hidden md:table-cell text-[#A1A1AA] truncate max-w-xs">
+                      <td className="py-2.5 px-2 sm:px-3 hidden md:table-cell text-[#A1A1AA] truncate max-w-xs">
                         {song.album}
                       </td>
 
-                      <td className="py-2.5 px-3 text-right text-[#A1A1AA] font-mono text-[11px]">
+                      <td className="py-2.5 px-2 sm:px-3 text-right text-[#A1A1AA] font-mono text-[11px]">
                         {formatDuration(song.duration)}
                       </td>
 
-                      <td className="py-2.5 px-3" onClick={e => e.stopPropagation()}>
+                      <td className="py-2.5 px-2 sm:px-3" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1.5">
                           <button
                             onClick={async () => {

@@ -90,13 +90,25 @@ export function AppLayout() {
     async function initCollection() {
       if (isAutoSeedingInProgress) return;
       try {
-        const seededSpotify = localStorage.getItem('sonora_telugu_v7_dedup_audit_unique');
+        const seededSpotify = localStorage.getItem('sonora_telugu_v9_audit_437_unique');
         const count = await db.songs.count();
+
+        // Always purge removed legacy categories (Devotional, Folk) immediately
+        try {
+          await db.songs.where('category').anyOf(['Devotional', 'Folk & Beats', 'Folk & Teenmaar']).delete();
+          await db.songs.where('genre').anyOf(['Devotional', 'Folk & Beats', 'Folk & Teenmaar']).delete();
+          await db.playlists.delete('pl_spotify_folk_beats');
+          await db.playlists.delete('pl_spotify_devotional');
+          await db.playlistSongs.where('playlistId').anyOf(['pl_spotify_folk_beats', 'pl_spotify_devotional']).delete();
+        } catch {
+          // continue
+        }
 
         // Run automatic deduplication on pre-existing database rows
         await deduplicateSongsInLibrary();
 
-        if (!seededSpotify || count < 350) {
+        // If not on v9 audit or count is distorted (> 450 indicates legacy 620 duplicates), re-seed fresh clean catalog
+        if (!seededSpotify || count > 450 || count < 350) {
           isAutoSeedingInProgress = true;
           // Clear any legacy duplicate-filled store to ensure each song appears only once
           try {
@@ -106,7 +118,7 @@ export function AppLayout() {
             // continue
           }
           await importAllSpotifyTeluguCategories();
-          localStorage.setItem('sonora_telugu_v7_dedup_audit_unique', 'true');
+          localStorage.setItem('sonora_telugu_v9_audit_437_unique', 'true');
         }
       } catch (e) {
         console.warn('Initial seeding error:', e);

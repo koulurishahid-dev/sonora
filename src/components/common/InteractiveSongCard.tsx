@@ -114,9 +114,9 @@ export function InteractiveSongCard({
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: Math.min(index * 0.03, 0.4), ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
@@ -146,6 +146,8 @@ export function InteractiveSongCard({
           <img
             src={imgSrc}
             alt=""
+            loading="lazy"
+            decoding="async"
             referrerPolicy="no-referrer"
             crossOrigin="anonymous"
             onError={handleImageError}

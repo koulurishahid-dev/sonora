@@ -113,7 +113,7 @@ export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }:
     results.playlists.length;
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto select-none">
+    <div className="p-3.5 sm:p-6 md:p-8 space-y-4 sm:space-y-6 max-w-7xl mx-auto select-none">
       {/* Search Input Bar with Focus Glow */}
       <div className="relative max-w-2xl group">
         <Search className="w-5 h-5 text-zinc-500 group-focus-within:text-[var(--accent)] transition-colors absolute left-4 top-1/2 -translate-y-1/2" />

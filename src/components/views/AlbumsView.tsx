@@ -18,7 +18,7 @@ export function AlbumsView({ onNavigate }: AlbumsViewProps) {
   }, []);
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-3.5 sm:p-6 md:p-8 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
       <div>
         <h1 className="text-2xl md:text-3xl font-extrabold text-white">Soundtracks & Albums</h1>
         <p className="text-xs text-[#A1A1AA] mt-1">
@@ -50,6 +50,8 @@ export function AlbumsView({ onNavigate }: AlbumsViewProps) {
                     <img
                       src={artUrl}
                       alt={alb.title}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (

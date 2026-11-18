@@ -132,7 +132,7 @@ export function MobileNavBar({ currentView, onNavigate }: MobileNavBarProps) {
       )}
 
       {/* 2. MOBILE NAVIGATION DOCK */}
-      <nav className="h-14 glass-dock border-t border-white/10 flex items-center justify-around px-2 z-20">
+      <nav className="min-h-14 pb-[env(safe-area-inset-bottom,0px)] bg-[#0B0D12] border-t border-white/10 flex items-center justify-around px-2 z-20">
         {items.map(item => {
           const Icon = item.icon;
           const isActive =
