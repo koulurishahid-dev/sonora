@@ -120,12 +120,12 @@ export function LyricsPanel({ song, currentTime, onSeek, className = '' }: Lyric
   return (
     <div className={`flex flex-col h-full ${className}`}>
       {/* Header Bar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#303038]/60 bg-[#121216]/60 backdrop-blur-md">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[#302744] bg-[#171326]/80 backdrop-blur-md">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-[var(--accent)]" />
-          <h3 className="font-semibold text-white text-base">Lyrics</h3>
+          <Sparkles className="w-4 h-4 text-[#A78BFA]" />
+          <h3 className="font-semibold text-[#F8F5FF] text-base">Lyrics</h3>
           {synced && synced.length > 0 && (
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/30">
+            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#A78BFA]/15 text-[#D8B4FE] border border-[#A78BFA]/30">
               Synced
             </span>
           )}
@@ -135,14 +135,14 @@ export function LyricsPanel({ song, currentTime, onSeek, className = '' }: Lyric
           {isEditing ? (
             <button
               onClick={handleSave}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[var(--accent)] text-black hover:opacity-95 transition-all shadow-md"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#A78BFA] hover:bg-[#D8B4FE] text-[#090812] transition-all shadow-md"
             >
               <Check className="w-3.5 h-3.5" /> Save Lyrics
             </button>
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#A1A1AA] hover:text-white hover:bg-[#25252D] border border-[#303038] transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#C2B5D9] hover:text-[#F8F5FF] hover:bg-[#2A2140] bg-[#141122] border border-[#302744] transition-all"
             >
               <Edit3 className="w-3.5 h-3.5" /> Edit / Add
             </button>
@@ -154,14 +154,14 @@ export function LyricsPanel({ song, currentTime, onSeek, className = '' }: Lyric
       <div ref={containerRef} className="flex-1 overflow-y-auto px-6 py-8 relative">
         {isEditing ? (
           <div className="flex flex-col h-full gap-3">
-            <p className="text-xs text-[#A1A1AA]">
-              Paste plain lyrics or synchronized LRC format like <code className="text-[var(--accent)] bg-[#25252D] px-1 rounded">[00:15.20] Lyric line</code>:
+            <p className="text-xs text-[#A99DBE]">
+              Paste plain lyrics or synchronized LRC format like <code className="text-[#D8B4FE] bg-[#211A32] px-1 rounded">[00:15.20] Lyric line</code>:
             </p>
             <textarea
               value={editText}
               onChange={e => setEditText(e.target.value)}
               placeholder="Paste or write lyrics here..."
-              className="w-full flex-1 min-h-[300px] p-4 rounded-xl bg-[#19191F] border border-[#303038] text-white text-sm focus:outline-none focus:border-[var(--accent)] resize-none font-mono"
+              className="w-full flex-1 min-h-[300px] p-4 rounded-xl bg-[#141122] border border-[#302744] text-[#F8F5FF] text-sm focus:outline-none focus:border-[#A78BFA] resize-none font-mono"
             />
           </div>
         ) : synced && synced.length > 0 ? (
@@ -176,10 +176,10 @@ export function LyricsPanel({ song, currentTime, onSeek, className = '' }: Lyric
                   onClick={() => onSeek && onSeek(line.time)}
                   className={`cursor-pointer transition-all duration-300 py-1.5 px-3 rounded-lg ${
                     isActive
-                      ? 'text-white text-2xl font-bold scale-105 origin-left text-[var(--accent)] drop-shadow-[0_0_12px_rgba(var(--accent-rgb),0.4)]'
+                      ? 'text-[#F8F5FF] text-2xl font-bold scale-105 origin-left text-[#D8B4FE] drop-shadow-[0_0_16px_rgba(167,139,250,0.5)]'
                       : isPast
-                      ? 'text-[#71717A] text-lg font-medium opacity-60 hover:opacity-100'
-                      : 'text-[#A1A1AA] text-lg font-medium hover:text-white hover:opacity-100'
+                      ? 'text-[#A99DBE] text-lg font-medium opacity-50 hover:opacity-90'
+                      : 'text-[#C2B5D9] text-lg font-medium hover:text-[#F8F5FF] hover:opacity-100'
                   }`}
                 >
                   {line.text || '...'}
@@ -188,19 +188,19 @@ export function LyricsPanel({ song, currentTime, onSeek, className = '' }: Lyric
             })}
           </div>
         ) : lyricsData?.plainLyrics ? (
-          <div className="max-w-xl mx-auto py-6 whitespace-pre-wrap text-lg leading-relaxed text-[#D4D4D8] font-medium">
+          <div className="max-w-xl mx-auto py-6 whitespace-pre-wrap text-lg leading-relaxed text-[#F8F5FF] font-medium">
             {lyricsData.plainLyrics}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center text-[#A1A1AA] py-16">
-            <Music2 className="w-12 h-12 mb-3 stroke-[1.5] text-[#303038]" />
-            <p className="text-base font-medium text-white mb-1">No lyrics available</p>
+          <div className="flex flex-col items-center justify-center h-full text-center text-[#A99DBE] py-16">
+            <Music2 className="w-12 h-12 mb-3 stroke-[1.5] text-[#302744]" />
+            <p className="text-base font-medium text-[#F8F5FF] mb-1">No lyrics available</p>
             <p className="text-sm max-w-xs mb-4">You can manually add synchronized or plain text lyrics for this song.</p>
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#25252D] text-white hover:bg-[#303038] border border-[#303038] transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#211A32] text-[#F8F5FF] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/50 transition-all"
             >
-              <Edit3 className="w-3.5 h-3.5 text-[var(--accent)]" /> Add Lyrics
+              <Edit3 className="w-3.5 h-3.5 text-[#A78BFA]" /> Add Lyrics
             </button>
           </div>
         )}

@@ -489,10 +489,10 @@ export function LibraryView({
             <div className="flex flex-col items-center justify-center pt-2 pb-6 gap-2">
               <button
                 onClick={() => setVisibleCount(prev => prev + 36)}
-                className="px-6 py-2.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] active:scale-95 border border-white/10 text-white text-xs font-bold transition-all shadow-md hover:border-[#1ED760]/40 flex items-center gap-2 group"
+                className="px-6 py-2.5 rounded-full bg-[#141122] hover:bg-[#2A2140] active:scale-95 border border-[#302744] text-[#F8F5FF] text-xs font-bold transition-all shadow-md hover:border-[#A78BFA]/40 flex items-center gap-2 group"
               >
                 <span>Load More Tracks</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1ED760]/20 text-[#1ED760] font-bold">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#211A32] text-[#A78BFA] border border-[#302744] font-bold">
                   +{Math.min(36, filteredSongs.length - visibleCount)}
                 </span>
               </button>

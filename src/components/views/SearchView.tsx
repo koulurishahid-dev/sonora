@@ -123,7 +123,7 @@ export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }:
           placeholder="Search songs, artists, albums, or playlists..."
           value={query}
           onChange={e => setQuery(e.target.value)}
-          className="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-[#12141C] border border-white/10 text-white text-sm focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 outline-none shadow-2xl transition-all"
+          className="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-[#141122] border border-[#302744] text-[#F8F5FF] text-sm focus:border-[#A78BFA] focus:ring-2 focus:ring-[#A78BFA]/20 outline-none shadow-2xl transition-all placeholder:text-[#A99DBE]"
         />
         {query && (
           <button
@@ -243,19 +243,19 @@ export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }:
                     <div
                       key={art.id}
                       onClick={() => onNavigate('artist-detail', art.name)}
-                      className="p-3.5 rounded-2xl bg-[#12141C] hover:bg-[#181B26] cursor-pointer transition-all flex flex-col items-center text-center group border border-white/10 hover:border-white/20 shadow-md hover:-translate-y-1"
+                      className="p-3.5 rounded-2xl bg-[#171326] hover:bg-[#2A2140] cursor-pointer transition-all flex flex-col items-center text-center group border border-[#302744] hover:border-[#A78BFA]/40 shadow-md hover:-translate-y-1"
                     >
-                      <div className="w-20 h-20 rounded-full overflow-hidden bg-zinc-900 mb-2.5 flex items-center justify-center border border-white/10 group-hover:border-[var(--accent)] transition-colors">
+                      <div className="w-20 h-20 rounded-full overflow-hidden bg-[#141122] mb-2.5 flex items-center justify-center border border-[#302744] group-hover:border-[#A78BFA] transition-colors">
                         {artUrl ? (
                           <img src={artUrl} alt={art.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                         ) : (
-                          <User className="w-8 h-8 text-zinc-500" />
+                          <User className="w-8 h-8 text-[#A99DBE]" />
                         )}
                       </div>
-                      <p className="text-xs font-bold text-white group-hover:text-[var(--accent)] transition-colors truncate w-full">
+                      <p className="text-xs font-bold text-[#F8F5FF] group-hover:text-[#D8B4FE] transition-colors truncate w-full">
                         <HighlightText text={art.name} query={query} />
                       </p>
-                      <span className="text-[10px] text-zinc-500 mt-0.5">Artist</span>
+                      <span className="text-[10px] text-[#A99DBE] mt-0.5">Artist</span>
                     </div>
                   );
                 })}
@@ -266,8 +266,8 @@ export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }:
           {/* Albums */}
           {(filterType === 'all' || filterType === 'albums') && results.albums.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <Disc className="w-4 h-4 text-[var(--accent)]" />
+              <h2 className="text-base font-bold text-[#F8F5FF] flex items-center gap-2">
+                <Disc className="w-4 h-4 text-[#A78BFA]" />
                 Albums ({results.albums.length})
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -277,9 +277,9 @@ export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }:
                     <div
                       key={alb.id}
                       onClick={() => onNavigate('album-detail', alb.id)}
-                      className="p-3.5 rounded-2xl bg-[#12141C] hover:bg-[#181B26] cursor-pointer transition-all group border border-white/10 hover:border-white/20 shadow-md hover:-translate-y-1"
+                      className="p-3.5 rounded-2xl bg-[#171326] hover:bg-[#2A2140] cursor-pointer transition-all group border border-[#302744] hover:border-[#A78BFA]/40 shadow-md hover:-translate-y-1"
                     >
-                      <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 mb-2.5 flex items-center justify-center border border-white/10">
+                      <div className="aspect-square rounded-xl overflow-hidden bg-[#141122] mb-2.5 flex items-center justify-center border border-[#302744]">
                         {albUrl ? (
                           <img src={albUrl} alt={alb.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                         ) : (

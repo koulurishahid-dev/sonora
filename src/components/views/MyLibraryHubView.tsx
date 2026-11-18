@@ -76,7 +76,7 @@ export function MyLibraryHubView({
       count: stats.songs,
       desc: 'Complete song collection with multi-select & sorting',
       icon: Music2,
-      color: 'from-emerald-500/20 to-teal-500/20 border-emerald-500/30 text-emerald-400',
+      color: 'from-[#A78BFA]/20 to-[#D8B4FE]/20 border-[#A78BFA]/30 text-[#D8B4FE]',
     },
     {
       view: 'playlists',

@@ -55,10 +55,10 @@ export function PlaylistDetailView({
   const [searchFilter, setSearchFilter] = useState('');
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const [colors, setColors] = useState<ExtractedColors>({
-    primary: '#1ED760',
-    secondary: '#38BDF8',
-    glow: 'rgba(30, 215, 96, 0.35)',
-    ambientRgb: '30, 215, 96',
+    primary: '#A78BFA',
+    secondary: '#D8B4FE',
+    glow: 'rgba(167, 139, 250, 0.25)',
+    ambientRgb: '167, 139, 250',
   });
 
   const loadData = async () => {
@@ -202,7 +202,7 @@ export function PlaylistDetailView({
       {/* ========================================================= */}
       {/* 1. CINEMATIC PLAYLIST HERO HEADER                         */}
       {/* ========================================================= */}
-      <div className="relative rounded-3xl p-6 sm:p-8 overflow-hidden border border-white/10 shadow-2xl bg-gradient-to-b from-[#141620] to-[#0A0C11]">
+      <div className="relative rounded-3xl p-6 sm:p-8 overflow-hidden border border-[#302744] shadow-2xl bg-gradient-to-b from-[#211A32] to-[#141122]">
         {/* Dynamic ambient color glow backdrop derived from artwork */}
         <div
           className="absolute -top-20 -left-20 w-96 h-96 rounded-full filter blur-[120px] pointer-events-none opacity-40 transition-all duration-1000"
@@ -381,12 +381,12 @@ export function PlaylistDetailView({
             placeholder={`Filter ${songs.length} songs in playlist...`}
             value={searchFilter}
             onChange={e => setSearchFilter(e.target.value)}
-            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#12141C] border border-white/10 text-white text-xs focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/40 outline-none transition-all placeholder:text-zinc-500"
+            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#141122] border border-[#302744] text-[#F8F5FF] text-xs focus:border-[#A78BFA] focus:ring-1 focus:ring-[#A78BFA]/40 outline-none transition-all placeholder:text-[#A99DBE]"
           />
           {searchFilter && (
             <button
               onClick={() => setSearchFilter('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A99DBE] hover:text-[#F8F5FF]"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -394,13 +394,13 @@ export function PlaylistDetailView({
         </div>
 
         {/* View Switcher (Table vs Grid) */}
-        <div className="flex items-center gap-1.5 self-end sm:self-auto p-1 rounded-xl bg-[#12141C] border border-white/10">
+        <div className="flex items-center gap-1.5 self-end sm:self-auto p-1 rounded-xl bg-[#141122] border border-[#302744]">
           <button
             onClick={() => setViewMode('table')}
             className={`p-1.5 rounded-lg text-xs font-semibold transition-all ${
               viewMode === 'table'
-                ? 'bg-white/15 text-white shadow-sm'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#211A32] text-[#D8B4FE] shadow-sm'
+                : 'text-[#A99DBE] hover:text-[#F8F5FF]'
             }`}
             title="Table View"
           >
@@ -410,8 +410,8 @@ export function PlaylistDetailView({
             onClick={() => setViewMode('grid')}
             className={`p-1.5 rounded-lg text-xs font-semibold transition-all ${
               viewMode === 'grid'
-                ? 'bg-white/15 text-white shadow-sm'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#211A32] text-[#D8B4FE] shadow-sm'
+                : 'text-[#A99DBE] hover:text-[#F8F5FF]'
             }`}
             title="Grid View"
           >

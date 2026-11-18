@@ -117,7 +117,7 @@ export function SongContextMenu({
     <div
       ref={menuRef}
       style={{ top: `${adjustedY}px`, left: `${adjustedX}px` }}
-      className="fixed z-50 w-56 rounded-xl glass-modal border border-white/15 shadow-2xl p-1.5 text-xs text-white select-none animate-in fade-in zoom-in-95 duration-100"
+      className="fixed z-50 w-56 rounded-xl bg-[#171326]/98 backdrop-blur-xl border border-[#302744] shadow-2xl p-1.5 text-xs text-[#F8F5FF] select-none animate-in fade-in zoom-in-95 duration-100"
     >
       {/* Play Now */}
       <button
@@ -125,7 +125,7 @@ export function SongContextMenu({
           playSong(song);
           onClose();
         }}
-        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[var(--accent)] hover:text-black transition-colors text-left font-medium"
+        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#A78BFA] hover:text-[#090812] transition-colors text-left font-medium"
       >
         <Play className="w-4 h-4 fill-current" /> Play
       </button>
@@ -137,9 +137,9 @@ export function SongContextMenu({
           showToast('Queue', `"${song.title}" will play next`, 'success');
           onClose();
         }}
-        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#25252D] transition-colors text-left text-[#D4D4D8] hover:text-white"
+        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#2A2140] transition-colors text-left text-[#C2B5D9] hover:text-[#F8F5FF]"
       >
-        <ListPlus className="w-4 h-4 text-[var(--accent)]" /> Play Next
+        <ListPlus className="w-4 h-4 text-[#A78BFA]" /> Play Next
       </button>
 
       {/* Add to Queue */}
@@ -149,7 +149,7 @@ export function SongContextMenu({
           showToast('Queue', `Added "${song.title}" to queue`, 'success');
           onClose();
         }}
-        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#25252D] transition-colors text-left text-[#D4D4D8] hover:text-white"
+        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#2A2140] transition-colors text-left text-[#C2B5D9] hover:text-[#F8F5FF]"
       >
         <ListPlus className="w-4 h-4" /> Add to Queue
       </button>
@@ -160,10 +160,10 @@ export function SongContextMenu({
           toggleFavorite(song.id);
           onClose();
         }}
-        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#25252D] transition-colors text-left text-[#D4D4D8] hover:text-white"
+        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#2A2140] transition-colors text-left text-[#C2B5D9] hover:text-[#F8F5FF]"
       >
         <Heart
-          className={`w-4 h-4 ${song.isFavorite ? 'fill-rose-500 text-rose-500' : 'text-[#A1A1AA]'}`}
+          className={`w-4 h-4 ${song.isFavorite ? 'fill-rose-500 text-rose-500' : 'text-[#A99DBE]'}`}
         />
         {song.isFavorite ? 'Remove from Liked' : 'Save to Liked Songs'}
       </button>
@@ -175,24 +175,24 @@ export function SongContextMenu({
         onMouseLeave={() => setShowPlaylistSubmenu(false)}
       >
         <button
-          className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#25252D] transition-colors text-left text-[#D4D4D8] hover:text-white"
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#2A2140] transition-colors text-left text-[#C2B5D9] hover:text-[#F8F5FF]"
         >
           <div className="flex items-center gap-2.5">
-            <FolderPlus className="w-4 h-4 text-sky-400" /> Add to Playlist
+            <FolderPlus className="w-4 h-4 text-[#A78BFA]" /> Add to Playlist
           </div>
-          <span className="text-[10px] text-[#A1A1AA]">›</span>
+          <span className="text-[10px] text-[#A99DBE]">›</span>
         </button>
 
         {showPlaylistSubmenu && (
-          <div className="absolute left-full top-0 ml-1 w-48 rounded-xl bg-[#18181F]/95 backdrop-blur-xl border border-[#303038] shadow-2xl p-1.5 space-y-0.5 max-h-56 overflow-y-auto">
+          <div className="absolute left-full top-0 ml-1 w-48 rounded-xl bg-[#171326]/98 backdrop-blur-xl border border-[#302744] shadow-2xl p-1.5 space-y-0.5 max-h-56 overflow-y-auto">
             {playlists.length === 0 ? (
-              <div className="px-3 py-2 text-[11px] text-[#71717A]">No playlists yet</div>
+              <div className="px-3 py-2 text-[11px] text-[#A99DBE]">No playlists yet</div>
             ) : (
               playlists.map(pl => (
                 <button
                   key={pl.id}
                   onClick={() => handleAddToPlaylist(pl.id, pl.title)}
-                  className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-[var(--accent)] hover:text-black truncate transition-colors"
+                  className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-[#A78BFA] hover:text-[#090812] truncate transition-colors text-[#F8F5FF]"
                 >
                   {pl.title}
                 </button>
@@ -202,7 +202,7 @@ export function SongContextMenu({
         )}
       </div>
 
-      <div className="my-1 border-t border-[#303038]/60" />
+      <div className="my-1 border-t border-[#302744]" />
 
       {/* View Album */}
       {song.album && (
@@ -211,9 +211,9 @@ export function SongContextMenu({
             if (onViewAlbum) onViewAlbum(song.album);
             onClose();
           }}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#25252D] transition-colors text-left text-[#D4D4D8] hover:text-white"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#2A2140] transition-colors text-left text-[#C2B5D9] hover:text-[#F8F5FF]"
         >
-          <Disc className="w-4 h-4 text-purple-400" /> Go to Album
+          <Disc className="w-4 h-4 text-[#D8B4FE]" /> Go to Album
         </button>
       )}
 
@@ -224,9 +224,9 @@ export function SongContextMenu({
             if (onViewArtist) onViewArtist(song.artist);
             onClose();
           }}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#25252D] transition-colors text-left text-[#D4D4D8] hover:text-white"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#2A2140] transition-colors text-left text-[#C2B5D9] hover:text-[#F8F5FF]"
         >
-          <User className="w-4 h-4 text-emerald-400" /> Go to Artist
+          <User className="w-4 h-4 text-[#A78BFA]" /> Go to Artist
         </button>
       )}
 
@@ -236,12 +236,12 @@ export function SongContextMenu({
           onEdit(song);
           onClose();
         }}
-        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#25252D] transition-colors text-left text-[#D4D4D8] hover:text-white"
+        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#2A2140] transition-colors text-left text-[#C2B5D9] hover:text-[#F8F5FF]"
       >
         <Edit2 className="w-4 h-4 text-amber-400" /> Edit Metadata
       </button>
 
-      <div className="my-1 border-t border-[#303038]/60" />
+      <div className="my-1 border-t border-[#302744]" />
 
       {/* Delete Song */}
       <button

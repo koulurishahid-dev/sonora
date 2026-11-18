@@ -111,9 +111,9 @@ export function BottomPlayer() {
   };
 
   return (
-    <footer className="h-24 w-full bg-[#0A0C11]/95 border-t border-white/[0.08] backdrop-blur-2xl flex flex-col justify-between px-4 sm:px-6 py-2.5 relative z-40 shadow-[0_-16px_45px_rgba(0,0,0,0.95)] select-none">
+    <footer className="h-24 w-full bg-[#110F1D]/98 border-t border-[#302744] backdrop-blur-2xl flex flex-col justify-between px-4 sm:px-6 py-2.5 relative z-40 shadow-[0_-16px_45px_rgba(0,0,0,0.95)] select-none">
       {/* Specular glass reflection bar */}
-      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#A78BFA]/25 to-transparent pointer-events-none" />
 
       {/* Audio Error Alert Banner */}
       {audioError && (
@@ -129,18 +129,18 @@ export function BottomPlayer() {
         <div className="flex items-center gap-3.5 w-1/4 min-w-[220px]">
           <div
             onClick={() => setIsNowPlayingOpen(true)}
-            className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl overflow-hidden bg-[#101216] border border-white/10 shrink-0 relative cursor-pointer group shadow-md hover:scale-105 transition-transform"
+            className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl overflow-hidden bg-[#141122] border border-[#302744] shrink-0 relative cursor-pointer group shadow-md hover:scale-105 transition-transform"
             title="Open Immersive Player"
           >
             {artworkUrl ? (
               <img src={artworkUrl} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-zinc-500">
+              <div className="w-full h-full flex items-center justify-center text-[#A99DBE]">
                 <Music2 className="w-6 h-6" />
               </div>
             )}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-              <Maximize2 className="w-4 h-4 text-white" />
+              <Maximize2 className="w-4 h-4 text-[#F8F5FF]" />
             </div>
           </div>
 
@@ -148,34 +148,34 @@ export function BottomPlayer() {
             <div className="flex items-center gap-2">
               <p
                 onClick={() => setIsNowPlayingOpen(true)}
-                className="text-xs sm:text-sm font-bold text-white truncate cursor-pointer hover:underline hover:text-[var(--accent)] transition-colors tracking-tight"
+                className="text-xs sm:text-sm font-bold text-[#F8F5FF] truncate cursor-pointer hover:underline hover:text-[#D8B4FE] transition-colors tracking-tight"
                 title={currentSong.title}
               >
                 {currentSong.title}
               </p>
               {isPlaying && (
-                <div className="flex items-end gap-0.5 h-3 shrink-0 px-1.5 py-0.5 rounded bg-[var(--accent)]/15 border border-[var(--accent)]/30" title="Live Playing">
-                  <span className="w-0.5 bg-[var(--accent)] rounded-full animate-eq-1 h-2.5" />
-                  <span className="w-0.5 bg-[var(--accent)] rounded-full animate-eq-2 h-2.5" />
-                  <span className="w-0.5 bg-[var(--accent)] rounded-full animate-eq-3 h-2.5" />
+                <div className="flex items-end gap-0.5 h-3 shrink-0 px-1.5 py-0.5 rounded bg-[#A78BFA]/15 border border-[#A78BFA]/30" title="Live Playing">
+                  <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-1 h-2.5" />
+                  <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-2 h-2.5" />
+                  <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-3 h-2.5" />
                 </div>
               )}
             </div>
-            <p className="text-xs text-[#A1A1AA] truncate mt-0.5 font-medium">{currentSong.artist}</p>
+            <p className="text-xs text-[#C2B5D9] truncate mt-0.5 font-medium">{currentSong.artist}</p>
           </div>
 
           {/* Favorite Button with Particle Burst */}
           <div className="relative shrink-0">
             <button
               onClick={handleToggleFavorite}
-              className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-[#141122] transition-colors"
               title={currentSong.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
             >
               <Heart
                 className={`w-4 h-4 transition-all ${
                   currentSong.isFavorite
                     ? 'fill-rose-500 text-rose-500 scale-110'
-                    : 'text-[#A1A1AA] hover:text-white'
+                    : 'text-[#A99DBE] hover:text-[#F8F5FF]'
                 }`}
               />
             </button>
@@ -203,7 +203,7 @@ export function BottomPlayer() {
               <button
                 onClick={toggleShuffle}
                 className={`p-1.5 rounded-lg transition-colors active:scale-90 ${
-                  shuffle ? 'text-[var(--accent)]' : 'text-[#A1A1AA] hover:text-white'
+                  shuffle ? 'text-[#D8B4FE] bg-[#A78BFA]/15' : 'text-[#A99DBE] hover:text-[#F8F5FF]'
                 }`}
               >
                 <Shuffle className="w-4 h-4" />
@@ -213,7 +213,7 @@ export function BottomPlayer() {
             <Tooltip content="Previous Track">
               <button
                 onClick={prevTrack}
-                className="p-1.5 text-[#A1A1AA] hover:text-white transition-colors active:scale-90"
+                className="p-1.5 text-[#C2B5D9] hover:text-[#F8F5FF] transition-colors active:scale-90"
               >
                 <SkipBack className="w-5 h-5" />
               </button>
@@ -223,12 +223,12 @@ export function BottomPlayer() {
             <Tooltip content={isPlaying ? 'Pause (Space)' : 'Play (Space)'}>
               <button
                 onClick={handlePlayToggle}
-                className="relative w-10 h-10 rounded-full bg-[var(--accent)] text-black flex items-center justify-center hover:scale-108 active:scale-95 transition-all shadow-lg shadow-[var(--accent)]/35 border border-white/30 cursor-pointer"
+                className="relative w-10 h-10 rounded-full bg-[#A78BFA] hover:bg-[#D8B4FE] text-[#090812] flex items-center justify-center hover:scale-108 active:scale-95 transition-all shadow-lg shadow-[#A78BFA]/35 border border-white/20 cursor-pointer"
               >
                 {isPlaying ? (
-                  <Pause className="w-5 h-5 fill-black" />
+                  <Pause className="w-5 h-5 fill-[#090812]" />
                 ) : (
-                  <Play className="w-5 h-5 fill-black ml-0.5" />
+                  <Play className="w-5 h-5 fill-[#090812] ml-0.5" />
                 )}
                 {isPlaying && (
                   <span className="absolute inset-0 rounded-full border-2 border-white/40 animate-ping opacity-30 pointer-events-none" />
@@ -239,7 +239,7 @@ export function BottomPlayer() {
             <Tooltip content="Next Track">
               <button
                 onClick={nextTrack}
-                className="p-1.5 text-[#A1A1AA] hover:text-white transition-colors active:scale-90"
+                className="p-1.5 text-[#C2B5D9] hover:text-[#F8F5FF] transition-colors active:scale-90"
               >
                 <SkipForward className="w-5 h-5" />
               </button>
@@ -249,7 +249,7 @@ export function BottomPlayer() {
               <button
                 onClick={toggleRepeat}
                 className={`p-1.5 rounded-lg transition-colors active:scale-90 ${
-                  repeat !== 'off' ? 'text-[var(--accent)]' : 'text-[#A1A1AA] hover:text-white'
+                  repeat !== 'off' ? 'text-[#D8B4FE] bg-[#A78BFA]/15' : 'text-[#A99DBE] hover:text-[#F8F5FF]'
                 }`}
               >
                 {repeat === 'one' ? <Repeat1 className="w-4 h-4" /> : <Repeat className="w-4 h-4" />}
@@ -259,7 +259,7 @@ export function BottomPlayer() {
 
           {/* Seekbar and Times with Hover Tooltip Preview */}
           <div className="flex items-center gap-2.5 w-full">
-            <span className="text-[11px] font-mono text-[#A1A1AA] w-9 text-right shrink-0">
+            <span className="text-[11px] font-mono text-[#A99DBE] w-9 text-right shrink-0">
               {formatDuration(currentTime)}
             </span>
 
@@ -272,7 +272,7 @@ export function BottomPlayer() {
               {/* Floating Timeline Hover Preview Badge */}
               {hoverTime !== null && (
                 <div
-                  className="absolute bottom-full mb-2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-[#161822] border border-white/20 text-[10px] font-mono text-white shadow-xl pointer-events-none z-30"
+                  className="absolute bottom-full mb-2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-[#171326] border border-[#302744] text-[10px] font-mono text-[#F8F5FF] shadow-xl pointer-events-none z-30"
                   style={{ left: `${hoverPosPercent}%` }}
                 >
                   {formatDuration(hoverTime)}
@@ -286,12 +286,12 @@ export function BottomPlayer() {
                 step="0.1"
                 value={currentTime}
                 onChange={e => seek(parseFloat(e.target.value))}
-                className="w-full cursor-pointer accent-[var(--accent)] h-1.5 hover:h-2 transition-all rounded-full"
+                className="w-full cursor-pointer accent-[#A78BFA] h-1.5 hover:h-2 transition-all rounded-full bg-[#211A32]"
                 aria-label="Seek time"
               />
             </div>
 
-            <span className="text-[11px] font-mono text-[#A1A1AA] w-9 shrink-0">
+            <span className="text-[11px] font-mono text-[#A99DBE] w-9 shrink-0">
               {formatDuration(duration)}
             </span>
           </div>
@@ -304,7 +304,7 @@ export function BottomPlayer() {
             <button
               onClick={() => setIsLyricsOpen(!isLyricsOpen)}
               className={`p-2 rounded-lg transition-colors ${
-                isLyricsOpen ? 'text-[var(--accent)] bg-[var(--accent)]/15' : 'text-[#A1A1AA] hover:text-white'
+                isLyricsOpen ? 'text-[#D8B4FE] bg-[#A78BFA]/15' : 'text-[#A99DBE] hover:text-[#F8F5FF]'
               }`}
             >
               <FileText className="w-4 h-4" />
@@ -316,7 +316,7 @@ export function BottomPlayer() {
             <button
               onClick={() => setIsQueueOpen(!isQueueOpen)}
               className={`p-2 rounded-lg transition-colors ${
-                isQueueOpen ? 'text-[var(--accent)] bg-[var(--accent)]/15' : 'text-[#A1A1AA] hover:text-white'
+                isQueueOpen ? 'text-[#D8B4FE] bg-[#A78BFA]/15' : 'text-[#A99DBE] hover:text-[#F8F5FF]'
               }`}
             >
               <ListMusic className="w-4 h-4" />
@@ -328,7 +328,7 @@ export function BottomPlayer() {
             <Tooltip content={isMuted ? 'Unmute' : 'Mute'}>
               <button
                 onClick={toggleMute}
-                className="text-[#A1A1AA] hover:text-white transition-colors"
+                className="text-[#A99DBE] hover:text-[#F8F5FF] transition-colors"
               >
                 {isMuted || volume === 0 ? (
                   <VolumeX className="w-4 h-4 text-rose-400" />
@@ -347,7 +347,7 @@ export function BottomPlayer() {
               step="0.01"
               value={isMuted ? 0 : volume}
               onChange={e => setVolume(parseFloat(e.target.value))}
-              className="w-18 accent-[var(--accent)] h-1"
+              className="w-18 accent-[#A78BFA] h-1"
               aria-label="Volume"
             />
           </div>
@@ -361,8 +361,8 @@ export function BottomPlayer() {
               }}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold transition-all shadow-sm active:scale-95 ${
                 isSideViewOpen
-                  ? 'bg-[var(--accent)]/20 border border-[var(--accent)]/40 text-[var(--accent)] shadow-[0_0_12px_rgba(245,158,11,0.25)]'
-                  : 'text-[#A1A1AA] hover:text-white hover:bg-white/10 border border-transparent'
+                  ? 'bg-[#211A32] border border-[#A78BFA]/40 text-[#D8B4FE] shadow-[0_0_12px_rgba(167,139,250,0.25)]'
+                  : 'text-[#A99DBE] hover:text-[#F8F5FF] hover:bg-[#141122] border border-transparent'
               }`}
             >
               <PanelRight className="w-3.5 h-3.5" />
@@ -374,9 +374,9 @@ export function BottomPlayer() {
           <Tooltip content="Turntable Studio">
             <button
               onClick={() => setIsNowPlayingOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 transition-all shadow-sm active:scale-95"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-[#211A32] border border-[#302744] hover:border-[#A78BFA]/40 text-[#D8B4FE] hover:bg-[#2A2140] transition-all shadow-sm active:scale-95"
             >
-              <Disc className={`w-3.5 h-3.5 text-amber-400 ${isPlaying ? 'animate-spin' : ''}`} style={{ animationDuration: '3s' }} />
+              <Disc className={`w-3.5 h-3.5 text-[#A78BFA] ${isPlaying ? 'animate-spin' : ''}`} style={{ animationDuration: '3s' }} />
               <span className="hidden xl:inline">Studio</span>
             </button>
           </Tooltip>
@@ -385,7 +385,7 @@ export function BottomPlayer() {
           <Tooltip content="Expand Player">
             <button
               onClick={() => setIsNowPlayingOpen(true)}
-              className="p-2 rounded-lg text-[#A1A1AA] hover:text-white hover:bg-white/10 transition-colors"
+              className="p-2 rounded-lg text-[#A99DBE] hover:text-[#F8F5FF] hover:bg-[#141122] transition-colors"
             >
               <Maximize2 className="w-4 h-4" />
             </button>

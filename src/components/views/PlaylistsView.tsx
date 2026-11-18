@@ -105,9 +105,9 @@ export function PlaylistsView({
             <div
               key={pl.id}
               onClick={() => onNavigate('playlist-detail', pl.id)}
-              className="group p-3 rounded-2xl bg-[#12141C] hover:bg-[#181B26] border border-white/10 hover:border-[var(--accent)]/50 cursor-pointer transition-all duration-300 shadow-md hover:shadow-2xl hover:-translate-y-1.5 flex flex-col relative select-none"
+              className="group p-3 rounded-2xl bg-[#171326] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/50 cursor-pointer transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-[rgba(167,139,250,0.15)] hover:-translate-y-1.5 flex flex-col relative select-none"
             >
-              <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 relative mb-3 flex items-center justify-center border border-white/10">
+              <div className="aspect-square rounded-xl overflow-hidden bg-[#141122] relative mb-3 flex items-center justify-center border border-[#302744]">
                 {artUrl ? (
                   <img
                     src={artUrl}
@@ -115,21 +115,21 @@ export function PlaylistsView({
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
                   />
                 ) : (
-                  <ListMusic className="w-12 h-12 text-zinc-500" />
+                  <ListMusic className="w-12 h-12 text-[#A99DBE]" />
                 )}
 
                 {/* Spotify Badge */}
                 {pl.id.startsWith('pl_spotify_') && (
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-[#1ED760]/40 text-[9px] font-mono font-bold tracking-wider text-[#1ED760] z-20 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#1ED760] animate-pulse" />
+                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-[#090812]/80 backdrop-blur-md border border-[#A78BFA]/40 text-[9px] font-mono font-bold tracking-wider text-[#D8B4FE] z-20 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#A78BFA] animate-pulse" />
                     SPOTIFY
                   </div>
                 )}
 
                 {/* Floating Play Button on Hover */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300">
-                  <div className="w-11 h-11 rounded-full bg-[var(--accent)] text-black flex items-center justify-center shadow-xl group-hover:scale-105 transition-transform">
-                    <Play className="w-5 h-5 fill-black ml-0.5" />
+                  <div className="w-11 h-11 rounded-full bg-[#A78BFA] hover:bg-[#D8B4FE] text-[#090812] flex items-center justify-center shadow-xl group-hover:scale-105 transition-transform">
+                    <Play className="w-5 h-5 fill-[#090812] ml-0.5" />
                   </div>
                 </div>
 

@@ -14,8 +14,8 @@ interface AudioVisualizerProps {
 export function AudioVisualizer({
   mode = 'bars',
   className = '',
-  accentColor = '#1ED760',
-  secondaryColor = '#38BDF8',
+  accentColor = '#A78BFA',
+  secondaryColor = '#D8B4FE',
 }: AudioVisualizerProps) {
   const { getFrequencyData, getTimeDomainData, isPlaying } = usePlayer();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -127,24 +127,24 @@ export function AudioVisualizer({
             peakCapsRef.current[i] = Math.max(0, peakCapsRef.current[i] - peakDecayRef.current[i]);
           }
 
-          // Gradient: Neon green -> Soft white
+          // Gradient: Lavender-to-violet
           const grad = ctx.createLinearGradient(x, height, x, y);
-          grad.addColorStop(0, accentColor);
-          grad.addColorStop(0.65, '#38BDF8');
-          grad.addColorStop(1, '#F5F5F5');
+          grad.addColorStop(0, '#7C3AED');
+          grad.addColorStop(0.5, '#A78BFA');
+          grad.addColorStop(1, '#D8B4FE');
 
           ctx.fillStyle = grad;
-          ctx.shadowColor = accentColor;
-          ctx.shadowBlur = 6;
+          ctx.shadowColor = 'rgba(167, 139, 250, 0.45)';
+          ctx.shadowBlur = 8;
           ctx.beginPath();
           ctx.roundRect(x, y, barWidth, barHeight, [3, 3, 1, 1]);
           ctx.fill();
 
           // Peak cap pill
           const capY = height - (peakCapsRef.current[i] || 0) - 6;
-          ctx.fillStyle = '#FFFFFF';
-          ctx.shadowColor = '#FFFFFF';
-          ctx.shadowBlur = 4;
+          ctx.fillStyle = '#F8F5FF';
+          ctx.shadowColor = '#D8B4FE';
+          ctx.shadowBlur = 6;
           ctx.beginPath();
           ctx.roundRect(x, Math.max(2, capY), barWidth, 2, [1, 1, 1, 1]);
           ctx.fill();
@@ -176,12 +176,12 @@ export function AudioVisualizer({
         }
         ctx.stroke();
 
-        // Foreground crisp white/cyan ribbon
-        ctx.lineWidth = 2;
+        // Foreground crisp lavender/violet ribbon
+        ctx.lineWidth = 2.5;
         const grad = ctx.createLinearGradient(0, 0, width, 0);
-        grad.addColorStop(0, '#FFFFFF');
-        grad.addColorStop(0.5, '#38BDF8');
-        grad.addColorStop(1, accentColor);
+        grad.addColorStop(0, '#D8B4FE');
+        grad.addColorStop(0.5, '#A78BFA');
+        grad.addColorStop(1, '#7C3AED');
         ctx.strokeStyle = grad;
         ctx.shadowBlur = 0;
         ctx.stroke();
@@ -253,9 +253,9 @@ export function AudioVisualizer({
           const x2 = centerX + Math.cos(angle) * (baseRadius + barLen);
           const y2 = centerY + Math.sin(angle) * (baseRadius + barLen);
 
-          ctx.strokeStyle = i % 2 === 0 ? accentColor : '#F5F5F5';
+          ctx.strokeStyle = i % 2 === 0 ? '#A78BFA' : '#D8B4FE';
           ctx.lineWidth = 2;
-          ctx.shadowColor = accentColor;
+          ctx.shadowColor = 'rgba(167, 139, 250, 0.5)';
           ctx.shadowBlur = 6;
           ctx.beginPath();
           ctx.moveTo(x1, y1);

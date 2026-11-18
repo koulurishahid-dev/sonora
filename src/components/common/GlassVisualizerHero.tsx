@@ -112,13 +112,13 @@ export function GlassVisualizerHero() {
         fillGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
         const strokeGrad = ctx.createLinearGradient(0, 0, width, 0);
-        strokeGrad.addColorStop(0, '#06B6D4');
-        strokeGrad.addColorStop(0.5, '#1ED760');
-        strokeGrad.addColorStop(1, '#A855F7');
+        strokeGrad.addColorStop(0, '#7C3AED');
+        strokeGrad.addColorStop(0.5, '#A78BFA');
+        strokeGrad.addColorStop(1, '#D8B4FE');
 
         ctx.strokeStyle = strokeGrad;
         ctx.fillStyle = fillGrad;
-        ctx.shadowColor = '#06B6D4';
+        ctx.shadowColor = '#A78BFA';
         ctx.shadowBlur = 16;
 
         ctx.beginPath();
@@ -172,7 +172,7 @@ export function GlassVisualizerHero() {
           const x2 = centerX + Math.cos(a) * (baseRadius + barLen);
           const y2 = centerY + Math.sin(a) * (baseRadius + barLen);
 
-          ctx.strokeStyle = '#1ED760';
+          ctx.strokeStyle = '#A78BFA';
           ctx.lineWidth = 3;
           ctx.beginPath();
           ctx.moveTo(x1, y1);
@@ -189,7 +189,7 @@ export function GlassVisualizerHero() {
           const py = (height * 0.5) + Math.sin(angle * speed * 0.8 + i) * (height * 0.4);
           const pRadius = (val / 255) * 7 + 2;
 
-          ctx.fillStyle = i % 2 === 0 ? '#1ED760' : '#06B6D4';
+          ctx.fillStyle = i % 2 === 0 ? '#A78BFA' : '#D8B4FE';
           ctx.shadowColor = ctx.fillStyle;
           ctx.shadowBlur = 12;
           ctx.beginPath();
@@ -233,7 +233,7 @@ export function GlassVisualizerHero() {
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
             Dynamic Equalizer & Audio Reactor
-            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-ping" />
+            <span className="flex h-2.5 w-2.5 rounded-full bg-[#A78BFA] animate-ping" />
           </h2>
           <p className="text-xs text-[#A1A1AA] mt-0.5">
             Real-time multi-frequency spectrum analyser reacting to your private library.

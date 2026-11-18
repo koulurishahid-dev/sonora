@@ -95,12 +95,12 @@ export function HeaderBar({
   };
 
   return (
-    <header className="h-16 px-4 sm:px-6 glass-header border-b border-white/10 flex items-center justify-between gap-4 sticky top-0 z-20 select-none">
+    <header className="h-16 px-4 sm:px-6 bg-[#110F1D]/95 backdrop-blur-xl border-b border-[#302744] flex items-center justify-between gap-4 sticky top-0 z-20 select-none">
       {/* Left: Window Controls & History Navigation */}
       <div className="flex items-center gap-3">
         <button
           onClick={onOpenMobileMenu}
-          className="md:hidden p-2 rounded-xl text-[#A1A1AA] hover:text-white hover:bg-white/10 transition-colors"
+          className="md:hidden p-2 rounded-xl text-[#A99DBE] hover:text-[#F8F5FF] hover:bg-[#141122] transition-colors"
           aria-label="Toggle navigation menu"
         >
           <Menu className="w-5 h-5" />
@@ -111,7 +111,7 @@ export function HeaderBar({
           <button
             onClick={onGoBack}
             disabled={!canGoBack}
-            className="p-1.5 rounded-full glass-pure text-[#A1A1AA] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors border border-white/10"
+            className="p-1.5 rounded-full bg-[#141122] text-[#A99DBE] hover:text-[#F8F5FF] disabled:opacity-30 disabled:cursor-not-allowed transition-colors border border-[#302744]"
             title="Go back"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -119,7 +119,7 @@ export function HeaderBar({
           <button
             onClick={onGoForward}
             disabled={!canGoForward}
-            className="p-1.5 rounded-full glass-pure text-[#A1A1AA] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors border border-white/10"
+            className="p-1.5 rounded-full bg-[#141122] text-[#A99DBE] hover:text-[#F8F5FF] disabled:opacity-30 disabled:cursor-not-allowed transition-colors border border-[#302744]"
             title="Go forward"
           >
             <ChevronRight className="w-4 h-4" />
@@ -127,21 +127,21 @@ export function HeaderBar({
         </div>
 
         {/* Breadcrumb Pill */}
-        <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full glass-pure border border-white/10 text-xs">
-          <span className="text-[#A1A1AA]">Sonora</span>
-          <span className="text-[#525260]">&gt;</span>
-          <span className="font-semibold text-white tracking-wide">{viewTitles[currentView] || 'Explore'}</span>
+        <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#141122] border border-[#302744] text-xs">
+          <span className="text-[#A99DBE]">Sonora</span>
+          <span className="text-[#302744]">&gt;</span>
+          <span className="font-semibold text-[#F8F5FF] tracking-wide">{viewTitles[currentView] || 'Explore'}</span>
         </div>
       </div>
 
       {/* Center: Global Search Pill */}
       <div
         onClick={onOpenSearch}
-        className="flex-1 max-w-md mx-2 flex items-center gap-2.5 px-4 py-2 rounded-full glass-pure hover:bg-white/10 border border-white/10 hover:border-[var(--accent)]/50 text-xs text-[#A1A1AA] cursor-pointer transition-all shadow-sm group"
+        className="flex-1 max-w-md mx-2 flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#141122] hover:bg-[#171326] border border-[#302744] hover:border-[#A78BFA]/50 text-xs text-[#A99DBE] cursor-pointer transition-all shadow-sm group"
       >
-        <Search className="w-3.5 h-3.5 text-[#71717A] group-hover:text-[var(--accent)] transition-colors" />
+        <Search className="w-3.5 h-3.5 text-[#A99DBE] group-hover:text-[#A78BFA] transition-colors" />
         <span className="flex-1 truncate">What do you want to listen to?</span>
-        <kbd className="hidden sm:inline-block text-[10px] glass-pill px-1.5 py-0.5 rounded border border-white/15 font-mono text-[#A1A1AA]">
+        <kbd className="hidden sm:inline-block text-[10px] bg-[#211A32] px-1.5 py-0.5 rounded border border-[#302744] font-mono text-[#C2B5D9]">
           Ctrl K
         </kbd>
       </div>
@@ -151,10 +151,10 @@ export function HeaderBar({
         {/* Add Link */}
         <button
           onClick={onOpenAddLink}
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold glass-pure hover:bg-white/10 border border-white/10 text-[#D4D4D8] hover:text-white transition-all shadow-sm"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#141122] hover:bg-[#2A2140] border border-[#302744] text-[#C2B5D9] hover:text-[#F8F5FF] transition-all shadow-sm"
           title="Add audio URL"
         >
-          <Link2 className="w-3.5 h-3.5 text-sky-400" />
+          <Link2 className="w-3.5 h-3.5 text-[#A78BFA]" />
           <span>Add Link</span>
         </button>
 
@@ -162,7 +162,7 @@ export function HeaderBar({
         {onOpenSpotifyImport && (
           <button
             onClick={onOpenSpotifyImport}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#1ED760]/15 hover:bg-[#1ED760]/25 border border-[#1ED760]/40 text-[#1ED760] hover:scale-105 active:scale-95 transition-all shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#A78BFA]/15 hover:bg-[#A78BFA]/25 border border-[#A78BFA]/40 text-[#A78BFA] hover:scale-105 active:scale-95 transition-all shadow-sm"
             title="Import Telugu music using Spotify"
           >
             <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -175,7 +175,7 @@ export function HeaderBar({
         {/* Upload Button */}
         <button
           onClick={onOpenUpload}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[var(--accent)] text-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--accent)]/25"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#A78BFA] hover:bg-[#D8B4FE] text-[#090812] hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#A78BFA]/25"
           title="Upload audio files"
         >
           <Upload className="w-3.5 h-3.5" />
@@ -187,8 +187,8 @@ export function HeaderBar({
           onClick={toggleSideView}
           className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
             isSideViewOpen
-              ? 'bg-[var(--accent)]/20 border-[var(--accent)]/40 text-[var(--accent)] shadow-[0_0_12px_rgba(245,158,11,0.2)]'
-              : 'glass-pure border-white/10 text-white/70 hover:text-white hover:bg-white/10'
+              ? 'bg-[#211A32] border-[#A78BFA]/40 text-[#D8B4FE] shadow-[0_0_12px_rgba(167,139,250,0.25)]'
+              : 'bg-[#141122] border-[#302744] text-[#C2B5D9] hover:text-[#F8F5FF] hover:bg-[#2A2140]'
           }`}
           title={isSideViewOpen ? 'Hide Player Sidebar' : 'Show Player Sidebar'}
         >
@@ -202,16 +202,16 @@ export function HeaderBar({
         {/* User Profile Pill (Reference Image 1) */}
         <div
           onClick={() => onNavigate('settings')}
-          className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full bg-[#181820] hover:bg-[#25252D] border border-[#303038] hover:border-white/20 cursor-pointer transition-all"
+          className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full bg-[#171326] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/40 cursor-pointer transition-all"
           title="Open My Space (Profile & Settings)"
         >
-          <div className="w-6 h-6 rounded-full bg-[var(--accent)]/20 text-[var(--accent)] flex items-center justify-center text-xs">
+          <div className="w-6 h-6 rounded-full bg-[#A78BFA]/20 text-[#A78BFA] flex items-center justify-center text-xs">
             {settings.listenerAvatar || '🎧'}
           </div>
-          <span className="text-xs font-semibold text-white max-w-[80px] truncate">
+          <span className="text-xs font-semibold text-[#F8F5FF] max-w-[80px] truncate">
             {settings.listenerName || 'Shahid'}
           </span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#A78BFA] shadow-[0_0_6px_#A78BFA] animate-pulse" />
         </div>
       </div>
     </header>

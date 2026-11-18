@@ -183,24 +183,24 @@ export function SpotifyImportModal({ isOpen, onClose, onSuccess }: SpotifyImport
         initial={{ opacity: 0, scale: 0.95, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 16 }}
-        className="relative w-full max-w-2xl bg-[#0D0F14]/95 border border-[#1ED760]/30 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col z-10 max-h-[90vh]"
+        className="relative w-full max-w-2xl bg-[#171326]/98 border border-[#302744] rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col z-10 max-h-[90vh]"
       >
-        {/* Subtle Ambient Spotify Green Glow */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-[#1ED760]/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Subtle Ambient Lavender Glow */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#A78BFA]/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/[0.08] relative z-10 bg-black/20">
+        <div className="flex items-center justify-between p-6 border-b border-[#302744] relative z-10 bg-[#090812]/40">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#1ED760] text-black flex items-center justify-center shadow-lg shadow-[#1ED760]/20 font-bold">
+            <div className="w-10 h-10 rounded-2xl bg-[#A78BFA] text-[#090812] flex items-center justify-center shadow-lg shadow-[#A78BFA]/20 font-bold">
               <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
                 <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.495 17.306c-.216.353-.674.464-1.026.25-2.812-1.718-6.353-2.106-10.523-1.154-.403.092-.803-.16-.895-.563-.092-.403.16-.803.563-.895 4.567-1.042 8.49-.602 11.63 1.336.353.216.464.674.251 1.026zm1.467-3.262c-.272.441-.852.58-1.293.308-3.22-1.979-8.127-2.551-11.935-1.395-.497.151-1.029-.136-1.18-.633-.151-.497.136-1.029.633-1.18 4.356-1.322 9.776-.682 13.467 1.587.441.272.58.852.308 1.293zm.126-3.41c-3.86-2.292-10.228-2.503-13.896-1.389-.592.18-1.226-.154-1.406-.746-.18-.592.154-1.226.746-1.406 4.218-1.281 11.253-1.034 15.696 1.603.533.316.708 1.011.392 1.544-.316.533-1.011.708-1.532.394z" />
               </svg>
             </div>
             <div>
-              <h2 className="text-lg font-extrabold text-white tracking-tight flex items-center gap-2">
+              <h2 className="text-lg font-extrabold text-[#F8F5FF] tracking-tight flex items-center gap-2">
                 Spotify Telugu Importer
               </h2>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-[#C2B5D9]">
                 Import complete Telugu songs & automatically divide into categories
               </p>
             </div>
@@ -208,20 +208,20 @@ export function SpotifyImportModal({ isOpen, onClose, onSuccess }: SpotifyImport
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-white/50 hover:text-white hover:bg-white/[0.08] transition-colors"
+            className="p-2 rounded-xl text-[#A99DBE] hover:text-[#F8F5FF] hover:bg-[#211A32] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex border-b border-white/[0.08] bg-black/30 px-6 pt-2">
+        <div className="flex border-b border-[#302744] bg-[#090812]/50 px-6 pt-2">
           <button
             onClick={() => setActiveTab('all')}
             className={`py-3 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 ${
               activeTab === 'all'
-                ? 'border-[#1ED760] text-[#1ED760]'
-                : 'border-transparent text-white/50 hover:text-white'
+                ? 'border-[#A78BFA] text-[#D8B4FE]'
+                : 'border-transparent text-[#A99DBE] hover:text-[#F8F5FF]'
             }`}
           >
             <Layers className="w-4 h-4" />
@@ -232,8 +232,8 @@ export function SpotifyImportModal({ isOpen, onClose, onSuccess }: SpotifyImport
             onClick={() => setActiveTab('custom')}
             className={`py-3 px-4 text-xs font-bold border-b-2 transition-all flex items-center gap-2 ${
               activeTab === 'custom'
-                ? 'border-[#1ED760] text-[#1ED760]'
-                : 'border-transparent text-white/50 hover:text-white'
+                ? 'border-[#A78BFA] text-[#D8B4FE]'
+                : 'border-transparent text-[#A99DBE] hover:text-[#F8F5FF]'
             }`}
           >
             <ExternalLink className="w-4 h-4" />
@@ -246,24 +246,24 @@ export function SpotifyImportModal({ isOpen, onClose, onSuccess }: SpotifyImport
           {activeTab === 'all' ? (
             <div className="space-y-6">
               {/* Introduction Banner */}
-              <div className="p-4 rounded-2xl bg-[#1ED760]/10 border border-[#1ED760]/25 flex items-center justify-between gap-4">
+              <div className="p-4 rounded-2xl bg-[#211A32] border border-[#302744] flex items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <h4 className="text-sm font-bold text-[#1ED760]">
+                  <h4 className="text-sm font-bold text-[#D8B4FE]">
                     Complete Spotify Telugu Music Collection
                   </h4>
-                  <p className="text-xs text-white/70 leading-relaxed">
-                    Imports all full Telugu tracks, synced karaoke lyrics, studio masters, and divides them automatically into 6 official Spotify category mixtapes.
+                  <p className="text-xs text-[#C2B5D9] leading-relaxed">
+                    Imports all full Telugu tracks, synced karaoke lyrics, studio masters, and divides them automatically into official Spotify category mixtapes.
                   </p>
                 </div>
                 <button
                   onClick={handleBulkImport}
                   disabled={isImporting}
-                  className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1ED760] hover:bg-[#1fdb63] active:scale-95 text-black text-xs font-extrabold shadow-lg shadow-[#1ED760]/25 transition-all disabled:opacity-50"
+                  className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#A78BFA] hover:bg-[#D8B4FE] active:scale-95 text-[#090812] text-xs font-extrabold shadow-lg shadow-[#A78BFA]/25 transition-all disabled:opacity-50"
                 >
                   {isImporting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin text-[#090812]" />
                   ) : (
-                    <Download className="w-4 h-4" />
+                    <Download className="w-4 h-4 text-[#090812]" />
                   )}
                   <span>{isImporting ? 'Importing...' : 'Import All Categories'}</span>
                 </button>
@@ -271,17 +271,17 @@ export function SpotifyImportModal({ isOpen, onClose, onSuccess }: SpotifyImport
 
               {/* Progress Indicator */}
               {isImporting && (
-                <div className="p-4 rounded-2xl bg-black/40 border border-[#1ED760]/40 space-y-2">
-                  <div className="flex items-center justify-between text-xs text-white">
+                <div className="p-4 rounded-2xl bg-[#090812]/60 border border-[#302744] space-y-2">
+                  <div className="flex items-center justify-between text-xs text-[#F8F5FF]">
                     <span className="flex items-center gap-2 font-medium">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1ED760]" />
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-[#A78BFA]" />
                       {importProgress.status}
                     </span>
-                    <span className="font-mono text-[#1ED760] font-bold">{importProgress.percent}%</span>
+                    <span className="font-mono text-[#D8B4FE] font-bold">{importProgress.percent}%</span>
                   </div>
-                  <div className="w-full bg-white/[0.08] h-2 rounded-full overflow-hidden">
+                  <div className="w-full bg-[#211A32] h-2 rounded-full overflow-hidden">
                     <div
-                      className="bg-[#1ED760] h-full transition-all duration-300"
+                      className="bg-[#A78BFA] h-full transition-all duration-300"
                       style={{ width: `${importProgress.percent}%` }}
                     />
                   </div>
@@ -290,7 +290,7 @@ export function SpotifyImportModal({ isOpen, onClose, onSuccess }: SpotifyImport
 
               {/* Categories Preview Grid */}
               <div className="space-y-3">
-                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-white/50">
+                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#A99DBE]">
                   Target Spotify Categories
                 </h3>
 
@@ -298,24 +298,24 @@ export function SpotifyImportModal({ isOpen, onClose, onSuccess }: SpotifyImport
                   {SPOTIFY_TELUGU_CATEGORIES.map(cat => (
                     <div
                       key={cat.id}
-                      className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-[#1ED760]/30 transition-all group"
+                      className="flex items-center gap-3 p-3 rounded-2xl bg-[#141122] border border-[#302744] hover:border-[#A78BFA]/40 transition-all group"
                     >
-                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-black/40 shrink-0 border border-white/10 relative">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#090812] shrink-0 border border-[#302744] relative">
                         <img src={cat.coverImage} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                       </div>
 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-bold text-white group-hover:text-[#1ED760] truncate transition-colors">
+                          <span className="text-xs font-bold text-[#F8F5FF] group-hover:text-[#D8B4FE] truncate transition-colors">
                             {cat.title}
                           </span>
                         </div>
-                        <p className="text-[11px] text-white/50 line-clamp-1 mt-0.5">
+                        <p className="text-[11px] text-[#A99DBE] line-clamp-1 mt-0.5">
                           {cat.description}
                         </p>
                       </div>
 
-                      <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-[#1ED760]/15 text-[#1ED760] border border-[#1ED760]/30 shrink-0">
+                      <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-[#211A32] text-[#A78BFA] border border-[#302744] shrink-0">
                         {cat.categoryTag}
                       </span>
                     </div>
@@ -327,7 +327,7 @@ export function SpotifyImportModal({ isOpen, onClose, onSuccess }: SpotifyImport
             /* TAB 2: PASTE SPOTIFY LINK */
             <div className="space-y-5">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-white uppercase tracking-wider font-mono">
+                <label className="text-xs font-bold text-[#F8F5FF] uppercase tracking-wider font-mono">
                   Spotify Track, Album or Playlist URL
                 </label>
                 <div className="flex items-center gap-2">
@@ -336,54 +336,56 @@ export function SpotifyImportModal({ isOpen, onClose, onSuccess }: SpotifyImport
                     placeholder="https://open.spotify.com/track/..."
                     value={spotifyUrl}
                     onChange={e => setSpotifyUrl(e.target.value)}
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.1] focus:border-[#1ED760] text-sm text-white placeholder-white/30 focus:outline-none transition-colors"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-[#141122] border border-[#302744] focus:border-[#A78BFA] text-sm text-[#F8F5FF] placeholder-[#A99DBE] focus:outline-none transition-colors"
                   />
                   <button
                     onClick={handlePreviewCustomUrl}
                     disabled={customLoading || !spotifyUrl.trim()}
-                    className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-white text-xs font-bold border border-white/10 transition-all disabled:opacity-50 flex items-center gap-1.5"
+                    className="px-4 py-2.5 rounded-xl bg-[#211A32] hover:bg-[#2A2140] text-[#F8F5FF] text-xs font-bold border border-[#302744] transition-all disabled:opacity-50 flex items-center gap-1.5"
                   >
-                    {customLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                    {customLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-[#A78BFA]" /> : null}
                     <span>Inspect</span>
                   </button>
                 </div>
-                <p className="text-[11px] text-white/40">
+                <p className="text-[11px] text-[#A99DBE]">
                   Paste any public Spotify song link to extract track info, high-res artwork, and add it to your collection.
                 </p>
               </div>
 
               {/* Target Category Selector */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-white uppercase tracking-wider font-mono">
+                <label className="text-xs font-bold text-[#F8F5FF] uppercase tracking-wider font-mono">
                   Select Target Category
                 </label>
                 <select
                   value={selectedCategory}
                   onChange={e => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#141720] border border-white/[0.1] focus:border-[#1ED760] text-sm text-white focus:outline-none cursor-pointer"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#141122] border border-[#302744] focus:border-[#A78BFA] text-sm text-[#F8F5FF] focus:outline-none cursor-pointer"
                 >
+                  <option value="Telugu Travel Melodies">🚗 Telugu Travel Melodies & Road Trips</option>
                   <option value="Love Songs">💖 Telugu Romance & Love Songs</option>
                   <option value="Melodies">🎵 Soulful Melodies & Acoustic</option>
                   <option value="Mass & Beats">🔥 Telugu Mass & Dance Beats</option>
                   <option value="Golden Classics">🌟 2000s Nostalgia & Golden Classics</option>
                   <option value="Sid Sriram">🎤 Sid Sriram Essentials</option>
                   <option value="Blockbusters">⚡ DSP, Thaman & Anirudh Hits</option>
+                  <option value="90s Classics">📻 90s Telugu Golden Era & Vintage</option>
                 </select>
               </div>
 
               {/* Preview Card */}
               {customPreview && (
-                <div className="p-4 rounded-2xl bg-white/[0.04] border border-[#1ED760]/40 flex items-center justify-between gap-4">
+                <div className="p-4 rounded-2xl bg-[#141122] border border-[#302744] flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
                     <img
                       src={customPreview.thumbnailUrl}
                       alt=""
-                      className="w-14 h-14 rounded-xl object-cover shrink-0 border border-white/10"
+                      className="w-14 h-14 rounded-xl object-cover shrink-0 border border-[#302744]"
                     />
                     <div className="min-w-0">
-                      <h4 className="text-sm font-bold text-white truncate">{customPreview.title}</h4>
-                      <p className="text-xs text-white/60 truncate mt-0.5">{customPreview.artist}</p>
-                      <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-mono bg-[#1ED760]/15 text-[#1ED760] border border-[#1ED760]/30 font-bold">
+                      <h4 className="text-sm font-bold text-[#F8F5FF] truncate">{customPreview.title}</h4>
+                      <p className="text-xs text-[#C2B5D9] truncate mt-0.5">{customPreview.artist}</p>
+                      <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-mono bg-[#211A32] text-[#A78BFA] border border-[#302744] font-bold">
                         Category: {selectedCategory}
                       </span>
                     </div>
@@ -391,7 +393,7 @@ export function SpotifyImportModal({ isOpen, onClose, onSuccess }: SpotifyImport
 
                   <button
                     onClick={handleSaveCustomSpotifySong}
-                    className="shrink-0 px-4 py-2 rounded-xl bg-[#1ED760] hover:bg-[#1fdb63] active:scale-95 text-black text-xs font-bold shadow-md transition-all"
+                    className="shrink-0 px-4 py-2 rounded-xl bg-[#A78BFA] hover:bg-[#D8B4FE] active:scale-95 text-[#090812] text-xs font-bold shadow-md transition-all"
                   >
                     Add to Library
                   </button>
@@ -402,15 +404,15 @@ export function SpotifyImportModal({ isOpen, onClose, onSuccess }: SpotifyImport
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 px-6 border-t border-white/[0.08] bg-black/30 flex items-center justify-between text-xs text-white/50">
+        <div className="p-4 px-6 border-t border-[#302744] bg-[#090812]/50 flex items-center justify-between text-xs text-[#A99DBE]">
           <span className="flex items-center gap-1.5 font-mono">
-            <span className="w-2 h-2 rounded-full bg-[#1ED760] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-[#A78BFA] animate-pulse" />
             Spotify Web Audio Ready
           </span>
 
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl hover:bg-white/[0.08] text-white transition-colors"
+            className="px-4 py-1.5 rounded-xl hover:bg-[#211A32] text-[#F8F5FF] transition-colors"
           >
             Close
           </button>

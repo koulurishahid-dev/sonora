@@ -111,7 +111,7 @@ export interface AppSettings {
   listenerName?: string;
   listenerAvatar?: string;
   listenerBio?: string;
-  atmosphere?: 'night' | 'focus' | 'relax' | 'energy';
+  atmosphere?: 'night' | 'focus' | 'relax' | 'energy' | 'lavender' | 'amethyst' | 'obsidian';
   hapticSoundEnabled?: boolean;
 }
 

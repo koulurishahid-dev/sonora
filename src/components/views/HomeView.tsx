@@ -92,9 +92,9 @@ function ShelfSongCard({
     <div
       onClick={() => (isThisCurrent ? onTogglePlay() : onPlaySong(song, songs))}
       onContextMenu={e => onSongContextMenu(e, song)}
-      className="w-32 sm:w-44 shrink-0 snap-start p-2.5 sm:p-3 rounded-2xl bg-[#12141C]/90 hover:bg-[#181B26] border border-white/[0.07] hover:border-[#1ED760]/40 cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1 group flex flex-col select-none"
+      className="w-32 sm:w-44 shrink-0 snap-start p-2.5 sm:p-3 rounded-2xl bg-[#171326] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/50 cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-[rgba(167,139,250,0.15)] hover:-translate-y-1 group flex flex-col select-none"
     >
-      <div className="aspect-square rounded-xl overflow-hidden bg-zinc-900 relative mb-2 sm:mb-3 flex items-center justify-center border border-white/[0.08]">
+      <div className="aspect-square rounded-xl overflow-hidden bg-[#141122] relative mb-2 sm:mb-3 flex items-center justify-center border border-[#302744]">
         {!hasFailed ? (
           <img
             src={currentSrc}
@@ -107,30 +107,30 @@ function ShelfSongCard({
             className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500 ease-out"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1A1D27] to-[#10121A] text-zinc-500">
-            <Music2 className="w-8 h-8 text-zinc-600 mb-1" />
-            <span className="text-[9px] font-bold tracking-wider text-zinc-600 uppercase">Sonora</span>
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#211A32] to-[#141122] text-[#A99DBE]">
+            <Music2 className="w-8 h-8 text-[#A99DBE]/60 mb-1" />
+            <span className="text-[9px] font-bold tracking-wider text-[#A99DBE] uppercase">Sonora</span>
           </div>
         )}
 
-        {/* Spotify Green Play Circle that rises on hover */}
+        {/* Electric Lavender Play Circle that rises on hover */}
         <div
-          className={`absolute right-2 bottom-2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#1ED760] text-black flex items-center justify-center shadow-2xl transition-all duration-300 ${
+          className={`absolute right-2 bottom-2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#A78BFA] hover:bg-[#D8B4FE] text-[#090812] flex items-center justify-center shadow-2xl transition-all duration-300 ${
             isThisPlaying
               ? 'opacity-100 scale-100'
               : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-105 active:scale-95'
           }`}
         >
           {isThisPlaying ? (
-            <Pause className="w-4 h-4 sm:w-5 sm:h-5 fill-black" />
+            <Pause className="w-4 h-4 sm:w-5 sm:h-5 fill-[#090812]" />
           ) : (
-            <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-black ml-0.5" />
+            <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-[#090812] ml-0.5" />
           )}
         </div>
 
         {/* Genre Tag */}
         {song.category && (
-          <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] font-mono font-bold tracking-wider bg-black/70 backdrop-blur-md border border-white/10 text-amber-300">
+          <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] font-mono font-bold tracking-wider bg-[#090812]/80 backdrop-blur-md border border-[#302744] text-[#D8B4FE]">
             {song.category}
           </div>
         )}
@@ -139,12 +139,12 @@ function ShelfSongCard({
       <div className="min-w-0 flex-1">
         <h3
           className={`text-xs sm:text-sm font-bold truncate transition-colors ${
-            isThisCurrent ? 'text-[#1ED760]' : 'text-white group-hover:text-white'
+            isThisCurrent ? 'text-[#D8B4FE]' : 'text-[#F8F5FF] group-hover:text-[#D8B4FE]'
           }`}
         >
           {song.title}
         </h3>
-        <p className="text-[10px] sm:text-[11px] text-white/50 truncate mt-0.5 font-medium">
+        <p className="text-[10px] sm:text-[11px] text-[#C2B5D9] truncate mt-0.5 font-medium">
           {song.artist}
         </p>
         {song.album && (
@@ -409,15 +409,15 @@ export function HomeView({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#1ED760] animate-pulse" />
-            <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-[#1ED760]">
-              Spotify Audio Engine
+            <span className="w-2.5 h-2.5 rounded-full bg-[#A78BFA] shadow-[0_0_8px_#A78BFA] animate-pulse" />
+            <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-[#A78BFA]">
+              Studio Audio Engine
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F8F5FF] tracking-tight mt-1">
             {greeting}, {displayName}
           </h1>
-          <p className="text-xs sm:text-sm text-white/50 mt-0.5">
+          <p className="text-xs sm:text-sm text-[#C2B5D9] mt-0.5">
             {allSongs.length} Full Telugu Master Tracks • Verified High-Bitrate Studio Audio
           </p>
         </div>
@@ -427,7 +427,7 @@ export function HomeView({
           {onOpenSpotifyImport && (
             <button
               onClick={onOpenSpotifyImport}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#1ED760] hover:bg-[#1fdb63] active:scale-95 text-black text-xs font-extrabold transition-all shadow-lg shadow-[#1ED760]/25"
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#A78BFA] hover:bg-[#D8B4FE] active:scale-95 text-[#090812] text-xs font-extrabold transition-all shadow-lg shadow-[#A78BFA]/25"
               title="Import all Telugu songs using Spotify"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -440,23 +440,23 @@ export function HomeView({
           <button
             onClick={handleSeedAllSpotify}
             disabled={isSeeding}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-xs font-semibold transition-all disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#141122] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/40 text-[#F8F5FF] text-xs font-semibold transition-all disabled:opacity-50"
             title="Reload complete Spotify Telugu collection"
           >
             {isSeeding ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1ED760]" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#A78BFA]" />
             ) : (
-              <Sparkles className="w-3.5 h-3.5 text-[#1ED760]" />
+              <Sparkles className="w-3.5 h-3.5 text-[#A78BFA]" />
             )}
             <span>Reload All</span>
           </button>
 
           <button
             onClick={() => setIsNowPlayingOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-xs font-semibold transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#141122] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/40 text-[#D8B4FE] text-xs font-semibold transition-all"
             title="Launch Full Turntable Studio"
           >
-            <Disc className="w-3.5 h-3.5 text-amber-400" />
+            <Disc className="w-3.5 h-3.5 text-[#A78BFA]" />
             <span>Studio</span>
           </button>
         </div>
@@ -464,17 +464,17 @@ export function HomeView({
 
       {/* Seeding Progress Bar */}
       {isSeeding && (
-        <div className="p-4 rounded-2xl bg-black/40 border border-[#1ED760]/40 space-y-2">
-          <div className="flex justify-between text-xs text-white">
+        <div className="p-4 rounded-2xl bg-[#141122]/90 border border-[#A78BFA]/40 space-y-2">
+          <div className="flex justify-between text-xs text-[#F8F5FF]">
             <span className="flex items-center gap-2 font-medium">
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1ED760]" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#A78BFA]" />
               {seedProgress.status}
             </span>
-            <span className="font-mono text-[#1ED760] font-bold">{seedProgress.percent}%</span>
+            <span className="font-mono text-[#D8B4FE] font-bold">{seedProgress.percent}%</span>
           </div>
-          <div className="w-full bg-white/[0.08] h-2 rounded-full overflow-hidden">
+          <div className="w-full bg-[#211A32] h-2 rounded-full overflow-hidden">
             <div
-              className="bg-[#1ED760] h-full transition-all duration-300"
+              className="bg-[#A78BFA] h-full transition-all duration-300"
               style={{ width: `${seedProgress.percent}%` }}
             />
           </div>
@@ -482,18 +482,19 @@ export function HomeView({
       )}
 
       {/* 2. SPOTIFY SIGNATURE QUICK ACCESS TILES (9 CURATED GENRES) */}
-      <section className="space-y-2.5 sm:space-y-3">
+      <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm sm:text-base md:text-lg font-black text-white tracking-tight flex items-center gap-2">
-            <Flame className="w-4 h-4 text-[#1ED760]" />
+          <h2 className="text-base sm:text-lg font-black text-[#F8F5FF] tracking-tight flex items-center gap-2">
+            <Flame className="w-4 h-4 text-[#A78BFA]" />
             <span>Featured Collections</span>
           </h2>
-          <span className="text-[11px] font-mono text-white/40">
+          <span className="text-xs font-mono text-[#A99DBE] font-semibold">
             {SPOTIFY_TELUGU_CATEGORIES.length} Playlists
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-3">
+        {/* Responsive grid: single column on ultra-compact mobile, 2 columns on phones, 3 columns on tablet/desktop */}
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
           {SPOTIFY_TELUGU_CATEGORIES.map(cat => {
             const playlistSongs = allSongs.filter(s => {
               const catTag = s.category || s.genre || '';
@@ -513,9 +514,9 @@ export function HomeView({
               <div
                 key={cat.id}
                 onClick={() => onNavigate('playlist-detail', cat.id)}
-                className="flex items-center gap-2 sm:gap-3 h-14 sm:h-16 md:h-18 rounded-xl bg-[#131622]/90 hover:bg-[#1A1F30] active:bg-[#22283D] active:scale-[0.98] border border-white/[0.08] hover:border-white/20 cursor-pointer transition-all duration-200 overflow-hidden group shadow-md relative select-none"
+                className="flex items-center gap-3 h-16 sm:h-18 rounded-2xl bg-[#171326] hover:bg-[#2A2140] active:bg-[#211A32] active:scale-[0.99] border border-[#302744] hover:border-[#A78BFA]/50 cursor-pointer transition-all duration-200 overflow-hidden group shadow-md hover:shadow-lg hover:shadow-[rgba(167,139,250,0.12)] relative select-none"
               >
-                <div className="w-14 sm:w-16 md:w-18 h-full shrink-0 relative bg-zinc-900 overflow-hidden">
+                <div className="w-16 sm:w-18 h-full shrink-0 relative bg-[#141122] overflow-hidden">
                   <img
                     src={cat.coverImage}
                     alt=""
@@ -531,16 +532,16 @@ export function HomeView({
                   />
                 </div>
 
-                <div className="min-w-0 flex-1 px-1.5 sm:px-2 pr-2 sm:pr-12 flex flex-col justify-center">
-                  <h3 className="text-[11px] sm:text-xs md:text-sm font-bold text-white line-clamp-2 leading-tight tracking-tight">
+                <div className="min-w-0 flex-1 px-2 pr-3 sm:pr-12 flex flex-col justify-center">
+                  <h3 className="text-xs sm:text-sm font-bold text-[#F8F5FF] group-hover:text-[#D8B4FE] line-clamp-2 leading-snug tracking-tight transition-colors">
                     {cat.shortTitle}
                   </h3>
-                  <p className="text-[9px] sm:text-[10px] text-white/50 font-mono mt-0.5 truncate">
+                  <p className="text-[10px] sm:text-[11px] text-[#C2B5D9] font-mono mt-0.5 truncate">
                     {playlistSongs.length} tracks
                   </p>
                 </div>
 
-                {/* Floating Spotify Play Button - Desktop Only */}
+                {/* Floating Play Button - Desktop Only */}
                 <div
                   onClick={e => {
                     e.stopPropagation();
@@ -548,9 +549,9 @@ export function HomeView({
                       playSong(playlistSongs[0], playlistSongs);
                     }
                   }}
-                  className="hidden sm:flex absolute right-2.5 w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#1ED760] text-black items-center justify-center shadow-xl opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 hover:scale-110 active:scale-95 transition-all"
+                  className="hidden sm:flex absolute right-2.5 w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#A78BFA] hover:bg-[#D8B4FE] text-[#090812] items-center justify-center shadow-xl opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 hover:scale-110 active:scale-95 transition-all"
                 >
-                  <Play className="w-3.5 h-3.5 fill-black ml-0.5" />
+                  <Play className="w-3.5 h-3.5 fill-[#090812] ml-0.5" />
                 </div>
               </div>
             );
@@ -659,33 +660,33 @@ export function HomeView({
       <section className="space-y-4 pt-4 border-t border-white/[0.08]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-extrabold text-[#F8F5FF] tracking-tight flex items-center gap-2">
               <span>Full Master Catalog</span>
-              <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-[#1ED760]/15 text-[#1ED760] border border-[#1ED760]/30">
+              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#211A32] text-[#A78BFA] border border-[#302744] shadow-sm">
                 {filteredCatalog.length} songs
               </span>
             </h2>
-            <p className="text-xs text-white/50 mt-0.5">
+            <p className="text-xs text-[#C2B5D9] mt-0.5">
               Browse {allSongs.length} verified unique Telugu studio master recordings across all 9 genres in 320kbps audio
             </p>
           </div>
 
           {/* Search Box */}
           <div className="relative w-full sm:w-72">
-            <Search className="w-3.5 h-3.5 text-white/40 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-[#A99DBE] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search by title, movie, singer..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 sm:py-2.5 rounded-full bg-white/[0.06] border border-white/[0.12] focus:border-[#1ED760] text-xs text-white placeholder-white/40 focus:outline-none transition-colors shadow-sm"
+              className="w-full pl-9 pr-4 py-2 sm:py-2.5 rounded-full bg-[#141122] border border-[#302744] focus:border-[#A78BFA] text-xs text-[#F8F5FF] placeholder-[#A99DBE] focus:outline-none transition-colors shadow-sm"
             />
           </div>
         </div>
 
         {/* Category Pills (Spotify-style with smooth mobile touch scrolling & no word-wrapping) */}
-        <div className="relative -mx-3 sm:mx-0 px-3 sm:px-0">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none flex-nowrap scroll-smooth touch-pan-x">
+        <div className="relative -mx-3.5 sm:mx-0 px-3.5 sm:px-0">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-0.5 scrollbar-none flex-nowrap scroll-smooth touch-pan-x pr-4 sm:pr-0">
             {[
               { id: 'All', label: 'All', count: allSongs.length, icon: null },
               { id: 'Telugu Travel Melodies', label: 'Travel Melodies', count: travelSongs.length, icon: '🚗' },
@@ -705,8 +706,8 @@ export function HomeView({
                   onClick={() => setActiveCategory(tab.id)}
                   className={`h-9 px-3.5 sm:px-4 rounded-full text-xs font-bold whitespace-nowrap shrink-0 transition-all duration-200 flex items-center gap-1.5 shadow-sm active:scale-95 select-none ${
                     isActive
-                      ? 'bg-[#1ED760] text-black shadow-md shadow-[#1ED760]/25 scale-[1.02]'
-                      : 'bg-[#141724] hover:bg-[#1C2133] active:bg-[#252B42] text-white/75 hover:text-white border border-white/[0.08] hover:border-white/20'
+                      ? 'bg-[#A78BFA] text-[#090812] shadow-md shadow-[#A78BFA]/30 scale-[1.02]'
+                      : 'bg-[#141122] hover:bg-[#2A2140] active:bg-[#211A32] text-[#C2B5D9] hover:text-[#F8F5FF] border border-[#302744] hover:border-[#A78BFA]/40'
                   }`}
                 >
                   {tab.icon && <span className="text-[13px]">{tab.icon}</span>}
@@ -714,8 +715,8 @@ export function HomeView({
                   <span
                     className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full font-bold ${
                       isActive
-                        ? 'bg-black/20 text-black'
-                        : 'bg-white/[0.08] text-white/50'
+                        ? 'bg-[#090812]/20 text-[#090812]'
+                        : 'bg-[#211A32] text-[#A99DBE]'
                     }`}
                   >
                     {tab.count}
@@ -734,9 +735,9 @@ export function HomeView({
             ))}
           </div>
         ) : filteredCatalog.length === 0 ? (
-          <div className="py-20 text-center space-y-2 text-white/40">
-            <Music2 className="w-10 h-10 mx-auto text-white/20" />
-            <p className="text-sm font-semibold text-white/70">No songs match your search</p>
+          <div className="py-20 text-center space-y-2 text-[#A99DBE]">
+            <Music2 className="w-10 h-10 mx-auto text-[#A99DBE]/40" />
+            <p className="text-sm font-semibold text-[#F8F5FF]">No songs match your search</p>
             <p className="text-xs">Try searching another title, singer or category</p>
           </div>
         ) : (
@@ -757,14 +758,14 @@ export function HomeView({
               <div className="flex flex-col items-center justify-center pt-2 pb-6 gap-2">
                 <button
                   onClick={() => setVisibleCount(prev => prev + 36)}
-                  className="px-6 py-2.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] active:scale-95 border border-white/10 text-white text-xs font-bold transition-all shadow-md hover:border-[#1ED760]/40 flex items-center gap-2 group"
+                  className="px-6 py-2.5 rounded-full bg-[#211A32] hover:bg-[#2A2140] active:scale-95 border border-[#302744] text-[#F8F5FF] text-xs font-bold transition-all shadow-md hover:border-[#A78BFA]/50 hover:shadow-[0_0_15px_rgba(167,139,250,0.2)] flex items-center gap-2 group"
                 >
                   <span>Load More Tracks</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1ED760]/20 text-[#1ED760] font-bold">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#A78BFA]/20 text-[#D8B4FE] font-bold">
                     +{Math.min(36, filteredCatalog.length - visibleCount)}
                   </span>
                 </button>
-                <p className="text-[11px] text-white/40 font-mono">
+                <p className="text-[11px] text-[#A99DBE] font-mono">
                   Showing {Math.min(visibleCount, filteredCatalog.length)} of {filteredCatalog.length} songs
                 </p>
               </div>

@@ -46,23 +46,23 @@ export function Sidebar({
 
   return (
     <aside
-      className={`h-full glass-sidebar border-r border-white/10 flex flex-col transition-all duration-300 relative select-none ${
+      className={`h-full bg-[#110F1D] border-r border-[#302744] flex flex-col transition-all duration-300 relative select-none ${
         isCollapsed ? 'w-20' : 'w-64'
       } ${className}`}
     >
       {/* Personal Brand Header */}
-      <div className="flex items-center justify-between px-5 py-5 border-b border-white/10">
+      <div className="flex items-center justify-between px-5 py-5 border-b border-[#302744]">
         {!isCollapsed && (
           <div
             onClick={() => onNavigate('home')}
             className="flex items-center gap-2.5 cursor-pointer group"
           >
-            <div className="w-8 h-8 rounded-xl bg-[var(--accent)] flex items-center justify-center text-black shadow-lg shadow-[var(--accent)]/30 group-hover:scale-105 transition-transform">
-              <Radio className="w-4 h-4 fill-black" />
+            <div className="w-8 h-8 rounded-xl bg-[#A78BFA] flex items-center justify-center text-[#090812] shadow-lg shadow-[#A78BFA]/25 group-hover:scale-105 transition-transform">
+              <Radio className="w-4 h-4 fill-[#090812]" />
             </div>
             <div>
-              <span className="font-extrabold text-base tracking-wider text-white">SONORA</span>
-              <span className="text-[10px] block text-[#A1A1AA] italic font-serif -mt-0.5">
+              <span className="font-extrabold text-base tracking-wider text-[#F8F5FF]">SONORA</span>
+              <span className="text-[10px] block text-[#C2B5D9] italic font-serif -mt-0.5">
                 my music journal
               </span>
             </div>
@@ -72,16 +72,16 @@ export function Sidebar({
         {isCollapsed && (
           <div
             onClick={() => onNavigate('home')}
-            className="w-10 h-10 rounded-xl bg-[var(--accent)] flex items-center justify-center text-black mx-auto cursor-pointer shadow-lg shadow-[var(--accent)]/30"
+            className="w-10 h-10 rounded-xl bg-[#A78BFA] flex items-center justify-center text-[#090812] mx-auto cursor-pointer shadow-lg shadow-[#A78BFA]/25"
             title="SONORA – My Music Journal"
           >
-            <Radio className="w-5 h-5 fill-black" />
+            <Radio className="w-5 h-5 fill-[#090812]" />
           </div>
         )}
 
         <button
           onClick={onToggleCollapse}
-          className="p-1.5 rounded-lg text-[#A1A1AA] hover:text-white hover:bg-white/10 hidden md:block transition-colors"
+          className="p-1.5 rounded-lg text-[#A99DBE] hover:text-[#F8F5FF] hover:bg-[#141122] hidden md:block transition-colors"
           title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -94,12 +94,12 @@ export function Sidebar({
           onClick={onOpenUpload}
           className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md ${
             isCollapsed
-              ? 'bg-[var(--accent)] text-black p-2.5 hover:scale-105'
-              : 'glass-pill hover:bg-white/15 text-white border border-white/15'
+              ? 'bg-[#A78BFA] text-[#090812] p-2.5 hover:scale-105 shadow-[#A78BFA]/25'
+              : 'bg-[#141122] hover:bg-[#2A2140] text-[#F8F5FF] border border-[#302744] hover:border-[#A78BFA]/40'
           }`}
           title="Add Music"
         >
-          <Plus className="w-4 h-4 text-[var(--accent)] stroke-[3]" />
+          <Plus className="w-4 h-4 text-[#A78BFA] stroke-[3]" />
           {!isCollapsed && <span>Add to Collection</span>}
         </button>
       </div>
@@ -115,22 +115,22 @@ export function Sidebar({
               onClick={() => onNavigate(item.view)}
               className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
                 isActive
-                  ? 'glass-pill-active shadow-md'
-                  : 'text-[#A1A1AA] hover:text-white hover:bg-white/10 hover:translate-x-1'
+                  ? 'bg-[#211A32] text-[#D8B4FE] border border-[#302744] shadow-md shadow-[#A78BFA]/10'
+                  : 'text-[#C2B5D9] hover:text-[#F8F5FF] hover:bg-[#141122] hover:translate-x-1'
               }`}
               title={item.label}
             >
               <Icon
                 className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                  isActive ? 'scale-110 text-[var(--accent)]' : 'group-hover:text-white'
+                  isActive ? 'scale-110 text-[#A78BFA]' : 'group-hover:text-[#F8F5FF]'
                 }`}
               />
               {!isCollapsed && <span className="truncate">{item.label}</span>}
               {!isCollapsed && isActive && (
                 <span className="ml-auto flex items-end gap-0.5 h-2.5">
-                  <span className="w-0.5 bg-[var(--accent)] rounded-full animate-eq-1 h-2.5" />
-                  <span className="w-0.5 bg-[var(--accent)] rounded-full animate-eq-2 h-2.5" />
-                  <span className="w-0.5 bg-[var(--accent)] rounded-full animate-eq-3 h-2.5" />
+                  <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-1 h-2.5" />
+                  <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-2 h-2.5" />
+                  <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-3 h-2.5" />
                 </span>
               )}
             </button>
@@ -139,13 +139,13 @@ export function Sidebar({
       </div>
 
       {/* Settings Footer */}
-      <div className="p-3 border-t border-white/10">
+      <div className="p-3 border-t border-[#302744]">
         <button
           onClick={() => onNavigate('settings')}
           className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
             currentView === 'settings'
-              ? 'glass-pill-active'
-              : 'text-[#A1A1AA] hover:text-white hover:bg-white/10'
+              ? 'bg-[#211A32] text-[#D8B4FE] border border-[#302744]'
+              : 'text-[#C2B5D9] hover:text-[#F8F5FF] hover:bg-[#141122]'
           }`}
           title="My Space / Settings"
         >

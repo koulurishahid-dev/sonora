@@ -126,22 +126,22 @@ export function InteractiveSongCard({
         transform: `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(0)`,
         transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.4s ease-out',
       }}
-      className={`group relative p-3 rounded-2xl bg-[#11131A] hover:bg-[#161822] border transition-all duration-300 cursor-pointer flex flex-col shadow-md select-none ${
+      className={`group relative p-3 rounded-2xl bg-[#171326] hover:bg-[#2A2140] border transition-all duration-300 cursor-pointer flex flex-col shadow-md select-none ${
         isCurrent
-          ? 'border-[#1ED760] shadow-[0_8px_30px_rgba(30,215,96,0.18)]'
-          : 'border-white/[0.08] hover:border-white/25 hover:shadow-[0_12px_36px_rgba(0,0,0,0.7)]'
+          ? 'border-[#A78BFA] shadow-[0_8px_30px_rgba(167,139,250,0.3)]'
+          : 'border-[#302744] hover:border-[#A78BFA]/50 hover:shadow-[0_12px_36px_rgba(167,139,250,0.18)]'
       } ${className}`}
     >
       {/* Dynamic Cursor Spotlight Radial Glow */}
       <div
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{
-          background: `radial-gradient(circle 120px at ${spotlightPos.x}px ${spotlightPos.y}px, rgba(30, 215, 96, 0.12), transparent 70%)`,
+          background: `radial-gradient(circle 120px at ${spotlightPos.x}px ${spotlightPos.y}px, rgba(167, 139, 250, 0.16), transparent 70%)`,
         }}
       />
 
       {/* 1. ARTWORK CONTAINER WITH ZOOM, WAVEFORM BADGE & PLAY BUTTON */}
-      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#171A24] border border-white/10 mb-2.5 flex items-center justify-center">
+      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#141122] border border-[#302744] mb-2.5 flex items-center justify-center">
         {!hasError ? (
           <img
             src={imgSrc}
@@ -154,9 +154,9 @@ export function InteractiveSongCard({
             className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108 group-hover:brightness-105"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-zinc-500 bg-gradient-to-br from-[#1A1D27] to-[#10121A]">
+          <div className="w-full h-full flex flex-col items-center justify-center text-zinc-500 bg-gradient-to-br from-[#211A32] to-[#141122]">
             <Music2 className="w-8 h-8 text-zinc-600 mb-1" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-600">Sonora</span>
+            <span className="text-[10px] uppercase font-bold tracking-widest text-[#A99DBE]">Sonora</span>
           </div>
         )}
 
@@ -165,10 +165,10 @@ export function InteractiveSongCard({
 
         {/* Live Audio Reactive Waveform Badge if Currently Playing */}
         {isCurrent && isPlaying && (
-          <div className="absolute top-2 left-2 z-20 flex items-end gap-0.5 px-2 py-1 rounded-md bg-black/60 backdrop-blur-md border border-[#1ED760]/40 shadow-md">
-            <span className="w-0.5 bg-[#1ED760] rounded-full animate-eq-1 h-3" />
-            <span className="w-0.5 bg-[#1ED760] rounded-full animate-eq-2 h-3" />
-            <span className="w-0.5 bg-[#1ED760] rounded-full animate-eq-3 h-3" />
+          <div className="absolute top-2 left-2 z-20 flex items-end gap-0.5 px-2 py-1 rounded-md bg-black/60 backdrop-blur-md border border-[#A78BFA]/50 shadow-md">
+            <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-1 h-3" />
+            <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-2 h-3" />
+            <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-3 h-3" />
           </div>
         )}
 
@@ -183,7 +183,7 @@ export function InteractiveSongCard({
           <motion.div
             whileHover={{ scale: 1.12 }}
             whileTap={{ scale: 0.92 }}
-            className="w-11 h-11 rounded-full bg-[#1ED760] text-[#08090B] flex items-center justify-center shadow-[0_0_20px_rgba(30,215,96,0.6)] cursor-pointer"
+            className="w-11 h-11 rounded-full bg-[#A78BFA] hover:bg-[#D8B4FE] text-[#090812] flex items-center justify-center shadow-[0_0_20px_rgba(167,139,250,0.6)] cursor-pointer"
           >
             {isCurrent && isPlaying ? (
               <Pause className="w-5 h-5 fill-current" />
@@ -239,21 +239,21 @@ export function InteractiveSongCard({
       <div className="min-w-0 flex-1">
         <p
           className={`text-xs sm:text-sm font-bold truncate transition-colors ${
-            isCurrent ? 'text-[#1ED760]' : 'text-white group-hover:text-[#1ED760]'
+            isCurrent ? 'text-[#D8B4FE]' : 'text-[#F8F5FF] group-hover:text-[#D8B4FE]'
           }`}
           title={song.title}
         >
           {song.title}
         </p>
-        <p className="text-[11px] text-[#A1A1AA] truncate font-medium mt-0.5">
+        <p className="text-[11px] text-[#C2B5D9] truncate font-medium mt-0.5">
           {song.artist}
         </p>
       </div>
 
       {/* 3. DURATION & SUBTLE FOOTER */}
-      <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/[0.06] text-[10px] font-mono text-zinc-500">
+      <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#302744] text-[10px] font-mono text-[#A99DBE]">
         <span>{formatDuration(song.duration)}</span>
-        <span className="opacity-0 group-hover:opacity-100 text-[#1ED760] font-semibold transition-opacity">
+        <span className="opacity-0 group-hover:opacity-100 text-[#A78BFA] font-semibold transition-opacity">
           Hi-Fi 320k
         </span>
       </div>
