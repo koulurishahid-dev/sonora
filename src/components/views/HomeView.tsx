@@ -92,9 +92,9 @@ function ShelfSongCard({
     <div
       onClick={() => (isThisCurrent ? onTogglePlay() : onPlaySong(song, songs))}
       onContextMenu={e => onSongContextMenu(e, song)}
-      className="w-32 sm:w-44 shrink-0 snap-start p-2.5 sm:p-3 rounded-2xl bg-[#171326] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/50 cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-[rgba(167,139,250,0.15)] hover:-translate-y-1 group flex flex-col select-none"
+      className="w-32 sm:w-44 shrink-0 snap-start p-2.5 sm:p-3 rounded-2xl bg-[#10051C]/65 backdrop-blur-xl hover:bg-[#21153B]/75 border border-[#302744]/70 hover:border-[#A855F7]/60 cursor-pointer transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-[rgba(168,85,247,0.25)] hover:-translate-y-1 group flex flex-col select-none"
     >
-      <div className="aspect-square rounded-xl overflow-hidden bg-[#141122] relative mb-2 sm:mb-3 flex items-center justify-center border border-[#302744]">
+      <div className="aspect-square rounded-xl overflow-hidden bg-[#050309]/80 relative mb-2 sm:mb-3 flex items-center justify-center border border-[#302744]/60">
         {!hasFailed ? (
           <img
             src={currentSrc}
@@ -514,7 +514,7 @@ export function HomeView({
               <div
                 key={cat.id}
                 onClick={() => onNavigate('playlist-detail', cat.id)}
-                className="flex items-center gap-3 h-16 sm:h-18 rounded-2xl bg-[#171326] hover:bg-[#2A2140] active:bg-[#211A32] active:scale-[0.99] border border-[#302744] hover:border-[#A78BFA]/50 cursor-pointer transition-all duration-200 overflow-hidden group shadow-md hover:shadow-lg hover:shadow-[rgba(167,139,250,0.12)] relative select-none"
+                className="flex items-center gap-3 h-16 sm:h-18 rounded-2xl bg-[#10051C]/65 backdrop-blur-xl hover:bg-[#21153B]/75 active:bg-[#21153B] active:scale-[0.99] border border-[#302744]/70 hover:border-[#A855F7]/60 cursor-pointer transition-all duration-200 overflow-hidden group shadow-md hover:shadow-xl hover:shadow-[rgba(168,85,247,0.2)] relative select-none"
               >
                 <div className="w-16 sm:w-18 h-full shrink-0 relative bg-[#141122] overflow-hidden">
                   <img

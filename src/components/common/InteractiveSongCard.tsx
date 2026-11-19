@@ -126,22 +126,22 @@ export function InteractiveSongCard({
         transform: `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(0)`,
         transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.4s ease-out',
       }}
-      className={`group relative p-3 rounded-2xl bg-[#171326] hover:bg-[#2A2140] border transition-all duration-300 cursor-pointer flex flex-col shadow-md select-none ${
+      className={`group relative p-3 rounded-2xl bg-[#10051C]/65 backdrop-blur-xl hover:bg-[#21153B]/75 border transition-all duration-300 cursor-pointer flex flex-col shadow-md select-none ${
         isCurrent
-          ? 'border-[#A78BFA] shadow-[0_8px_30px_rgba(167,139,250,0.3)]'
-          : 'border-[#302744] hover:border-[#A78BFA]/50 hover:shadow-[0_12px_36px_rgba(167,139,250,0.18)]'
+          ? 'border-[#A855F7] shadow-[0_8px_30px_rgba(168,85,247,0.35)]'
+          : 'border-[#302744]/70 hover:border-[#A855F7]/60 hover:shadow-[0_12px_36px_rgba(168,85,247,0.22)]'
       } ${className}`}
     >
       {/* Dynamic Cursor Spotlight Radial Glow */}
       <div
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{
-          background: `radial-gradient(circle 120px at ${spotlightPos.x}px ${spotlightPos.y}px, rgba(167, 139, 250, 0.16), transparent 70%)`,
+          background: `radial-gradient(circle 120px at ${spotlightPos.x}px ${spotlightPos.y}px, rgba(168, 85, 247, 0.22), transparent 70%)`,
         }}
       />
 
       {/* 1. ARTWORK CONTAINER WITH ZOOM, WAVEFORM BADGE & PLAY BUTTON */}
-      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#141122] border border-[#302744] mb-2.5 flex items-center justify-center">
+      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#050309]/80 border border-[#302744]/60 mb-2.5 flex items-center justify-center">
         {!hasError ? (
           <img
             src={imgSrc}

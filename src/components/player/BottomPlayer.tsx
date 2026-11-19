@@ -111,9 +111,9 @@ export function BottomPlayer() {
   };
 
   return (
-    <footer className="h-24 w-full bg-[#110F1D]/98 border-t border-[#302744] backdrop-blur-2xl flex flex-col justify-between px-4 sm:px-6 py-2.5 relative z-40 shadow-[0_-16px_45px_rgba(0,0,0,0.95)] select-none">
-      {/* Specular glass reflection bar */}
-      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#A78BFA]/25 to-transparent pointer-events-none" />
+    <footer className="h-24 w-full bg-[#10051C]/80 border-t border-[#302744]/70 backdrop-blur-2xl flex flex-col justify-between px-4 sm:px-6 py-2.5 relative z-40 shadow-[0_-16px_45px_rgba(5,3,9,0.95)] select-none">
+      {/* Specular glass reflection bar with subtle cyan glow */}
+      <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#8BE9FF]/30 to-[#A855F7]/20 pointer-events-none" />
 
       {/* Audio Error Alert Banner */}
       {audioError && (

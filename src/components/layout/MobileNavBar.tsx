@@ -52,7 +52,7 @@ export function MobileNavBar({ currentView, onNavigate }: MobileNavBarProps) {
       {currentSong && (
         <div
           onClick={() => setIsNowPlayingOpen(true)}
-          className="relative mx-2 mb-1.5 rounded-xl bg-[#171326]/98 backdrop-blur-2xl border border-[#302744] shadow-[0_8px_30px_rgba(0,0,0,0.9)] overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
+          className="relative mx-2 mb-1.5 rounded-xl bg-[#10051C]/85 backdrop-blur-2xl border border-[#302744]/70 shadow-[0_8px_30px_rgba(5,3,9,0.95)] overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
         >
           {/* Top Progress Line */}
           <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-[#211A32]">
@@ -132,7 +132,7 @@ export function MobileNavBar({ currentView, onNavigate }: MobileNavBarProps) {
       )}
 
       {/* 2. MOBILE NAVIGATION DOCK */}
-      <nav className="min-h-14 pb-[env(safe-area-inset-bottom,0px)] bg-[#110F1D] border-t border-[#302744] flex items-center justify-around px-2 z-20">
+      <nav className="min-h-14 pb-[env(safe-area-inset-bottom,0px)] bg-[#10051C]/90 backdrop-blur-2xl border-t border-[#302744]/70 flex items-center justify-around px-2 z-20">
         {items.map(item => {
           const Icon = item.icon;
           const isActive =

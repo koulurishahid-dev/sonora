@@ -110,16 +110,23 @@ export function TurntableStudioStage() {
       <section className="w-full lg:w-[46%] max-w-[540px] flex flex-col items-center justify-center shrink-0">
         {/* PHYSICAL TURNTABLE PLINTH */}
         <div
-          className="relative w-full rounded-[32px] p-5 sm:p-7 border border-[#302744] shadow-[0_24px_60px_rgba(9,8,18,0.95),inset_0_1px_1px_rgba(216,180,254,0.15)] overflow-hidden"
+          className="relative w-full rounded-[32px] p-5 sm:p-7 border border-[#302744]/80 shadow-[0_30px_80px_rgba(5,3,9,0.98),0_0_45px_rgba(168,85,247,0.18)] overflow-hidden"
           style={{
-            background: 'linear-gradient(165deg, #211A32 0%, #171326 50%, #090812 100%)',
+            background: 'linear-gradient(155deg, rgba(33, 21, 59, 0.95) 0%, rgba(16, 5, 28, 0.98) 55%, #050309 100%)',
           }}
         >
-          {/* Subtle purple ambient gradient around the turntable */}
-          <div className="absolute inset-0 rounded-[32px] bg-[radial-gradient(circle_at_center,rgba(167,139,250,0.15)_0%,rgba(124,58,237,0.05)_50%,transparent_75%)] pointer-events-none" />
+          {/* Atmospheric Purple & Cyan Ambient Glow Behind Turntable */}
+          <div
+            className="absolute -inset-10 -z-10 rounded-[44px] pointer-events-none blur-3xl transition-opacity duration-700"
+            style={{
+              background:
+                'radial-gradient(ellipse at 65% 15%, rgba(139, 233, 255, 0.22) 0%, rgba(168, 85, 247, 0.38) 40%, rgba(112, 38, 185, 0.22) 70%, transparent 85%)',
+              opacity: isPlaying ? 0.9 + bassEnergy * 0.3 : 0.55,
+            }}
+          />
 
-          {/* Subtle top edge metallic chamfer reflection */}
-          <div className="absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#D8B4FE]/30 to-transparent pointer-events-none" />
+          {/* Top edge metallic chamfer reflection with cyan highlight */}
+          <div className="absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#8BE9FF]/40 to-[#A855F7]/30 pointer-events-none" />
 
           {/* TURNTABLE HEADER STATUS ROW */}
           <div className="flex items-center justify-between mb-4 px-1 relative z-10">
@@ -176,12 +183,22 @@ export function TurntableStudioStage() {
                   '0 20px 45px -5px rgba(9,8,18,0.98), inset 0 0 30px rgba(0,0,0,0.95)',
               }}
             >
-              {/* Elegant Purple Specular Reflections */}
+              {/* Realistic Purple & Cyan Specular Reflections (Matching Reference Photo Spotlight Angle) */}
               <div
-                className="absolute inset-0 rounded-full pointer-events-none opacity-50"
+                className="absolute inset-0 rounded-full pointer-events-none transition-opacity duration-300"
                 style={{
                   background:
-                    'conic-gradient(from 45deg, transparent 0deg, rgba(216, 180, 254, 0.18) 35deg, transparent 70deg, transparent 180deg, rgba(167, 139, 250, 0.22) 215deg, transparent 250deg)',
+                    'conic-gradient(from 35deg, transparent 0deg, rgba(192, 132, 252, 0.38) 25deg, rgba(139, 233, 255, 0.25) 42deg, rgba(168, 85, 247, 0.42) 60deg, transparent 95deg, transparent 180deg, rgba(112, 38, 185, 0.30) 210deg, transparent 255deg)',
+                  opacity: isPlaying && isPowerOn ? 0.82 + bassEnergy * 0.22 : 0.65,
+                }}
+              />
+
+              {/* Radial Specular Sheen Across Grooves */}
+              <div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                  background:
+                    'radial-gradient(circle at 75% 25%, rgba(139, 233, 255, 0.22) 0%, rgba(168, 85, 247, 0.18) 35%, transparent 65%)',
                 }}
               />
 
@@ -273,9 +290,9 @@ export function TurntableStudioStage() {
                   <div className="w-0.5 h-2 bg-zinc-300" />
                   {/* Stylus Target Light */}
                   <div
-                    className={`w-2 h-2 rounded-full filter blur-[0.5px] transition-all duration-300 ${
+                    className={`w-2.5 h-2.5 rounded-full filter blur-[0.5px] transition-all duration-300 ${
                       isPlaying && isPowerOn
-                        ? 'bg-[#A78BFA] shadow-[0_0_10px_#A78BFA]'
+                        ? 'bg-[#8BE9FF] shadow-[0_0_10px_#8BE9FF,0_0_18px_#A855F7]'
                         : 'bg-zinc-600 opacity-30'
                     }`}
                   />

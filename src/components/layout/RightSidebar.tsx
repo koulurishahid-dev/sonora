@@ -166,10 +166,10 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 380, opacity: 0 }}
       transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-      className="fixed lg:relative right-0 top-0 bottom-0 z-40 lg:z-30 flex flex-col w-full sm:w-92 lg:w-84 xl:w-92 2xl:w-98 h-full bg-[#110F1D]/98 lg:bg-[#110F1D]/95 backdrop-blur-2xl border-l border-[#302744] shadow-[-16px_0_40px_rgba(0,0,0,0.85)] select-none shrink-0 overflow-hidden"
+      className="fixed lg:relative right-0 top-0 bottom-0 z-40 lg:z-30 flex flex-col w-full sm:w-92 lg:w-84 xl:w-92 2xl:w-98 h-full bg-[#10051C]/80 lg:bg-[#10051C]/75 backdrop-blur-2xl border-l border-[#302744]/70 shadow-[-16px_0_40px_rgba(5,3,9,0.85)] select-none shrink-0 overflow-hidden"
     >
-      {/* Background ambient glow */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-[#7C3AED]/15 via-[#A78BFA]/10 to-transparent rounded-full blur-3xl pointer-events-none -z-0" />
+      {/* Background ambient glow with cyan-purple spotlight scattering */}
+      <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-[#8BE9FF]/15 via-[#A855F7]/15 to-transparent rounded-full blur-3xl pointer-events-none -z-0" />
 
       {/* 1. TOP HEADER */}
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#302744] z-10 shrink-0 bg-[#090812]/50">
@@ -263,6 +263,15 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
               <div className="p-5 space-y-5">
                 {/* VINYL TURNTABLE SHOWCASE */}
                 <div className="relative mx-auto w-full pt-1">
+                  {/* Atmospheric Purple & Cyan Ambient Bounce Behind Showcase */}
+                  <div
+                    className="absolute -inset-4 -z-10 rounded-3xl blur-2xl transition-opacity duration-700 pointer-events-none"
+                    style={{
+                      background:
+                        'radial-gradient(ellipse at 65% 25%, rgba(139, 233, 255, 0.18) 0%, rgba(168, 85, 247, 0.3) 45%, rgba(112, 38, 185, 0.15) 75%, transparent 90%)',
+                      opacity: isPlaying ? 0.95 : 0.5,
+                    }}
+                  />
                   <div className="relative w-full aspect-square max-w-[270px] mx-auto flex items-center justify-center">
                     {/* Spinning Vinyl Record (Slides out from behind sleeve when playing) */}
                     <motion.div
@@ -281,19 +290,37 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
                       className="absolute right-0 w-[90%] h-[90%] rounded-full shadow-2xl overflow-hidden flex items-center justify-center -z-0"
                       style={{
                         background:
-                          'radial-gradient(circle at center, #1c1d22 0%, #090a0d 60%, #15161a 80%, #08090a 100%)',
-                        boxShadow: '0 12px 36px rgba(0,0,0,0.85), inset 0 0 10px rgba(255,255,255,0.08)',
+                          'radial-gradient(circle at center, #160726 0%, #050309 60%, #10051C 80%, #050309 100%)',
+                        boxShadow: '0 16px 40px rgba(5,3,9,0.95), inset 0 0 14px rgba(168,85,247,0.22)',
                       }}
                     >
+                      {/* Realistic Purple & Cyan Specular Sheen (Matching Spotlight Angle) */}
+                      <div
+                        className="absolute inset-0 rounded-full pointer-events-none"
+                        style={{
+                          background:
+                            'conic-gradient(from 35deg, transparent 0deg, rgba(192, 132, 252, 0.35) 25deg, rgba(139, 233, 255, 0.22) 42deg, rgba(168, 85, 247, 0.38) 60deg, transparent 95deg, transparent 180deg, rgba(112, 38, 185, 0.28) 210deg, transparent 255deg)',
+                          opacity: 0.8,
+                        }}
+                      />
+                      {/* Radial Sheen Across Grooves */}
+                      <div
+                        className="absolute inset-0 rounded-full pointer-events-none"
+                        style={{
+                          background:
+                            'radial-gradient(circle at 75% 25%, rgba(139, 233, 255, 0.2) 0%, rgba(168, 85, 247, 0.16) 35%, transparent 65%)',
+                        }}
+                      />
+
                       {/* Vinyl Grooves rings */}
                       <div className="absolute inset-2 rounded-full border border-white/[0.04]" />
-                      <div className="absolute inset-5 rounded-full border border-white/[0.03]" />
+                      <div className="absolute inset-5 rounded-full border border-[#A855F7]/[0.05]" />
                       <div className="absolute inset-8 rounded-full border border-white/[0.04]" />
-                      <div className="absolute inset-11 rounded-full border border-white/[0.03]" />
+                      <div className="absolute inset-11 rounded-full border border-[#A855F7]/[0.05]" />
                       <div className="absolute inset-14 rounded-full border border-white/[0.04]" />
 
                       {/* Vinyl center label */}
-                      <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#7C3AED] via-[#A78BFA] to-[#D8B4FE] flex items-center justify-center relative shadow-inner overflow-hidden border-2 border-black/80">
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#7026B9] via-[#A855F7] to-[#C084FC] flex items-center justify-center relative shadow-inner overflow-hidden border-2 border-black/80">
                         {artworkUrl ? (
                           <img
                             src={artworkUrl}

@@ -95,7 +95,7 @@ export function HeaderBar({
   };
 
   return (
-    <header className="h-16 px-4 sm:px-6 bg-[#110F1D]/95 backdrop-blur-xl border-b border-[#302744] flex items-center justify-between gap-4 sticky top-0 z-20 select-none">
+    <header className="h-16 px-4 sm:px-6 bg-[#10051C]/75 backdrop-blur-2xl border-b border-[#302744]/70 shadow-[0_4px_30px_rgba(5,3,9,0.5)] flex items-center justify-between gap-4 sticky top-0 z-20 select-none">
       {/* Left: Window Controls & History Navigation */}
       <div className="flex items-center gap-3">
         <button

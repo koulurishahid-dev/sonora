@@ -48,11 +48,21 @@ export function VinylCover({
             ? { repeat: Infinity, duration: 6, ease: 'linear' }
             : { duration: 0.5 },
         }}
-        className={`absolute top-0 left-0 ${dimensions.vinyl} rounded-full bg-[#0D0D11] border-2 border-[#202028] shadow-2xl flex items-center justify-center pointer-events-none z-0`}
+        className={`absolute top-0 left-0 ${dimensions.vinyl} rounded-full bg-[#050309] border-2 border-[#1F1432] shadow-2xl flex items-center justify-center pointer-events-none z-0`}
         style={{
-          boxShadow: '0 10px 25px -5px rgba(0,0,0,0.8), inset 0 0 12px rgba(255,255,255,0.06)',
+          boxShadow: '0 12px 30px -5px rgba(5,3,9,0.9), 0 0 20px rgba(168,85,247,0.2), inset 0 0 14px rgba(168,85,247,0.15)',
         }}
       >
+        {/* Realistic Purple & Cyan Specular Sheen */}
+        <div
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{
+            background:
+              'conic-gradient(from 35deg, transparent 0deg, rgba(192, 132, 252, 0.32) 25deg, rgba(139, 233, 255, 0.2) 42deg, rgba(168, 85, 247, 0.35) 60deg, transparent 95deg, transparent 180deg, rgba(112, 38, 185, 0.25) 210deg, transparent 255deg)',
+            opacity: 0.8,
+          }}
+        />
+
         {/* Acoustic Shockwave Ripple when playing */}
         {isPlaying && (
           <div className="absolute inset-0 rounded-full border-2 border-[var(--accent)]/60 animate-sound-ripple pointer-events-none" />

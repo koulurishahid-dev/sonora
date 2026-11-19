@@ -16,6 +16,7 @@ import { EditSongModal } from '../modals/EditSongModal';
 import { SongContextMenu } from '../modals/SongContextMenu';
 import { SpotifyImportModal } from '../modals/SpotifyImportModal';
 import { LyricsPanel } from '../player/LyricsPanel';
+import { CinematicSmokeAtmosphere } from '../common/CinematicSmokeAtmosphere';
 import { usePlayer } from '@/context/PlayerContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Lock, Radio, Disc } from 'lucide-react';
@@ -221,7 +222,10 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#08090B] text-white relative">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#050309] text-white relative">
+      {/* Cinematic Purple Smoke Atmosphere Effect */}
+      <CinematicSmokeAtmosphere />
+
       {/* Left Sidebar for Desktop */}
       <Sidebar
         currentView={currentRoute.view}
@@ -439,7 +443,7 @@ export function AppLayout() {
         )}
 
         {/* Mobile Navigation Bar only (Desktop uses Player Sidebar with no bottom player bar) */}
-        <div className="md:hidden absolute bottom-0 left-0 right-0 z-40 bg-[#0D0F12] border-t border-[#292D35] flex flex-col pointer-events-auto shadow-[0_-20px_50px_rgba(0,0,0,0.95)]">
+        <div className="md:hidden absolute bottom-0 left-0 right-0 z-40 bg-[#10051C]/90 backdrop-blur-2xl border-t border-[#302744]/70 flex flex-col pointer-events-auto shadow-[0_-20px_50px_rgba(5,3,9,0.95)]">
           <MobileNavBar currentView={currentRoute.view} onNavigate={handleNavigate} />
         </div>
       </div>

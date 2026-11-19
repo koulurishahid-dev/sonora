@@ -46,12 +46,12 @@ export function Sidebar({
 
   return (
     <aside
-      className={`h-full bg-[#110F1D] border-r border-[#302744] flex flex-col transition-all duration-300 relative select-none ${
+      className={`h-full bg-[#10051C]/75 backdrop-blur-2xl border-r border-[#302744]/70 shadow-[4px_0_30px_rgba(5,3,9,0.7)] flex flex-col transition-all duration-300 relative select-none ${
         isCollapsed ? 'w-20' : 'w-64'
       } ${className}`}
     >
       {/* Personal Brand Header */}
-      <div className="flex items-center justify-between px-5 py-5 border-b border-[#302744]">
+      <div className="flex items-center justify-between px-5 py-5 border-b border-[#302744]/60">
         {!isCollapsed && (
           <div
             onClick={() => onNavigate('home')}

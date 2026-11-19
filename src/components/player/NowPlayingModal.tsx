@@ -9,6 +9,7 @@ import { extractColorsFromImage, ExtractedColors } from '@/lib/colorExtractor';
 import { AudioVisualizer } from './AudioVisualizer';
 import { LyricsPanel } from './LyricsPanel';
 import { TurntableStudioStage } from './TurntableStudioStage';
+import { CinematicSmokeAtmosphere } from '../common/CinematicSmokeAtmosphere';
 import { VisualizerMode, EqPresetName, EqBands } from '@/types/music';
 import {
   ChevronDown,
@@ -178,25 +179,27 @@ export function NowPlayingModal() {
         {/* ========================================================= */}
         {/* BACKGROUND ATMOSPHERE (Deep obsidian listening studio)    */}
         {/* ========================================================= */}
+        {/* BACKGROUND AMBIENT ATMOSPHERE WITH PURPLE SMOKE & LIGHT  */}
+        {/* ========================================================= */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Dedicated Cinematic Purple Smoke Atmosphere Stage */}
+          <CinematicSmokeAtmosphere variant="stage" intensity={1.15} />
+
           {/* Subtle blurred artwork illumination */}
           {artworkUrl && (
             <motion.div
               key={currentSong.id}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.22 }}
+              animate={{ opacity: 0.16 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.2 }}
-              className="absolute inset-[-10%] bg-cover bg-center filter blur-[120px] saturate-150 brightness-[0.3]"
+              className="absolute inset-[-10%] bg-cover bg-center filter blur-[120px] saturate-150 brightness-[0.25]"
               style={{ backgroundImage: `url(${artworkUrl})` }}
             />
           )}
 
-          {/* Deep studio midnight purple vignette */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#090812]/95 via-[#141122]/70 to-[#090812]/95" />
-
-          {/* Very fine studio acoustic texture grid */}
-          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(rgba(167,139,250,0.12)_1px,transparent_1px)] [background-size:32px_32px]" />
+          {/* Deep studio midnight purple vignette framing */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#050309]/80 via-transparent to-[#050309]/90 pointer-events-none" />
         </div>
 
         {/* ========================================================= */}
