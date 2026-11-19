@@ -240,6 +240,43 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0 12px 35px rgba(5, 3, 9, 0.7), 0 0 25px rgba(168, 85, 247, 0.25);
 }
 
+/* =========================================================================
+   MOBILE ULTRA-PERFORMANCE ENGINE (SILKY 60 FPS SCROLL & TAP RESPONSE)
+   ========================================================================= */
+@media (max-width: 768px), (pointer: coarse) {
+  /* Disable heavy multi-layer backdrop-filter blurs on mobile lists & cards */
+  .glass-card,
+  [class*="backdrop-blur-xl"],
+  [class*="backdrop-blur-2xl"] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background-color: rgba(16, 5, 28, 0.88) !important;
+  }
+
+  /* Keep fast, lightweight 8px blur on sticky/fixed navigation surfaces */
+  header,
+  .glass-header,
+  .glass-dock {
+    -webkit-backdrop-filter: blur(8px) !important;
+    backdrop-filter: blur(8px) !important;
+    background-color: rgba(16, 5, 28, 0.94) !important;
+  }
+
+  /* GPU layer isolation & containment for rapid scroll momentum */
+  .shelf-track,
+  main {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Skip offscreen layout & paint on mobile until scrolled into view */
+  .shelf-song-card,
+  .interactive-song-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 130px 190px;
+  }
+}
+
 /* Vinyl Specular Reflection Overlay */
 .vinyl-reflection-sheen {
   background: conic-gradient(

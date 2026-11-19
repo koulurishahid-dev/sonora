@@ -52,8 +52,6 @@ export function AppLayout() {
     isLyricsOpen,
     setIsLyricsOpen,
     currentSong,
-    currentTime,
-    seek,
     setIsNowPlayingOpen,
     isSideViewOpen,
     toggleSideView,
@@ -429,7 +427,7 @@ export function AppLayout() {
               </button>
             </div>
             <div className="flex-1 overflow-hidden">
-              <LyricsPanel song={currentSong} currentTime={currentTime} onSeek={seek} />
+              <LyricsPanel />
             </div>
           </div>
         )}

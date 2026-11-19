@@ -105,14 +105,15 @@ export function CinematicSmokeAtmosphere({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d', { alpha: false });
-    if (!ctx) return;
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isMobile =
       window.innerWidth < 768 ||
       isTouchDeviceRef.current ||
       /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    const ctx = canvas.getContext('2d', { alpha: isMobile ? true : false });
+    if (!ctx) return;
 
     // PERFORMANCE CEILING: Mobile runs at 1.0 DPR (eliminates 4x fill-rate penalty)
     const dpr = isMobile ? 1.0 : Math.min(window.devicePixelRatio || 1, 1.25);
@@ -353,68 +354,71 @@ export function CinematicSmokeAtmosphere({
       ctx.save();
       ctx.clearRect(0, 0, width, height);
 
-      // A. Deep Black & Purple Background (#050309 to #10051C)
-      ctx.fillStyle = '#050309';
-      ctx.fillRect(0, 0, width, height);
+      // On desktop, render procedural background and volumetric light rays
+      if (!isMobile) {
+        // A. Deep Black & Purple Background (#050309 to #10051C)
+        ctx.fillStyle = '#050309';
+        ctx.fillRect(0, 0, width, height);
 
-      const bgGrad = ctx.createRadialGradient(
-        lightX,
-        lightY,
-        width * 0.08,
-        width * 0.5,
-        height * 0.5,
-        Math.max(width, height) * 0.95
-      );
-      bgGrad.addColorStop(0, '#22083D');
-      bgGrad.addColorStop(0.35, '#130524');
-      bgGrad.addColorStop(0.75, '#080311');
-      bgGrad.addColorStop(1, '#050309');
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, width, height);
-
-      // B. Volumetric Light Shafts
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
-      volumetricRays.forEach(ray => {
-        const dynamicAlpha =
-          (ray.baseAlpha + Math.sin(time * ray.speed + ray.phase) * 0.03 + smoothBass * 0.05) *
-          currentIntensity;
-
-        const rayGrad = ctx.createRadialGradient(
+        const bgGrad = ctx.createRadialGradient(
           lightX,
           lightY,
-          10,
-          lightX,
-          lightY,
-          ray.length
+          width * 0.08,
+          width * 0.5,
+          height * 0.5,
+          Math.max(width, height) * 0.95
         );
-        rayGrad.addColorStop(0, 'rgba(139, 233, 255, 0.4)');
-        rayGrad.addColorStop(0.2, ray.colorStop);
-        rayGrad.addColorStop(0.7, 'rgba(112, 38, 185, 0.05)');
-        rayGrad.addColorStop(1, 'rgba(5, 3, 9, 0)');
+        bgGrad.addColorStop(0, '#22083D');
+        bgGrad.addColorStop(0.35, '#130524');
+        bgGrad.addColorStop(0.75, '#080311');
+        bgGrad.addColorStop(1, '#050309');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, width, height);
 
-        ctx.fillStyle = rayGrad;
-        ctx.globalAlpha = Math.max(0, Math.min(1, dynamicAlpha));
+        // B. Volumetric Light Shafts
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        volumetricRays.forEach(ray => {
+          const dynamicAlpha =
+            (ray.baseAlpha + Math.sin(time * ray.speed + ray.phase) * 0.03 + smoothBass * 0.05) *
+            currentIntensity;
 
-        const rayAngle = ray.angle + Math.sin(time * 0.4 + ray.phase) * 0.03 + pr.x * 0.03;
-        const halfWidth = ray.width * 0.5;
+          const rayGrad = ctx.createRadialGradient(
+            lightX,
+            lightY,
+            10,
+            lightX,
+            lightY,
+            ray.length
+          );
+          rayGrad.addColorStop(0, 'rgba(139, 233, 255, 0.4)');
+          rayGrad.addColorStop(0.2, ray.colorStop);
+          rayGrad.addColorStop(0.7, 'rgba(112, 38, 185, 0.05)');
+          rayGrad.addColorStop(1, 'rgba(5, 3, 9, 0)');
 
-        ctx.beginPath();
-        ctx.moveTo(lightX, lightY);
-        ctx.lineTo(
-          lightX + Math.cos(rayAngle - halfWidth) * ray.length,
-          lightY + Math.sin(rayAngle - halfWidth) * ray.length
-        );
-        ctx.lineTo(
-          lightX + Math.cos(rayAngle + halfWidth) * ray.length,
-          lightY + Math.sin(rayAngle + halfWidth) * ray.length
-        );
-        ctx.closePath();
-        ctx.fill();
-      });
-      ctx.restore();
+          ctx.fillStyle = rayGrad;
+          ctx.globalAlpha = Math.max(0, Math.min(1, dynamicAlpha));
 
-      // C. Render Multi-Layered Smoke Particles
+          const rayAngle = ray.angle + Math.sin(time * 0.4 + ray.phase) * 0.03 + pr.x * 0.03;
+          const halfWidth = ray.width * 0.5;
+
+          ctx.beginPath();
+          ctx.moveTo(lightX, lightY);
+          ctx.lineTo(
+            lightX + Math.cos(rayAngle - halfWidth) * ray.length,
+            lightY + Math.sin(rayAngle - halfWidth) * ray.length
+          );
+          ctx.lineTo(
+            lightX + Math.cos(rayAngle + halfWidth) * ray.length,
+            lightY + Math.sin(rayAngle + halfWidth) * ray.length
+          );
+          ctx.closePath();
+          ctx.fill();
+        });
+        ctx.restore();
+      }
+
+      // C. Render Multi-Layered Smoke Particles (Active on both mobile and desktop)
       particles.forEach(p => {
         const curlX = Math.sin(p.y * p.curlFreq + time * 0.7 + p.phase) * p.curlAmp;
         const curlY = Math.cos(p.x * p.curlFreq * 1.3 - time * 0.6 + p.phase) * (p.curlAmp * 0.5);
@@ -503,60 +507,62 @@ export function CinematicSmokeAtmosphere({
       });
       ctx.restore();
 
-      // E. Overhead Spotlight & Cyan Core
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
-      const lightPulse = 1.0 + audioPulseRef.current * 0.25;
+      // E & F. On desktop, render procedural overhead spotlight & vignette
+      if (!isMobile) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        const lightPulse = 1.0 + audioPulseRef.current * 0.25;
 
-      const outerGlowRadius = (isMobile ? 300 : 580) * lightPulse;
-      const outerGlow = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, outerGlowRadius);
-      outerGlow.addColorStop(0, 'rgba(168, 85, 247, 0.40)');
-      outerGlow.addColorStop(0.3, 'rgba(112, 38, 185, 0.25)');
-      outerGlow.addColorStop(0.65, 'rgba(38, 12, 68, 0.10)');
-      outerGlow.addColorStop(1, 'rgba(5, 3, 9, 0)');
-      ctx.fillStyle = outerGlow;
-      ctx.beginPath();
-      ctx.arc(lightX, lightY, outerGlowRadius, 0, Math.PI * 2);
-      ctx.fill();
+        const outerGlowRadius = 580 * lightPulse;
+        const outerGlow = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, outerGlowRadius);
+        outerGlow.addColorStop(0, 'rgba(168, 85, 247, 0.40)');
+        outerGlow.addColorStop(0.3, 'rgba(112, 38, 185, 0.25)');
+        outerGlow.addColorStop(0.65, 'rgba(38, 12, 68, 0.10)');
+        outerGlow.addColorStop(1, 'rgba(5, 3, 9, 0)');
+        ctx.fillStyle = outerGlow;
+        ctx.beginPath();
+        ctx.arc(lightX, lightY, outerGlowRadius, 0, Math.PI * 2);
+        ctx.fill();
 
-      const midGlowRadius = (isMobile ? 140 : 260) * lightPulse;
-      const midGlow = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, midGlowRadius);
-      midGlow.addColorStop(0, 'rgba(192, 132, 252, 0.6)');
-      midGlow.addColorStop(0.45, 'rgba(168, 85, 247, 0.35)');
-      midGlow.addColorStop(1, 'rgba(112, 38, 185, 0)');
-      ctx.fillStyle = midGlow;
-      ctx.beginPath();
-      ctx.arc(lightX, lightY, midGlowRadius, 0, Math.PI * 2);
-      ctx.fill();
+        const midGlowRadius = 260 * lightPulse;
+        const midGlow = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, midGlowRadius);
+        midGlow.addColorStop(0, 'rgba(192, 132, 252, 0.6)');
+        midGlow.addColorStop(0.45, 'rgba(168, 85, 247, 0.35)');
+        midGlow.addColorStop(1, 'rgba(112, 38, 185, 0)');
+        ctx.fillStyle = midGlow;
+        ctx.beginPath();
+        ctx.arc(lightX, lightY, midGlowRadius, 0, Math.PI * 2);
+        ctx.fill();
 
-      const cyanCoreRadius = (isMobile ? 45 : 85) * lightPulse;
-      const cyanCore = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, cyanCoreRadius);
-      cyanCore.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-      cyanCore.addColorStop(0.2, 'rgba(139, 233, 255, 0.85)');
-      cyanCore.addColorStop(0.6, 'rgba(192, 132, 252, 0.45)');
-      cyanCore.addColorStop(1, 'rgba(168, 85, 247, 0)');
-      ctx.fillStyle = cyanCore;
-      ctx.beginPath();
-      ctx.arc(lightX, lightY, cyanCoreRadius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+        const cyanCoreRadius = 85 * lightPulse;
+        const cyanCore = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, cyanCoreRadius);
+        cyanCore.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+        cyanCore.addColorStop(0.2, 'rgba(139, 233, 255, 0.85)');
+        cyanCore.addColorStop(0.6, 'rgba(192, 132, 252, 0.45)');
+        cyanCore.addColorStop(1, 'rgba(168, 85, 247, 0)');
+        ctx.fillStyle = cyanCore;
+        ctx.beginPath();
+        ctx.arc(lightX, lightY, cyanCoreRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
 
-      // F. Cinematic Vignette (Crisp Readability)
-      ctx.save();
-      const vignette = ctx.createRadialGradient(
-        width * 0.5,
-        height * 0.5,
-        Math.min(width, height) * 0.35,
-        width * 0.5,
-        height * 0.5,
-        Math.max(width, height) * 0.78
-      );
-      vignette.addColorStop(0, 'rgba(5, 3, 9, 0)');
-      vignette.addColorStop(0.65, 'rgba(5, 3, 9, 0.35)');
-      vignette.addColorStop(1, 'rgba(5, 3, 9, 0.88)');
-      ctx.fillStyle = vignette;
-      ctx.fillRect(0, 0, width, height);
-      ctx.restore();
+        // F. Cinematic Vignette
+        ctx.save();
+        const vignette = ctx.createRadialGradient(
+          width * 0.5,
+          height * 0.5,
+          Math.min(width, height) * 0.35,
+          width * 0.5,
+          height * 0.5,
+          Math.max(width, height) * 0.78
+        );
+        vignette.addColorStop(0, 'rgba(5, 3, 9, 0)');
+        vignette.addColorStop(0.65, 'rgba(5, 3, 9, 0.35)');
+        vignette.addColorStop(1, 'rgba(5, 3, 9, 0.88)');
+        ctx.fillStyle = vignette;
+        ctx.fillRect(0, 0, width, height);
+        ctx.restore();
+      }
 
       ctx.restore();
       animFrameRef.current = requestAnimationFrame(render);
@@ -591,10 +597,51 @@ export function CinematicSmokeAtmosphere({
     <div
       className={`fixed inset-0 pointer-events-none select-none overflow-hidden z-0 ${className}`}
       aria-hidden="true"
+      style={{ backgroundColor: '#050309' }}
     >
-      <canvas ref={canvasRef} className="w-full h-full block" />
+      {/* 1. Hardware-Accelerated Ambient Stage Glow (GPU composited) */}
       <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(circle at 62% 4%, #280b48 0%, #17072a 35%, #0b0316 70%, #050309 100%)',
+          willChange: 'transform',
+        }}
+      />
+
+      {/* 2. Soft Cyan Spotlight Core at Upper Center in CSS */}
+      <div
+        className="absolute pointer-events-none rounded-full"
+        style={{
+          top: '-15%',
+          left: '58%',
+          width: '80vw',
+          maxWidth: '550px',
+          height: '80vw',
+          maxHeight: '550px',
+          background:
+            'radial-gradient(circle, rgba(139, 233, 255, 0.28) 0%, rgba(192, 132, 252, 0.20) 28%, rgba(168, 85, 247, 0.12) 55%, transparent 75%)',
+          transform: 'translate(-50%, 0)',
+          filter: 'blur(35px)',
+          willChange: 'transform',
+        }}
+      />
+
+      {/* 3. Animated Smoke Canvas (10-14 dynamic drifting smoke particles) */}
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block" />
+
+      {/* 4. Cinematic Vignette Overlay in CSS */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(circle at 50% 50%, transparent 40%, rgba(5, 3, 9, 0.45) 75%, rgba(5, 3, 9, 0.88) 100%)',
+        }}
+      />
+
+      {/* 5. Acoustic Mesh */}
+      <div
+        className="absolute inset-0 opacity-[0.025] pointer-events-none mix-blend-overlay"
         style={{
           backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.9) 1px, transparent 0)`,
           backgroundSize: '24px 24px',

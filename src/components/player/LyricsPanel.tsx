@@ -5,10 +5,11 @@ import { Song, SongLyrics, LyricLine } from '@/types/music';
 import { db } from '@/lib/db';
 import { Edit3, Check, Music2, Sparkles } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
+import { usePlayer } from '@/context/PlayerContext';
 
 interface LyricsPanelProps {
-  song: Song | null;
-  currentTime: number;
+  song?: Song | null;
+  currentTime?: number;
   onSeek?: (time: number) => void;
   className?: string;
 }
@@ -37,6 +38,11 @@ export function parseLrc(lrcText: string): LyricLine[] {
 }
 
 export function LyricsPanel({ song, currentTime, onSeek, className = '' }: LyricsPanelProps) {
+  const player = usePlayer();
+  const currentTrack = song !== undefined ? song : player.currentSong;
+  const activeTime = currentTime !== undefined ? currentTime : player.currentTime;
+  const handleSeek = onSeek ?? player.seek;
+
   const { showToast } = useToast();
   const [lyricsData, setLyricsData] = useState<SongLyrics | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -46,14 +52,14 @@ export function LyricsPanel({ song, currentTime, onSeek, className = '' }: Lyric
 
   // Load lyrics from db
   useEffect(() => {
-    if (!song) {
+    if (!currentTrack) {
       setLyricsData(null);
       return;
     }
 
     async function loadLyrics() {
-      if (!song) return;
-      const stored = await db.lyrics.where('songId').equals(song.id).first();
+      if (!currentTrack) return;
+      const stored = await db.lyrics.where('songId').equals(currentTrack.id).first();
       if (stored) {
         setLyricsData(stored);
         setEditText(stored.plainLyrics || '');
@@ -64,14 +70,14 @@ export function LyricsPanel({ song, currentTime, onSeek, className = '' }: Lyric
     }
 
     loadLyrics();
-  }, [song]);
+  }, [currentTrack]);
 
   // Determine current active lyric index
   let activeIndex = -1;
   const synced = lyricsData?.syncedLyrics;
   if (synced && synced.length > 0) {
     for (let i = 0; i < synced.length; i++) {
-      if (currentTime >= synced[i].time) {
+      if (activeTime >= synced[i].time) {
         activeIndex = i;
       } else {
         break;
@@ -90,12 +96,12 @@ export function LyricsPanel({ song, currentTime, onSeek, className = '' }: Lyric
   }, [activeIndex, isEditing]);
 
   const handleSave = async () => {
-    if (!song) return;
+    if (!currentTrack) return;
     const parsedSynced = parseLrc(editText);
 
     const updated: SongLyrics = {
-      id: lyricsData?.id || `lyrics_${song.id}`,
-      songId: song.id,
+      id: lyricsData?.id || `lyrics_${currentTrack.id}`,
+      songId: currentTrack.id,
       plainLyrics: editText,
       syncedLyrics: parsedSynced.length > 0 ? parsedSynced : undefined,
       updatedAt: Date.now(),
@@ -107,7 +113,7 @@ export function LyricsPanel({ song, currentTime, onSeek, className = '' }: Lyric
     showToast('Lyrics saved', 'Lyrics updated for this track', 'success');
   };
 
-  if (!song) {
+  if (!currentTrack) {
     return (
       <div className={`flex flex-col items-center justify-center p-8 text-center text-[#A1A1AA] ${className}`}>
         <Music2 className="w-12 h-12 mb-3 stroke-[1.5] text-[#303038]" />
@@ -173,7 +179,7 @@ export function LyricsPanel({ song, currentTime, onSeek, className = '' }: Lyric
                 <div
                   key={idx}
                   ref={isActive ? activeLineRef : null}
-                  onClick={() => onSeek && onSeek(line.time)}
+                  onClick={() => handleSeek(line.time)}
                   className={`cursor-pointer transition-all duration-300 py-1.5 px-3 rounded-lg ${
                     isActive
                       ? 'text-[#F8F5FF] text-2xl font-bold scale-105 origin-left text-[#D8B4FE] drop-shadow-[0_0_16px_rgba(167,139,250,0.5)]'

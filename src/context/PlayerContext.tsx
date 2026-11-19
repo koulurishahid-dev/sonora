@@ -367,7 +367,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const onTimeUpdate = () => {
       if (audioRef.current && !isSwitchingTrackRef.current) {
         setCurrentTime(audioRef.current.currentTime);
-        syncPositionState();
       }
     };
 
@@ -459,11 +458,17 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     };
   }, [syncPositionState]);
 
-  // Save current time and track to localStorage periodically
+  // Save current time and track to localStorage periodically (throttled to at most every 5 seconds)
+  const lastSaveTimeRef = useRef<number>(0);
   useEffect(() => {
-    if (currentSong && currentTime > 0) {
-      localStorage.setItem('sonora_last_song_id', currentSong.id);
-      localStorage.setItem('sonora_last_time', currentTime.toString());
+    if (!currentSong || currentTime <= 0) return;
+    const now = Date.now();
+    if (now - lastSaveTimeRef.current >= 5000) {
+      lastSaveTimeRef.current = now;
+      try {
+        localStorage.setItem('sonora_last_song_id', currentSong.id);
+        localStorage.setItem('sonora_last_time', currentTime.toString());
+      } catch {}
     }
   }, [currentSong, currentTime]);
 
@@ -557,19 +562,28 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
   }, [currentSong, isPlaying, syncPositionState]);
 
-  // Visualizer data extractors
+  // Visualizer data extractors (reusing typed arrays to eliminate frame garbage collection)
+  const cachedFreqDataRef = useRef<Uint8Array | null>(null);
+  const cachedTimeDataRef = useRef<Uint8Array | null>(null);
+
   const getFrequencyData = useCallback((): Uint8Array | null => {
     if (!analyserRef.current) return null;
-    const data = new Uint8Array(analyserRef.current.frequencyBinCount);
-    analyserRef.current.getByteFrequencyData(data);
-    return data;
+    const count = analyserRef.current.frequencyBinCount;
+    if (!cachedFreqDataRef.current || cachedFreqDataRef.current.length !== count) {
+      cachedFreqDataRef.current = new Uint8Array(count);
+    }
+    analyserRef.current.getByteFrequencyData(cachedFreqDataRef.current as any);
+    return cachedFreqDataRef.current;
   }, []);
 
   const getTimeDomainData = useCallback((): Uint8Array | null => {
     if (!analyserRef.current) return null;
-    const data = new Uint8Array(analyserRef.current.frequencyBinCount);
-    analyserRef.current.getByteTimeDomainData(data);
-    return data;
+    const count = analyserRef.current.frequencyBinCount;
+    if (!cachedTimeDataRef.current || cachedTimeDataRef.current.length !== count) {
+      cachedTimeDataRef.current = new Uint8Array(count);
+    }
+    analyserRef.current.getByteTimeDomainData(cachedTimeDataRef.current as any);
+    return cachedTimeDataRef.current;
   }, []);
 
   // Play Song action

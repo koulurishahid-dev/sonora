@@ -367,7 +367,7 @@ export function LibraryView({
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {filteredSongs.map((song, idx) => {
+              {filteredSongs.slice(0, visibleCount).map((song, idx) => {
                 const isCur = currentSong?.id === song.id;
                 const isSel = selectedIds.has(song.id);
                 const artworkUrl = getArtworkObjectUrl(song);
@@ -484,6 +484,23 @@ export function LibraryView({
               })}
             </tbody>
           </table>
+
+          {filteredSongs.length > visibleCount && (
+            <div className="flex flex-col items-center justify-center pt-4 pb-6 gap-2">
+              <button
+                onClick={() => setVisibleCount(prev => prev + 36)}
+                className="px-6 py-2.5 rounded-full bg-[#141122] hover:bg-[#2A2140] active:scale-95 border border-[#302744] text-[#F8F5FF] text-xs font-bold transition-all shadow-md hover:border-[#A78BFA]/40 flex items-center gap-2 group"
+              >
+                <span>Load More Tracks</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#211A32] text-[#A78BFA] border border-[#302744] font-bold">
+                  +{Math.min(36, filteredSongs.length - visibleCount)}
+                </span>
+              </button>
+              <p className="text-[11px] text-white/40 font-mono">
+                Showing {Math.min(visibleCount, filteredSongs.length)} of {filteredSongs.length} songs
+              </p>
+            </div>
+          )}
         </div>
       )}
 

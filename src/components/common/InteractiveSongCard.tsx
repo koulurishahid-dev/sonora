@@ -123,11 +123,15 @@ export function InteractiveSongCard({
       onMouseLeave={handleMouseLeave}
       onClick={handleClickPlay}
       onContextMenu={e => onContextMenu(e, song)}
-      style={{
-        transform: `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(0)`,
-        transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.4s ease-out',
-      }}
-      className={`group relative p-3 rounded-2xl bg-[#10051C]/65 backdrop-blur-xl hover:bg-[#21153B]/75 border transition-all duration-300 cursor-pointer flex flex-col shadow-md select-none ${
+      style={
+        rotateX !== 0 || rotateY !== 0
+          ? {
+              transform: `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(0)`,
+              transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.4s ease-out',
+            }
+          : undefined
+      }
+      className={`interactive-song-card group relative p-3 rounded-2xl bg-[#10051C]/80 backdrop-blur-xl hover:bg-[#21153B]/75 border transition-all duration-300 cursor-pointer flex flex-col shadow-md select-none ${
         isCurrent
           ? 'border-[#A855F7] shadow-[0_8px_30px_rgba(168,85,247,0.35)]'
           : 'border-[#302744]/70 hover:border-[#A855F7]/60 hover:shadow-[0_12px_36px_rgba(168,85,247,0.22)]'

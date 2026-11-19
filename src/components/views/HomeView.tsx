@@ -92,7 +92,7 @@ function ShelfSongCard({
     <div
       onClick={() => (isThisCurrent ? onTogglePlay() : onPlaySong(song, songs))}
       onContextMenu={e => onSongContextMenu(e, song)}
-      className="w-32 sm:w-44 shrink-0 snap-start p-2.5 sm:p-3 rounded-2xl bg-[#10051C]/65 backdrop-blur-xl hover:bg-[#21153B]/75 border border-[#302744]/70 hover:border-[#A855F7]/60 cursor-pointer transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-[rgba(168,85,247,0.25)] hover:-translate-y-1 group flex flex-col select-none"
+      className="shelf-song-card w-32 sm:w-44 shrink-0 snap-start p-2.5 sm:p-3 rounded-2xl bg-[#10051C]/80 backdrop-blur-xl hover:bg-[#21153B]/75 border border-[#302744]/70 hover:border-[#A855F7]/60 cursor-pointer transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-[rgba(168,85,247,0.25)] hover:-translate-y-1 group flex flex-col select-none"
     >
       <div className="aspect-square rounded-xl overflow-hidden bg-[#050309]/80 relative mb-2 sm:mb-3 flex items-center justify-center border border-[#302744]/60">
         {!hasFailed ? (
@@ -223,7 +223,7 @@ function SpotifyShelf({
       {/* Shelf Track Row with smooth native momentum scrolling */}
       <div
         ref={scrollRef}
-        className="flex gap-2.5 sm:gap-4 overflow-x-auto pb-2 scrollbar-none scroll-smooth snap-x snap-mandatory touch-pan-x -mx-3 px-3 sm:mx-0 sm:px-0"
+        className="shelf-track flex gap-2.5 sm:gap-4 overflow-x-auto pb-2 scrollbar-none scroll-smooth snap-x snap-mandatory touch-pan-x -mx-3 px-3 sm:mx-0 sm:px-0"
       >
         {displaySongs.map(song => (
           <ShelfSongCard
