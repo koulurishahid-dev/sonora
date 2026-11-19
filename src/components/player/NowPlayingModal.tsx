@@ -179,17 +179,12 @@ export function NowPlayingModal() {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.98 }}
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed inset-0 z-50 flex flex-col bg-[#090812] text-[#F8F5FF] overflow-hidden select-none"
+        className="fixed inset-0 z-50 flex flex-col bg-[#050309]/80 backdrop-blur-2xl text-[#F8F5FF] overflow-hidden select-none"
       >
         {/* ========================================================= */}
         {/* BACKGROUND ATMOSPHERE (Deep obsidian listening studio)    */}
         {/* ========================================================= */}
-        {/* BACKGROUND AMBIENT ATMOSPHERE WITH PURPLE SMOKE & LIGHT  */}
-        {/* ========================================================= */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Dedicated Cinematic Purple Smoke Atmosphere Stage */}
-          <CinematicSmokeAtmosphere variant="stage" intensity={1.15} />
-
           {/* Subtle blurred artwork illumination */}
           {artworkUrl && (
             <motion.div

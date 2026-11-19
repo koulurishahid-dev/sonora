@@ -161,13 +161,19 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
   };
 
   return (
-    <motion.aside
-      initial={{ x: 380, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: 380, opacity: 0 }}
-      transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-      className="fixed lg:relative right-0 top-0 bottom-0 z-40 lg:z-30 flex flex-col w-full sm:w-92 lg:w-84 xl:w-92 2xl:w-98 h-full bg-[#10051C]/80 lg:bg-[#10051C]/75 backdrop-blur-2xl border-l border-[#302744]/70 shadow-[-16px_0_40px_rgba(5,3,9,0.85)] select-none shrink-0 overflow-hidden"
-    >
+    <>
+      {/* Mobile Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/75 backdrop-blur-sm z-40 lg:hidden"
+        onClick={onToggle}
+      />
+      <motion.aside
+        initial={{ x: 380, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: 380, opacity: 0 }}
+        transition={{ type: 'spring', damping: 28, stiffness: 260 }}
+        className="fixed lg:relative right-0 top-0 bottom-0 z-50 lg:z-30 flex flex-col w-[85vw] max-w-sm sm:w-92 lg:w-84 xl:w-92 2xl:w-98 h-full bg-[#10051C]/95 lg:bg-[#10051C]/75 backdrop-blur-2xl border-l border-[#302744]/70 shadow-[-16px_0_40px_rgba(5,3,9,0.85)] select-none shrink-0 overflow-hidden"
+      >
       {/* Background ambient glow with cyan-purple spotlight scattering */}
       <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-[#8BE9FF]/15 via-[#A855F7]/15 to-transparent rounded-full blur-3xl pointer-events-none -z-0" />
 
@@ -827,5 +833,6 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
         </button>
       </div>
     </motion.aside>
+    </>
   );
 }

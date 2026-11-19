@@ -110,7 +110,7 @@ export function TurntableStudioStage() {
       <section className="w-full lg:w-[46%] max-w-[540px] flex flex-col items-center justify-center shrink-0">
         {/* PHYSICAL TURNTABLE PLINTH */}
         <div
-          className="relative w-full rounded-[32px] p-5 sm:p-7 border border-[#302744]/80 shadow-[0_30px_80px_rgba(5,3,9,0.98),0_0_45px_rgba(168,85,247,0.18)] overflow-hidden"
+          className="relative w-full rounded-[28px] sm:rounded-[32px] p-3.5 sm:p-7 border border-[#302744]/80 shadow-[0_30px_80px_rgba(5,3,9,0.98),0_0_45px_rgba(168,85,247,0.18)] overflow-hidden"
           style={{
             background: 'linear-gradient(155deg, rgba(33, 21, 59, 0.95) 0%, rgba(16, 5, 28, 0.98) 55%, #050309 100%)',
           }}
@@ -129,29 +129,29 @@ export function TurntableStudioStage() {
           <div className="absolute inset-x-8 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#8BE9FF]/40 to-[#A855F7]/30 pointer-events-none" />
 
           {/* TURNTABLE HEADER STATUS ROW */}
-          <div className="flex items-center justify-between mb-4 px-1 relative z-10">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between mb-3 sm:mb-4 px-1 relative z-10">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#A78BFA] shadow-[0_0_10px_#A78BFA] animate-pulse" />
-              <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-[#F8F5FF]/90">
-                DIRECT DRIVE • QUARTZ LOCK
+              <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest uppercase text-[#F8F5FF]/90">
+                DIRECT DRIVE • QUARTZ
               </span>
             </div>
 
             {/* Playing Status Pill */}
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#141122]/90 border border-[#302744] text-[10px] font-mono">
+            <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-[#141122]/90 border border-[#302744] text-[9px] sm:text-[10px] font-mono">
               <span
                 className={`w-1.5 h-1.5 rounded-full ${
                   isPlaying && isPowerOn ? 'bg-[#A78BFA] shadow-[0_0_8px_#A78BFA] animate-pulse' : 'bg-amber-400'
                 }`}
               />
               <span className={isPlaying && isPowerOn ? 'text-[#D8B4FE] font-bold' : 'text-[#A99DBE]'}>
-                {isPlaying && isPowerOn ? `${turntableSpeed} RPM PLAYING` : 'PAUSED'}
+                {isPlaying && isPowerOn ? `${turntableSpeed} RPM` : 'PAUSED'}
               </span>
             </div>
           </div>
 
           {/* CIRCULAR PLATTER & ROTATING VINYL ASSEMBLY */}
-          <div className="relative w-full aspect-square max-w-[380px] mx-auto flex items-center justify-center">
+          <div className="relative w-full aspect-square max-w-[310px] min-[420px]:max-w-[345px] sm:max-w-[380px] mx-auto flex items-center justify-center">
             {/* Outer Cast Aluminum Platter Rim with Strobe Dots */}
             <div
               className="absolute inset-0 rounded-full border-4 border-zinc-700/80 bg-gradient-to-br from-[#1C162E] via-[#120F1F] to-[#090812] shadow-2xl flex items-center justify-center pointer-events-none"
@@ -249,7 +249,7 @@ export function TurntableStudioStage() {
             </motion.div>
 
             {/* AUTHENTIC TONEARM ASSEMBLY (Top Right Mount) */}
-            <div className="absolute -top-2 -right-3 w-28 h-56 pointer-events-none z-20">
+            <div className="absolute -top-2 right-0 sm:-right-2 w-24 sm:w-28 h-56 pointer-events-none z-20">
               {/* Tonearm Base / Gimbal Ring */}
               <div className="absolute top-2 right-4 w-12 h-12 rounded-full bg-gradient-to-br from-zinc-600 via-zinc-800 to-zinc-950 border-2 border-[#302744] shadow-xl flex items-center justify-center">
                 <div className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-600 shadow-inner flex items-center justify-center">

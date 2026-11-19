@@ -241,7 +241,10 @@ export function AppLayout() {
           />
           <Sidebar
             currentView={currentRoute.view}
-            onNavigate={handleNavigate}
+            onNavigate={(view, param) => {
+              setIsMobileMenuOpen(false);
+              handleNavigate(view, param);
+            }}
             onOpenUpload={() => {
               setIsMobileMenuOpen(false);
               setIsUploadOpen(true);

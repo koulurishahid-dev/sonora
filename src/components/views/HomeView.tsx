@@ -274,30 +274,28 @@ export function HomeView({
   useEffect(() => {
     loadData();
 
-    // Re-check after 800ms and 2000ms if database is loading on initial startup
-    const t1 = setTimeout(loadData, 800);
-    const t2 = setTimeout(loadData, 2200);
-
     // Listen for library updates from background seeder or imports
     const handleUpdate = () => {
       loadData();
     };
     window.addEventListener('sonora_library_updated', handleUpdate);
 
-    deduplicateSongsInLibrary().then(removed => {
-      if (removed > 0) {
-        showToast('Library Cleaned', `Removed ${removed} duplicate song entries.`, 'success');
-        loadData();
-      }
-    });
+    // Only run one-time audit/repair on initial startup, never on every view mount!
+    if (typeof window !== 'undefined' && !localStorage.getItem('sonora_cleanup_done_v9')) {
+      deduplicateSongsInLibrary().then(removed => {
+        if (removed > 0) {
+          showToast('Library Cleaned', `Removed ${removed} duplicate song entries.`, 'success');
+          loadData();
+        }
+        localStorage.setItem('sonora_cleanup_done_v9', 'true');
+      });
 
-    repairLibraryArtworkAndTitles().then(count => {
-      if (count > 0) loadData();
-    });
+      repairLibraryArtworkAndTitles().then(count => {
+        if (count > 0) loadData();
+      });
+    }
 
     return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
       window.removeEventListener('sonora_library_updated', handleUpdate);
     };
   }, []);

@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0B0B0D',
+  themeColor: '#050309',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -49,12 +49,14 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/logo-icon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/logo-icon.png" />
+        <link rel="preload" href="/logo.png" as="image" />
+        <link rel="preload" href="/logo-icon.png" as="image" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="NAA PAATALU" />
       </head>
-      <body className="h-full w-full overflow-hidden bg-[#0B0B0D] text-white">
+      <body className="h-full w-full overflow-hidden bg-[#050309] text-white">
         <ThemeProvider>
           <PlayerProvider>
             <ToastProvider>

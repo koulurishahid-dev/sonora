@@ -91,7 +91,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [isNowPlayingOpen, setIsNowPlayingOpen] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
-  const [isSideViewOpen, setIsSideViewOpen] = useState(true);
+  const [isSideViewOpen, setIsSideViewOpen] = useState(false);
+
+  // Auto-open sidebar on desktop screens (>=1024px), keep closed on mobile
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+      setIsSideViewOpen(true);
+    }
+  }, []);
   const [visualizerMode, setVisualizerMode] = useState<VisualizerMode>('bars');
   const [audioError, setAudioError] = useState<string | null>(null);
   const [playbackRate, setPlaybackRateState] = useState<number>(1);

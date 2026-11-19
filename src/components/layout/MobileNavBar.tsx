@@ -138,7 +138,7 @@ export function MobileNavBar({ currentView, onNavigate }: MobileNavBarProps) {
           const Icon = item.icon;
           const isActive =
             currentView === item.view ||
-            (item.view === 'library' && currentView === 'all-songs');
+            (item.view === 'all-songs' && (currentView === 'all-songs' || currentView === 'library'));
 
           return (
             <button

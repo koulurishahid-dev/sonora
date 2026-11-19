@@ -70,7 +70,8 @@ export function InteractiveSongCard({
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || typeof window === 'undefined') return;
+    if (window.matchMedia('(pointer: coarse)').matches) return; // Skip 3D tilt on mobile touch to keep scrolling 100% fluid!
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;

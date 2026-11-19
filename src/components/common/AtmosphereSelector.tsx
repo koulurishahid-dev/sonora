@@ -63,7 +63,7 @@ export function AtmosphereSelector() {
     <div className="relative inline-block text-left">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 hover:border-white/20 text-xs font-semibold text-white transition-all active:scale-95 shadow-sm"
+        className="flex items-center gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.1] border border-white/10 hover:border-white/20 text-xs font-semibold text-white transition-all active:scale-95 shadow-sm"
         title="Listening Atmosphere"
       >
         <Icon className="w-3.5 h-3.5 text-[var(--accent)]" />

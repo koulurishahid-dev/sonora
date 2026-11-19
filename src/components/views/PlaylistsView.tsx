@@ -48,10 +48,18 @@ export function PlaylistsView({
 
     const counts: Record<string, number> = {};
     const arts: Record<string, string> = {};
-    const all = await db.songs.toArray();
+    const [all, allPlSongs] = await Promise.all([
+      db.songs.toArray(),
+      db.playlistSongs.toArray(),
+    ]);
+
+    // Map song counts instantly in memory
+    for (const ps of allPlSongs) {
+      counts[ps.playlistId] = (counts[ps.playlistId] || 0) + 1;
+    }
 
     for (const pl of list) {
-      let count = await db.playlistSongs.where('playlistId').equals(pl.id).count();
+      let count = counts[pl.id] || 0;
 
       // Self-healing fallback if playlistSongs table was not yet populated
       if (count === 0) {
