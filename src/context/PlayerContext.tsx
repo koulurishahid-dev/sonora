@@ -34,6 +34,15 @@ interface PlayerContextType {
   eqBands: EqBands;
   eqPreset: EqPresetName;
 
+  // Advanced Listening: Sleep Timer & Crossfade
+  sleepTimerOption: number | 'end-of-track' | null;
+  sleepTimerRemaining: number | null; // in seconds
+  setSleepTimer: (option: number | 'end-of-track' | null) => void;
+  crossfadeDuration: number; // in seconds (0 to 12)
+  setCrossfadeDuration: (sec: number) => void;
+  isShortcutsOpen: boolean;
+  setIsShortcutsOpen: (open: boolean) => void;
+
   // Actions
   playSong: (song: Song, newQueue?: Song[]) => Promise<void>;
   togglePlay: () => void;
@@ -95,10 +104,24 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     band12k: 0,
   });
 
+  // Advanced Listening Features State
+  const [sleepTimerOption, setSleepTimerOption] = useState<number | 'end-of-track' | null>(null);
+  const [sleepTimerRemaining, setSleepTimerRemaining] = useState<number | null>(null);
+  const originalVolumeBeforeFadeRef = useRef<number>(0.8);
+  const [crossfadeDuration, setCrossfadeDurationState] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('naa_paatalu_crossfade_duration');
+      if (saved) return parseInt(saved, 10);
+    }
+    return 2; // Default 2 seconds
+  });
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+
   // Audio elements and Web Audio API nodes
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const masterGainRef = useRef<GainNode | null>(null);
   const band60Ref = useRef<BiquadFilterNode | null>(null);
   const band250Ref = useRef<BiquadFilterNode | null>(null);
   const band1kRef = useRef<BiquadFilterNode | null>(null);
@@ -108,6 +131,61 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const isSwitchingTrackRef = useRef(false);
   const nextTrackRef = useRef<() => void>(() => {});
   const prevTrackRef = useRef<() => void>(() => {});
+
+  const setCrossfadeDuration = useCallback((sec: number) => {
+    const clamped = Math.max(0, Math.min(12, sec));
+    setCrossfadeDurationState(clamped);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('naa_paatalu_crossfade_duration', clamped.toString());
+    }
+  }, []);
+
+  const setSleepTimer = useCallback((option: number | 'end-of-track' | null) => {
+    setSleepTimerOption(option);
+    if (audioRef.current) {
+      originalVolumeBeforeFadeRef.current = audioRef.current.volume || 0.8;
+    }
+    if (option === null) {
+      setSleepTimerRemaining(null);
+      if (audioRef.current) {
+        audioRef.current.volume = originalVolumeBeforeFadeRef.current;
+      }
+    } else if (option === 'end-of-track') {
+      setSleepTimerRemaining(null);
+    } else {
+      setSleepTimerRemaining(option * 60);
+    }
+  }, []);
+
+  // Sleep Timer Countdown & Smooth Volume Fadeout Loop
+  useEffect(() => {
+    if (typeof sleepTimerRemaining !== 'number') return;
+    if (sleepTimerRemaining <= 0) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.volume = originalVolumeBeforeFadeRef.current;
+      }
+      setIsPlaying(false);
+      setSleepTimerOption(null);
+      setSleepTimerRemaining(null);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setSleepTimerRemaining(prev => {
+        if (prev === null) return null;
+        const next = prev - 1;
+        // Gradual fade out over the final 15 seconds
+        if (next <= 15 && next > 0 && audioRef.current) {
+          const fadeRatio = next / 15;
+          audioRef.current.volume = originalVolumeBeforeFadeRef.current * fadeRatio;
+        }
+        return next;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [sleepTimerRemaining]);
 
   // Initialize Web Audio API 5-Band Equalizer nodes
   const initWebAudio = useCallback(() => {
@@ -167,8 +245,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       f12k.gain.value = eqBands.band12k;
       band12kRef.current = f12k;
 
+      // Master Gain for smooth crossfade transitions
+      const masterGain = ctx.createGain();
+      masterGain.gain.value = 1.0;
+      masterGainRef.current = masterGain;
+
       // Connect 5-band filter pipeline:
-      // source -> 60Hz -> 250Hz -> 1kHz -> 4kHz -> 12kHz -> analyser -> destination
+      // source -> 60Hz -> 250Hz -> 1kHz -> 4kHz -> 12kHz -> analyser -> masterGain -> destination
       const source = ctx.createMediaElementSource(audioRef.current);
       sourceNodeRef.current = source;
       source.connect(f60);
@@ -177,7 +260,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       f1k.connect(f4k);
       f4k.connect(f12k);
       f12k.connect(analyser);
-      analyser.connect(ctx.destination);
+      analyser.connect(masterGain);
+      masterGain.connect(ctx.destination);
     } catch (e) {
       console.warn('Web Audio initialization error (may already be bound):', e);
     }
@@ -543,6 +627,19 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
 
     isSwitchingTrackRef.current = true;
+
+    // Crossfade ramp-out on current track if actively playing
+    if (crossfadeDuration > 0 && isPlaying && masterGainRef.current && audioCtxRef.current) {
+      try {
+        const now = audioCtxRef.current.currentTime;
+        const halfFade = Math.min(1.5, crossfadeDuration / 2);
+        masterGainRef.current.gain.cancelScheduledValues(now);
+        masterGainRef.current.gain.setValueAtTime(masterGainRef.current.gain.value, now);
+        masterGainRef.current.gain.linearRampToValueAtTime(0.01, now + halfFade);
+        await new Promise(r => setTimeout(r, halfFade * 1000));
+      } catch (e) {}
+    }
+
     audioRef.current.src = audioUrl;
     audioRef.current.currentTime = 0;
     setCurrentTime(0);
@@ -551,6 +648,19 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       await audioRef.current.play();
       setIsPlaying(true);
       isSwitchingTrackRef.current = false;
+
+      // Crossfade ramp-in on new track
+      if (crossfadeDuration > 0 && masterGainRef.current && audioCtxRef.current) {
+        try {
+          const now = audioCtxRef.current.currentTime;
+          const halfFade = Math.min(1.5, crossfadeDuration / 2);
+          masterGainRef.current.gain.cancelScheduledValues(now);
+          masterGainRef.current.gain.setValueAtTime(0.01, now);
+          masterGainRef.current.gain.linearRampToValueAtTime(1.0, now + halfFade);
+        } catch (e) {}
+      } else if (masterGainRef.current) {
+        masterGainRef.current.gain.value = 1.0;
+      }
 
       // Track play count and listening history
       await db.songs.update(song.id, {
@@ -665,6 +775,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     if (!audio) return;
 
     const onEnded = () => {
+      if (sleepTimerOption === 'end-of-track') {
+        if (audioRef.current) audioRef.current.pause();
+        setIsPlaying(false);
+        setSleepTimerOption(null);
+        setSleepTimerRemaining(null);
+        return;
+      }
       nextTrack();
     };
 
@@ -776,6 +893,12 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      if (e.key === '?') {
+        e.preventDefault();
+        setIsShortcutsOpen(prev => !prev);
+        return;
+      }
+
       switch (e.code) {
         case 'Space':
           e.preventDefault();
@@ -801,6 +924,20 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
           e.preventDefault();
           toggleMute();
           break;
+        case 'KeyS':
+          e.preventDefault();
+          toggleShuffle();
+          break;
+        case 'KeyR':
+          e.preventDefault();
+          toggleRepeat();
+          break;
+        case 'KeyH':
+          if (currentSong) {
+            e.preventDefault();
+            toggleFavorite(currentSong.id);
+          }
+          break;
         case 'KeyL':
           e.preventDefault();
           setIsLyricsOpen(prev => !prev);
@@ -813,24 +950,27 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
           e.preventDefault();
           setIsNowPlayingOpen(prev => !prev);
           break;
-        case 'KeyN':
+        case 'Slash':
           if (e.shiftKey) {
+            // '?' shortcut
             e.preventDefault();
-            nextTrack();
+            setIsShortcutsOpen(prev => !prev);
           }
           break;
+        case 'KeyN':
+          e.preventDefault();
+          nextTrack();
+          break;
         case 'KeyP':
-          if (e.shiftKey) {
-            e.preventDefault();
-            prevTrack();
-          }
+          e.preventDefault();
+          prevTrack();
           break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentTime, duration, volume, nextTrack, prevTrack, currentSong, isPlaying]);
+  }, [currentTime, duration, volume, nextTrack, prevTrack, currentSong, isPlaying, toggleMute, toggleShuffle, toggleRepeat, toggleFavorite]);
 
   const toggleSideView = useCallback(() => {
     setIsSideViewOpen(prev => !prev);
@@ -858,6 +998,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         playbackRate,
         eqBands,
         eqPreset,
+        sleepTimerOption,
+        sleepTimerRemaining,
+        setSleepTimer,
+        crossfadeDuration,
+        setCrossfadeDuration,
+        isShortcutsOpen,
+        setIsShortcutsOpen,
         playSong,
         togglePlay,
         nextTrack,

@@ -6,6 +6,7 @@ import { usePlayer } from '@/context/PlayerContext';
 import { getArtworkObjectUrl } from '@/lib/db';
 import {
   Home,
+  Compass,
   Search,
   Library,
   ListMusic,
@@ -39,10 +40,10 @@ export function MobileNavBar({ currentView, onNavigate }: MobileNavBarProps) {
 
   const items: { view: ViewType; label: string; icon: any }[] = [
     { view: 'home', label: 'Home', icon: Home },
-    { view: 'search', label: 'Search', icon: Search },
-    { view: 'library', label: 'Library', icon: Library },
+    { view: 'explore', label: 'Explore', icon: Compass },
+    { view: 'all-songs', label: 'Library', icon: Library },
     { view: 'playlists', label: 'Playlists', icon: ListMusic },
-    { view: 'liked', label: 'Liked', icon: Heart },
+    { view: 'search', label: 'Search', icon: Search },
     { view: 'settings', label: 'Settings', icon: Settings },
   ];
 

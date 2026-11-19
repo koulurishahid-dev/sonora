@@ -3,17 +3,21 @@
 import React from 'react';
 import { ViewType } from '@/types/music';
 import {
+  Home as HomeIcon,
   Compass,
   Music2,
   Heart,
   ListMusic,
   User,
+  Disc,
+  BarChart3,
   Settings,
   Plus,
   Radio,
   ChevronLeft,
   ChevronRight,
   Search,
+  Wand2,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -21,6 +25,7 @@ interface SidebarProps {
   onNavigate: (view: ViewType, param?: string) => void;
   onOpenUpload: () => void;
   onOpenCreatePlaylist: () => void;
+  onOpenAiGenerator?: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   className?: string;
@@ -31,16 +36,20 @@ export function Sidebar({
   onNavigate,
   onOpenUpload,
   onOpenCreatePlaylist,
+  onOpenAiGenerator,
   isCollapsed,
   onToggleCollapse,
   className = '',
 }: SidebarProps) {
   const navItems: { view: ViewType; label: string; icon: any }[] = [
-    { view: 'home', label: 'Home', icon: Compass },
+    { view: 'home', label: 'Home', icon: HomeIcon },
+    { view: 'explore', label: 'Explore', icon: Compass },
     { view: 'all-songs', label: 'All Songs', icon: Music2 },
     { view: 'playlists', label: 'Playlists', icon: ListMusic },
     { view: 'liked', label: 'Favorites', icon: Heart },
     { view: 'artists', label: 'Artists', icon: User },
+    { view: 'albums', label: 'Albums', icon: Disc },
+    { view: 'analytics', label: 'History & Stats', icon: BarChart3 },
     { view: 'search', label: 'Search', icon: Search },
   ];
 
@@ -105,6 +114,21 @@ export function Sidebar({
           <Plus className="w-4 h-4 text-[#A78BFA] stroke-[3]" />
           {!isCollapsed && <span>Add to Collection</span>}
         </button>
+
+        {onOpenAiGenerator && (
+          <button
+            onClick={onOpenAiGenerator}
+            className={`w-full flex items-center justify-center gap-2 mt-2 py-2 rounded-xl text-xs font-bold transition-all shadow-md ${
+              isCollapsed
+                ? 'bg-gradient-to-tr from-[#7026B9] to-[#C084FC] text-white p-2.5 hover:scale-105'
+                : 'bg-gradient-to-r from-[#7026B9]/30 to-[#A855F7]/25 hover:from-[#7026B9]/50 hover:to-[#A855F7]/40 text-white border border-[#A855F7]/40'
+            }`}
+            title="Smart AI Playlist Curator"
+          >
+            <Wand2 className="w-3.5 h-3.5 text-[#C084FC]" />
+            {!isCollapsed && <span>AI Smart Curator</span>}
+          </button>
+        )}
       </div>
 
       {/* Navigation Links */}

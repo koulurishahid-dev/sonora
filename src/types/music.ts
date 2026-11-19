@@ -125,6 +125,7 @@ export interface DownloadItem {
 
 export type ViewType = 
   | 'home'
+  | 'explore'
   | 'search'
   | 'library'
   | 'all-songs'
@@ -136,6 +137,7 @@ export type ViewType =
   | 'artists'
   | 'artist-detail'
   | 'recently-played'
+  | 'analytics'
   | 'offline'
   | 'now-playing'
   | 'settings';

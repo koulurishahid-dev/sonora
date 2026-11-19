@@ -17,6 +17,8 @@ import {
   X,
   Sparkles,
   TrendingUp,
+  Clock,
+  Trash2,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -44,13 +46,51 @@ function HighlightText({ text, query }: { text: string; query: string }) {
   );
 }
 
-const POPULAR_SEARCHES = ['Sid Sriram', 'Melodies', 'Love Songs', 'A.R. Rahman', 'Anirudh', 'Rock', 'Acoustic'];
+const POPULAR_SEARCHES = [
+  'Devara',
+  'Sid Sriram',
+  'Guntur Kaaram',
+  'Anirudh',
+  'Thaman S',
+  'Pushpa 2',
+  'SPB Classics',
+  'Melodies',
+  'Mass Beats',
+  'A.R. Rahman',
+];
 
 export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }: SearchViewProps) {
   const { playSong, currentSong, isPlaying, togglePlay } = usePlayer();
 
   const [query, setQuery] = useState(initialQuery);
   const [filterType, setFilterType] = useState<'all' | 'songs' | 'artists' | 'albums' | 'playlists'>('all');
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('naa_paatalu_recent_searches');
+      if (saved) {
+        setRecentSearches(JSON.parse(saved));
+      }
+    } catch {}
+  }, []);
+
+  const saveRecentSearch = (term: string) => {
+    const clean = term.trim();
+    if (!clean || clean.length < 2) return;
+    setRecentSearches(prev => {
+      const updated = [clean, ...prev.filter(s => s.toLowerCase() !== clean.toLowerCase())].slice(0, 10);
+      try {
+        localStorage.setItem('naa_paatalu_recent_searches', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const clearRecentSearches = () => {
+    setRecentSearches([]);
+    localStorage.removeItem('naa_paatalu_recent_searches');
+  };
 
   const [results, setResults] = useState<{
     songs: Song[];
@@ -123,6 +163,11 @@ export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }:
           placeholder="Search songs, artists, albums, or playlists..."
           value={query}
           onChange={e => setQuery(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter' && query.trim()) {
+              saveRecentSearch(query);
+            }
+          }}
           className="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-[#141122] border border-[#302744] text-[#F8F5FF] text-sm focus:border-[#A78BFA] focus:ring-2 focus:ring-[#A78BFA]/20 outline-none shadow-2xl transition-all placeholder:text-[#A99DBE]"
         />
         {query && (
@@ -135,6 +180,39 @@ export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }:
         )}
       </div>
 
+      {/* Recent Searches */}
+      {!query && recentSearches.length > 0 && (
+        <div className="space-y-2 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-zinc-400 flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-purple-400" />
+              Recent Searches
+            </span>
+            <button
+              onClick={clearRecentSearches}
+              className="text-[11px] text-zinc-500 hover:text-red-400 transition-colors flex items-center gap-1"
+            >
+              <Trash2 className="w-3 h-3" />
+              Clear
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {recentSearches.map(item => (
+              <button
+                key={item}
+                onClick={() => {
+                  setQuery(item);
+                  saveRecentSearch(item);
+                }}
+                className="px-3 py-1 rounded-full text-xs font-medium bg-purple-950/40 hover:bg-purple-900/50 border border-purple-500/20 text-purple-200 hover:text-white transition-all active:scale-95 flex items-center gap-1.5"
+              >
+                <span>{item}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Suggested Search Chips */}
       {!query && (
         <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -145,7 +223,10 @@ export function SearchView({ initialQuery = '', onNavigate, onSongContextMenu }:
           {POPULAR_SEARCHES.map(item => (
             <button
               key={item}
-              onClick={() => setQuery(item)}
+              onClick={() => {
+                setQuery(item);
+                saveRecentSearch(item);
+              }}
               className="px-3 py-1 rounded-full text-xs font-medium bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-zinc-300 hover:text-white transition-all active:scale-95"
             >
               {item}

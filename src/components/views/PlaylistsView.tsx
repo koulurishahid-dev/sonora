@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Playlist, ViewType } from '@/types/music';
 import { db, getArtworkObjectUrl } from '@/lib/db';
 import { useToast } from '@/context/ToastContext';
-import { ListMusic, Plus, Play, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { ListMusic, Plus, Play, MoreVertical, Edit2, Trash2, Copy, Download } from 'lucide-react';
 import { SPOTIFY_TELUGU_CATEGORIES, filterSpotifyCategorySongs } from '@/lib/spotifyService';
 
 interface PlaylistsViewProps {
@@ -111,6 +111,61 @@ export function PlaylistsView({
     };
   }, []);
 
+  const handleDuplicate = async (e: React.MouseEvent, pl: Playlist) => {
+    e.stopPropagation();
+    const newId = `pl_copy_${Date.now()}`;
+    const newPl: Playlist = {
+      ...pl,
+      id: newId,
+      title: `${pl.title} (Copy)`,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    await db.playlists.add(newPl);
+
+    const existingSongs = await db.playlistSongs.where('playlistId').equals(pl.id).toArray();
+    if (existingSongs.length > 0) {
+      const clonedSongs = existingSongs.map(s => ({
+        ...s,
+        id: `${newId}_${s.songId}`,
+        playlistId: newId,
+        addedAt: Date.now(),
+      }));
+      await db.playlistSongs.bulkAdd(clonedSongs);
+    }
+    showToast('Playlist Duplicated', `Created "${newPl.title}"`, 'success');
+    await loadData();
+  };
+
+  const handleExportPlaylist = async (e: React.MouseEvent, pl: Playlist) => {
+    e.stopPropagation();
+    const plSongs = await db.playlistSongs.where('playlistId').equals(pl.id).toArray();
+    const songIds = plSongs.map(s => s.songId);
+    const songs = await db.songs.where('id').anyOf(songIds).toArray();
+    const data = {
+      type: 'naa-paatalu-playlist-export',
+      version: 1,
+      playlist: pl,
+      songs: songs.map(s => ({
+        title: s.title,
+        artist: s.artist,
+        album: s.album,
+        duration: s.duration,
+        genre: s.genre,
+        year: s.year,
+      })),
+      exportedAt: Date.now(),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${pl.title.replace(/[^a-zA-Z0-9_-]/g, '_')}_playlist.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Exported', `Playlist saved as JSON`, 'success');
+  };
+
   const handleDelete = async (e: React.MouseEvent, pl: Playlist) => {
     e.stopPropagation();
     if (confirm(`Delete playlist "${pl.title}"? (Songs will remain in your library)`)) {
@@ -189,8 +244,22 @@ export function PlaylistsView({
                   </div>
                 </div>
 
-                {/* Edit & Delete Action Buttons */}
+                {/* Edit, Duplicate, Export & Delete Action Buttons */}
                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                  <button
+                    onClick={e => handleDuplicate(e, pl)}
+                    className="p-1.5 rounded-lg bg-black/60 hover:bg-purple-900/90 text-[#D8B4FE] backdrop-blur-md transition-transform active:scale-90"
+                    title="Duplicate Playlist"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={e => handleExportPlaylist(e, pl)}
+                    className="p-1.5 rounded-lg bg-black/60 hover:bg-blue-900/90 text-blue-300 backdrop-blur-md transition-transform active:scale-90"
+                    title="Export Playlist JSON"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
                   <button
                     onClick={e => {
                       e.stopPropagation();

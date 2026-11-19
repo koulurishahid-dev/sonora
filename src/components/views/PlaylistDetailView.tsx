@@ -17,6 +17,8 @@ import {
   ListMusic,
   Trash2,
   Edit2,
+  Copy,
+  Download,
   ChevronLeft,
   ChevronUp,
   ChevronDown,
@@ -227,6 +229,68 @@ export function PlaylistDetailView({
     await loadData();
   };
 
+  const handleDuplicatePlaylist = async () => {
+    if (!playlist) return;
+    const newId = `pl_copy_${Date.now()}`;
+    const newPl: Playlist = {
+      ...playlist,
+      id: newId,
+      title: `${playlist.title} (Copy)`,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    await db.playlists.add(newPl);
+
+    const existingSongs = await db.playlistSongs.where('playlistId').equals(playlistId).toArray();
+    if (existingSongs.length > 0) {
+      const clonedSongs = existingSongs.map(s => ({
+        ...s,
+        id: `${newId}_${s.songId}`,
+        playlistId: newId,
+        addedAt: Date.now(),
+      }));
+      await db.playlistSongs.bulkAdd(clonedSongs);
+    }
+    showToast('Playlist Duplicated', `Created "${newPl.title}"`, 'success');
+    onNavigate('playlist-detail', newId);
+  };
+
+  const handleExportPlaylist = async () => {
+    if (!playlist) return;
+    const data = {
+      type: 'naa-paatalu-playlist-export',
+      version: 1,
+      playlist,
+      songs: songs.map(s => ({
+        title: s.title,
+        artist: s.artist,
+        album: s.album,
+        duration: s.duration,
+        genre: s.genre,
+        year: s.year,
+      })),
+      exportedAt: Date.now(),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${playlist.title.replace(/[^a-zA-Z0-9_-]/g, '_')}_playlist.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Exported', `Playlist saved as JSON`, 'success');
+  };
+
+  const handleDeletePlaylist = async () => {
+    if (!playlist) return;
+    if (confirm(`Delete playlist "${playlist.title}"? (Songs will remain in your library)`)) {
+      await db.playlists.delete(playlist.id);
+      await db.playlistSongs.where('playlistId').equals(playlist.id).delete();
+      showToast('Deleted', `Removed playlist "${playlist.title}"`, 'info');
+      onNavigate('playlists');
+    }
+  };
+
   // Format hours and minutes
   const totalHours = Math.floor(totalDuration / 3600);
   const totalMinutes = Math.floor((totalDuration % 3600) / 60);
@@ -409,6 +473,33 @@ export function PlaylistDetailView({
                   className="p-3 rounded-full bg-white/[0.06] hover:bg-white/15 text-zinc-300 hover:text-white transition-all border border-white/10 active:scale-90"
                 >
                   <Edit2 className="w-4 h-4" />
+                </button>
+              </Tooltip>
+
+              <Tooltip content="Duplicate Playlist">
+                <button
+                  onClick={handleDuplicatePlaylist}
+                  className="p-3 rounded-full bg-white/[0.06] hover:bg-purple-900/40 text-[#D8B4FE] hover:text-white transition-all border border-white/10 active:scale-90"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+              </Tooltip>
+
+              <Tooltip content="Export Playlist as JSON">
+                <button
+                  onClick={handleExportPlaylist}
+                  className="p-3 rounded-full bg-white/[0.06] hover:bg-blue-900/40 text-blue-300 hover:text-white transition-all border border-white/10 active:scale-90"
+                >
+                  <Download className="w-4 h-4" />
+                </button>
+              </Tooltip>
+
+              <Tooltip content="Delete Playlist">
+                <button
+                  onClick={handleDeletePlaylist}
+                  className="p-3 rounded-full bg-white/[0.06] hover:bg-rose-950/60 text-rose-400 hover:text-rose-200 transition-all border border-rose-900/30 active:scale-90"
+                >
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </Tooltip>
             </div>

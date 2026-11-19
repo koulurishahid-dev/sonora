@@ -78,6 +78,7 @@ export function HeaderBar({
 
   const viewTitles: Record<ViewType, string> = {
     home: 'Home',
+    explore: 'Explore',
     search: 'Search',
     library: 'Library',
     'all-songs': 'All Songs',
@@ -89,6 +90,7 @@ export function HeaderBar({
     artists: 'Artists',
     'artist-detail': 'Artist',
     'recently-played': 'Recent',
+    analytics: 'History & Stats',
     offline: 'Offline',
     'now-playing': 'Now Playing',
     settings: 'Settings',

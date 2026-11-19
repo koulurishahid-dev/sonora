@@ -37,6 +37,10 @@ import { RecentlyPlayedView } from '../views/RecentlyPlayedView';
 import { OfflineView } from '../views/OfflineView';
 import { SearchView } from '../views/SearchView';
 import { SettingsView } from '../views/SettingsView';
+import { ExploreView } from '../views/ExploreView';
+import { ListeningAnalyticsView } from '../views/ListeningAnalyticsView';
+import { KeyboardShortcutsModal } from '../modals/KeyboardShortcutsModal';
+import { SmartAiPlaylistModal } from '../modals/SmartAiPlaylistModal';
 import { seedCuratedPersonalMusic, CURATED_TELUGU_SONGS } from '@/lib/audioSynthesis';
 import { importAllSpotifyTeluguCategories } from '@/lib/spotifyService';
 import { db, deduplicateSongsInLibrary } from '@/lib/db';
@@ -80,6 +84,7 @@ export function AppLayout() {
   const [playlistToEdit, setPlaylistToEdit] = useState<Playlist | null>(null);
   const [isEditSongOpen, setIsEditSongOpen] = useState(false);
   const [songToEdit, setSongToEdit] = useState<Song | null>(null);
+  const [isAiGeneratorOpen, setIsAiGeneratorOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ song: Song; x: number; y: number } | null>(
     null
   );
@@ -221,6 +226,7 @@ export function AppLayout() {
           setPlaylistToEdit(null);
           setIsCreatePlaylistOpen(true);
         }}
+        onOpenAiGenerator={() => setIsAiGeneratorOpen(true)}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         className="hidden md:flex shrink-0 z-30"
@@ -244,6 +250,10 @@ export function AppLayout() {
               setIsMobileMenuOpen(false);
               setPlaylistToEdit(null);
               setIsCreatePlaylistOpen(true);
+            }}
+            onOpenAiGenerator={() => {
+              setIsMobileMenuOpen(false);
+              setIsAiGeneratorOpen(true);
             }}
             isCollapsed={false}
             onToggleCollapse={() => setIsMobileMenuOpen(false)}
@@ -287,6 +297,21 @@ export function AppLayout() {
                   onNavigate={handleNavigate}
                   onOpenUpload={() => setIsUploadOpen(true)}
                   onOpenSpotifyImport={() => setIsSpotifyImportOpen(true)}
+                  onSongContextMenu={handleSongContextMenu}
+                />
+              )}
+
+              {currentRoute.view === 'explore' && (
+                <ExploreView
+                  onNavigate={handleNavigate}
+                  onSongContextMenu={handleSongContextMenu}
+                  onOpenAiGenerator={() => setIsAiGeneratorOpen(true)}
+                />
+              )}
+
+              {currentRoute.view === 'analytics' && (
+                <ListeningAnalyticsView
+                  onNavigate={handleNavigate}
                   onSongContextMenu={handleSongContextMenu}
                 />
               )}
@@ -469,6 +494,17 @@ export function AppLayout() {
           setSongToEdit(null);
         }}
         song={songToEdit}
+      />
+
+      <KeyboardShortcutsModal />
+
+      <SmartAiPlaylistModal
+        isOpen={isAiGeneratorOpen}
+        onClose={() => setIsAiGeneratorOpen(false)}
+        onPlaylistCreated={playlistId => {
+          setIsAiGeneratorOpen(false);
+          handleNavigate('playlist-detail', playlistId);
+        }}
       />
 
       {contextMenu && (

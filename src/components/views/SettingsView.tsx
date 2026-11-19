@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme, ACCENT_COLORS } from '@/context/ThemeContext';
+import { usePlayer } from '@/context/PlayerContext';
 import {
   db,
   getStorageEstimate,
@@ -43,6 +44,7 @@ import {
 export function SettingsView() {
   const { settings, updateSettings } = useTheme();
   const { showToast } = useToast();
+  const { crossfadeDuration, setCrossfadeDuration, setIsShortcutsOpen } = usePlayer();
 
   const [listenerName, setListenerName] = useState(settings.listenerName || '');
   const [listenerBio, setListenerBio] = useState(settings.listenerBio || '');
@@ -462,6 +464,24 @@ export function SettingsView() {
           </button>
         </div>
 
+        {settings.crossfadeEnabled && (
+          <div className="p-3 rounded-xl bg-[#121216] border border-[#303038]/60 space-y-1.5">
+            <div className="flex justify-between text-xs font-medium text-[#A1A1AA]">
+              <span>Crossfade Transition Duration</span>
+              <span className="font-mono text-[#D8B4FE] font-bold">{crossfadeDuration} seconds</span>
+            </div>
+            <input
+              type="range"
+              min="1"
+              max="12"
+              step="1"
+              value={crossfadeDuration}
+              onChange={e => setCrossfadeDuration(parseInt(e.target.value, 10))}
+              className="w-full accent-[var(--accent)] cursor-pointer"
+            />
+          </div>
+        )}
+
         {/* Autoplay */}
         <div className="flex items-center justify-between pt-2 border-t border-[#303038]/60">
           <div>
@@ -725,6 +745,16 @@ export function SettingsView() {
               </kbd>
             </div>
           ))}
+        </div>
+
+        <div className="pt-2 flex justify-end">
+          <button
+            onClick={() => setIsShortcutsOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#211A32] hover:bg-[#2C2344] border border-[#302744] text-xs font-semibold text-white transition-all"
+          >
+            <Keyboard className="w-4 h-4 text-[#A855F7]" />
+            <span>Open Interactive Cheatsheet (?)</span>
+          </button>
         </div>
       </section>
 

@@ -9,6 +9,7 @@ import { extractColorsFromImage, ExtractedColors } from '@/lib/colorExtractor';
 import { AudioVisualizer } from './AudioVisualizer';
 import { LyricsPanel } from './LyricsPanel';
 import { TurntableStudioStage } from './TurntableStudioStage';
+import { SleepTimerModal } from './SleepTimerModal';
 import { CinematicSmokeAtmosphere } from '../common/CinematicSmokeAtmosphere';
 import { VisualizerMode, EqPresetName, EqBands } from '@/types/music';
 import {
@@ -33,6 +34,7 @@ import {
   Trash2,
   ArrowUp,
   ArrowDown,
+  Moon,
   RotateCcw,
   Gauge,
   Sparkles,
@@ -76,12 +78,15 @@ export function NowPlayingModal() {
     setEqBand,
     setEqPreset,
     resetEq,
+    sleepTimerOption,
+    sleepTimerRemaining,
   } = usePlayer();
 
   const { settings } = useTheme();
 
   const [activeTab, setActiveTab] = useState<'turntable' | 'visualizer' | 'lyrics' | 'queue' | 'eq'>('turntable');
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isSleepTimerOpen, setIsSleepTimerOpen] = useState(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [colors, setColors] = useState<ExtractedColors>({
     primary: '#A78BFA',
@@ -264,8 +269,25 @@ export function NowPlayingModal() {
             })}
           </nav>
 
-          {/* Right: Audio Quality Specs & Fullscreen Toggle */}
+          {/* Right: Audio Quality Specs, Sleep Timer & Fullscreen Toggle */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <button
+              onClick={() => setIsSleepTimerOpen(true)}
+              className={`p-1.5 sm:p-2 rounded-full border transition-all shadow-md active:scale-95 flex items-center gap-1.5 ${
+                sleepTimerOption !== null
+                  ? 'bg-purple-950/80 border-[#A855F7] text-[#C084FC] shadow-[0_0_12px_rgba(168,85,247,0.4)]'
+                  : 'bg-[#141122] hover:bg-[#2A2140] border-[#302744] hover:border-[#A78BFA]/50 text-[#C2B5D9] hover:text-[#F8F5FF]'
+              }`}
+              title={sleepTimerRemaining ? `Sleep timer: ${Math.ceil(sleepTimerRemaining / 60)}m remaining` : 'Sleep Timer'}
+            >
+              <Moon className="w-4 h-4" />
+              {sleepTimerRemaining && (
+                <span className="text-[10px] font-mono font-bold hidden sm:inline text-purple-300">
+                  {Math.ceil(sleepTimerRemaining / 60)}m
+                </span>
+              )}
+            </button>
+
             <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#171326] border border-[#302744] text-[11px] font-mono text-[#C2B5D9]">
               <Radio className="w-3 h-3 text-[#A78BFA] animate-pulse" />
               <span>320 KBPS MASTER</span>
@@ -280,6 +302,12 @@ export function NowPlayingModal() {
             </button>
           </div>
         </header>
+
+        {/* Sleep Timer Modal */}
+        <SleepTimerModal
+          isOpen={isSleepTimerOpen}
+          onClose={() => setIsSleepTimerOpen(false)}
+        />
 
         {/* ========================================================= */}
         {/* B. MAIN LISTENING STAGE — Balanced Viewport Utilization   */}

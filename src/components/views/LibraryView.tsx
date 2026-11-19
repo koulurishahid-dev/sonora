@@ -40,7 +40,7 @@ export function LibraryView({
 
   const [songs, setSongs] = useState<Song[]>([]);
   const [filterText, setFilterText] = useState('');
-  const [sortBy, setSortBy] = useState<'title' | 'artist' | 'album' | 'duration' | 'dateAdded'>('dateAdded');
+  const [sortBy, setSortBy] = useState<'title' | 'artist' | 'album' | 'duration' | 'dateAdded' | 'playCount'>('dateAdded');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -81,6 +81,7 @@ export function LibraryView({
       else if (sortBy === 'album') cmp = a.album.localeCompare(b.album);
       else if (sortBy === 'duration') cmp = a.duration - b.duration;
       else if (sortBy === 'dateAdded') cmp = a.dateAdded - b.dateAdded;
+      else if (sortBy === 'playCount') cmp = (a.playCount || 0) - (b.playCount || 0);
 
       return sortOrder === 'asc' ? cmp : -cmp;
     });
@@ -160,6 +161,15 @@ export function LibraryView({
     setShowBulkPlaylistDropdown(false);
   };
 
+  // Bulk Play Selected
+  const handleBulkPlay = () => {
+    const selectedList = songs.filter(s => selectedIds.has(s.id));
+    if (selectedList.length > 0) {
+      playSong(selectedList[0], selectedList);
+      showToast('Playing Selection', `Playing ${selectedList.length} tracks`, 'info');
+    }
+  };
+
   return (
     <div className="p-3.5 sm:p-6 md:p-8 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -218,6 +228,13 @@ export function LibraryView({
           </div>
 
           <div className="flex items-center gap-2 relative">
+            <button
+              onClick={handleBulkPlay}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#A855F7] hover:bg-[#C084FC] text-black transition-colors shadow-md"
+            >
+              <Play className="w-3.5 h-3.5 fill-black" /> Play Selected
+            </button>
+
             <button
               onClick={handleBulkFavorite}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#19191F] hover:bg-[#303038] text-white border border-[#303038] transition-colors"

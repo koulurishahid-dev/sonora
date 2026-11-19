@@ -25,12 +25,31 @@ export function QueueDrawer() {
   const currentTrack = currentSong || (queueIndex >= 0 ? queue[queueIndex] : null);
   const upNextTracks = queue.slice(queueIndex + 1);
 
+  const [draggedIdx, setDraggedIdx] = React.useState<number | null>(null);
+
   const moveItem = (fromIdx: number, toIdx: number) => {
     if (toIdx < 0 || toIdx >= queue.length) return;
     const newQueue = [...queue];
     const [moved] = newQueue.splice(fromIdx, 1);
     newQueue.splice(toIdx, 0, moved);
     reorderQueue(newQueue);
+  };
+
+  const handleDragStart = (e: React.DragEvent, idx: number) => {
+    setDraggedIdx(idx);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, targetIdx: number) => {
+    e.preventDefault();
+    if (draggedIdx === null || draggedIdx === targetIdx) return;
+    moveItem(draggedIdx, targetIdx);
+    setDraggedIdx(null);
   };
 
   return (
@@ -132,7 +151,15 @@ export function QueueDrawer() {
                     return (
                       <div
                         key={`${song.id}_${actualQueueIndex}`}
-                        className="group flex items-center gap-2.5 p-2 rounded-xl bg-[#171326]/70 hover:bg-[#2A2140] border border-transparent hover:border-[#302744] transition-all"
+                        draggable
+                        onDragStart={e => handleDragStart(e, actualQueueIndex)}
+                        onDragOver={handleDragOver}
+                        onDrop={e => handleDrop(e, actualQueueIndex)}
+                        className={`group flex items-center gap-2.5 p-2 rounded-xl border transition-all cursor-grab active:cursor-grabbing ${
+                          draggedIdx === actualQueueIndex
+                            ? 'opacity-40 border-[#A855F7] bg-[#211A32]'
+                            : 'bg-[#171326]/70 hover:bg-[#2A2140] border-transparent hover:border-[#302744]'
+                        }`}
                       >
                         {/* Drag / Move Up/Down Controls */}
                         <div className="flex flex-col items-center justify-center text-[#A99DBE] opacity-0 group-hover:opacity-100 transition-opacity">
