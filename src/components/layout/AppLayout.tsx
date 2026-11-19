@@ -86,41 +86,23 @@ export function AppLayout() {
 
   const currentRoute = history[historyIndex] || { view: 'home' };
 
-  // Auto-seed and deduplicate all Telugu Melodies & Love Songs
+  // Auto-seed and verify all Telugu Melodies & Love Songs on startup
   React.useEffect(() => {
     async function initCollection() {
       if (isAutoSeedingInProgress) return;
       try {
-        const seededSpotify = localStorage.getItem('sonora_telugu_v9_audit_437_unique');
-        const count = await db.songs.count();
+        const songCount = await db.songs.count();
+        const plSongCount = await db.playlistSongs.count();
 
-        // Always purge removed legacy categories (Devotional, Folk) immediately
-        try {
-          await db.songs.where('category').anyOf(['Devotional', 'Folk & Beats', 'Folk & Teenmaar']).delete();
-          await db.songs.where('genre').anyOf(['Devotional', 'Folk & Beats', 'Folk & Teenmaar']).delete();
-          await db.playlists.delete('pl_spotify_folk_beats');
-          await db.playlists.delete('pl_spotify_devotional');
-          await db.playlistSongs.where('playlistId').anyOf(['pl_spotify_folk_beats', 'pl_spotify_devotional']).delete();
-        } catch {
-          // continue
-        }
-
-        // Run automatic deduplication on pre-existing database rows
-        await deduplicateSongsInLibrary();
-
-        // If not on v9 audit or count is distorted (> 450 indicates legacy 620 duplicates), re-seed fresh clean catalog
-        if (!seededSpotify || count > 450 || count < 350) {
-          isAutoSeedingInProgress = true;
-          // Clear any legacy duplicate-filled store to ensure each song appears only once
-          try {
-            await db.songs.clear();
-            await db.playlistSongs.clear();
-          } catch {
-            // continue
-          }
-          await importAllSpotifyTeluguCategories();
+        // If library already has songs and playlist mappings, do NOT wipe anything!
+        if (songCount >= 350 && plSongCount >= 100) {
           localStorage.setItem('sonora_telugu_v9_audit_437_unique', 'true');
+          return;
         }
+
+        isAutoSeedingInProgress = true;
+        await importAllSpotifyTeluguCategories();
+        localStorage.setItem('sonora_telugu_v9_audit_437_unique', 'true');
       } catch (e) {
         console.warn('Initial seeding error:', e);
       } finally {

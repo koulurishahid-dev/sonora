@@ -5,6 +5,7 @@ import { Playlist, ViewType } from '@/types/music';
 import { db, getArtworkObjectUrl } from '@/lib/db';
 import { useToast } from '@/context/ToastContext';
 import { ListMusic, Plus, Play, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { SPOTIFY_TELUGU_CATEGORIES, filterSpotifyCategorySongs } from '@/lib/spotifyService';
 
 interface PlaylistsViewProps {
   onNavigate: (view: ViewType, param?: string) => void;
@@ -23,26 +24,69 @@ export function PlaylistsView({
   const [playlistArtworks, setPlaylistArtworks] = useState<Record<string, string>>({});
 
   const loadData = async () => {
-    const list = await db.playlists.toArray();
+    let list = await db.playlists.toArray();
+
+    // Ensure all predefined Spotify category playlists exist
+    if (list.length < SPOTIFY_TELUGU_CATEGORIES.length) {
+      for (const cat of SPOTIFY_TELUGU_CATEGORIES) {
+        if (!list.some(p => p.id === cat.id)) {
+          const newPl: Playlist = {
+            id: cat.id,
+            title: cat.title,
+            description: cat.description,
+            customArtwork: cat.coverImage,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          };
+          await db.playlists.put(newPl);
+          list.push(newPl);
+        }
+      }
+    }
+
     setPlaylists(list);
 
     const counts: Record<string, number> = {};
     const arts: Record<string, string> = {};
+    const all = await db.songs.toArray();
 
     for (const pl of list) {
-      counts[pl.id] = await db.playlistSongs.where('playlistId').equals(pl.id).count();
+      let count = await db.playlistSongs.where('playlistId').equals(pl.id).count();
 
-      // If no custom artwork, grab the artwork from the first song in the playlist
+      // Self-healing fallback if playlistSongs table was not yet populated
+      if (count === 0) {
+        const matches = filterSpotifyCategorySongs(all, pl.id);
+        count = matches.length;
+        if (count > 0) {
+          const toAdd = matches.map((s, idx) => ({
+            id: `${pl.id}_${s.id}`,
+            playlistId: pl.id,
+            songId: s.id,
+            order: idx,
+            addedAt: Date.now(),
+          }));
+          db.playlistSongs.bulkPut(toAdd).catch(() => {});
+        }
+      }
+
+      counts[pl.id] = count;
+
+      // If no custom artwork, grab artwork from Spotify category or first song
       const customUrl = getArtworkObjectUrl(pl);
       if (customUrl) {
         arts[pl.id] = customUrl;
       } else {
-        const firstPs = await db.playlistSongs.where('playlistId').equals(pl.id).first();
-        if (firstPs) {
-          const song = await db.songs.get(firstPs.songId);
-          if (song) {
-            const songArt = getArtworkObjectUrl(song);
-            if (songArt) arts[pl.id] = songArt;
+        const catDef = SPOTIFY_TELUGU_CATEGORIES.find(c => c.id === pl.id);
+        if (catDef?.coverImage) {
+          arts[pl.id] = catDef.coverImage;
+        } else {
+          const firstPs = await db.playlistSongs.where('playlistId').equals(pl.id).first();
+          if (firstPs) {
+            const song = await db.songs.get(firstPs.songId);
+            if (song) {
+              const songArt = getArtworkObjectUrl(song);
+              if (songArt) arts[pl.id] = songArt;
+            }
           }
         }
       }
@@ -53,6 +97,18 @@ export function PlaylistsView({
 
   useEffect(() => {
     loadData();
+
+    const handleUpdate = () => {
+      loadData();
+    };
+    window.addEventListener('sonora_library_updated', handleUpdate);
+
+    const timer = setTimeout(loadData, 1200);
+
+    return () => {
+      window.removeEventListener('sonora_library_updated', handleUpdate);
+      clearTimeout(timer);
+    };
   }, []);
 
   const handleDelete = async (e: React.MouseEvent, pl: Playlist) => {

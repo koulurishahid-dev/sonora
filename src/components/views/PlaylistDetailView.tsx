@@ -9,6 +9,7 @@ import { formatDuration, formatDate } from '@/lib/utils';
 import { extractColorsFromImage, ExtractedColors } from '@/lib/colorExtractor';
 import { InteractiveSongCard } from '@/components/common/InteractiveSongCard';
 import { Tooltip } from '@/components/common/Tooltip';
+import { SPOTIFY_TELUGU_CATEGORIES, filterSpotifyCategorySongs } from '@/lib/spotifyService';
 import {
   Play,
   Pause,
@@ -63,7 +64,22 @@ export function PlaylistDetailView({
 
   const loadData = async () => {
     setIsLoading(true);
-    const pl = await db.playlists.get(playlistId);
+    let pl = await db.playlists.get(playlistId);
+
+    // Auto-resolve playlist metadata if not stored yet
+    const catDef = SPOTIFY_TELUGU_CATEGORIES.find(c => c.id === playlistId);
+    if (!pl && catDef) {
+      pl = {
+        id: catDef.id,
+        title: catDef.title,
+        description: catDef.description,
+        customArtwork: catDef.coverImage,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      await db.playlists.put(pl);
+    }
+
     if (!pl) {
       setIsLoading(false);
       return;
@@ -76,17 +92,48 @@ export function PlaylistDetailView({
       .equals(playlistId)
       .sortBy('order');
 
-    const songObjects: Song[] = [];
+    let songObjects: Song[] = [];
     for (const ps of pSongs) {
       const s = await db.songs.get(ps.songId);
       if (s) songObjects.push(s);
     }
+
+    // Self-healing fallback: If playlistSongs is empty, dynamically query matching songs from db.songs
+    if (songObjects.length === 0 && catDef) {
+      const all = await db.songs.toArray();
+      songObjects = filterSpotifyCategorySongs(all, playlistId);
+      if (songObjects.length > 0) {
+        // Cache to playlistSongs table in background so subsequent loads are fast
+        const toAdd = songObjects.map((s, idx) => ({
+          id: `${playlistId}_${s.id}`,
+          playlistId,
+          songId: s.id,
+          order: idx,
+          addedAt: Date.now(),
+        }));
+        db.playlistSongs.bulkPut(toAdd).catch(() => {});
+      }
+    }
+
     setSongs(songObjects);
     setIsLoading(false);
   };
 
   useEffect(() => {
     loadData();
+
+    const handleUpdate = () => {
+      loadData();
+    };
+    window.addEventListener('sonora_library_updated', handleUpdate);
+
+    // Re-check after 1 second if songs were still importing
+    const timer = setTimeout(loadData, 1000);
+
+    return () => {
+      window.removeEventListener('sonora_library_updated', handleUpdate);
+      clearTimeout(timer);
+    };
   }, [playlistId]);
 
   // Extract ambient colors from the playlist artwork or the first song

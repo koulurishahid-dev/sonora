@@ -14,7 +14,7 @@ import { useToast } from '@/context/ToastContext';
 import { useTheme } from '@/context/ThemeContext';
 import { InteractiveSongCard } from '@/components/common/InteractiveSongCard';
 import { SkeletonSongCard } from '@/components/common/SkeletonSongCard';
-import { SPOTIFY_TELUGU_CATEGORIES, importAllSpotifyTeluguCategories } from '@/lib/spotifyService';
+import { SPOTIFY_TELUGU_CATEGORIES, importAllSpotifyTeluguCategories, filterSpotifyCategorySongs } from '@/lib/spotifyService';
 import {
   Play,
   Pause,
@@ -272,17 +272,34 @@ export function HomeView({
   };
 
   useEffect(() => {
+    loadData();
+
+    // Re-check after 800ms and 2000ms if database is loading on initial startup
+    const t1 = setTimeout(loadData, 800);
+    const t2 = setTimeout(loadData, 2200);
+
+    // Listen for library updates from background seeder or imports
+    const handleUpdate = () => {
+      loadData();
+    };
+    window.addEventListener('sonora_library_updated', handleUpdate);
+
     deduplicateSongsInLibrary().then(removed => {
       if (removed > 0) {
         showToast('Library Cleaned', `Removed ${removed} duplicate song entries.`, 'success');
         loadData();
       }
     });
-    loadData();
 
     repairLibraryArtworkAndTitles().then(count => {
       if (count > 0) loadData();
     });
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener('sonora_library_updated', handleUpdate);
+    };
   }, []);
 
   useEffect(() => {
@@ -496,19 +513,7 @@ export function HomeView({
         {/* Responsive grid: single column on ultra-compact mobile, 2 columns on phones, 3 columns on tablet/desktop */}
         <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
           {SPOTIFY_TELUGU_CATEGORIES.map(cat => {
-            const playlistSongs = allSongs.filter(s => {
-              const catTag = s.category || s.genre || '';
-              if (cat.id === 'pl_spotify_hot_hits') return catTag === 'Hot Hits' || (s.year !== undefined && s.year >= 2023);
-              if (cat.id === 'pl_spotify_romance') return catTag === 'Love Songs';
-              if (cat.id === 'pl_spotify_melodies') return catTag === 'Melodies';
-              if (cat.id === 'pl_spotify_mass_beats') return catTag === 'Mass & Beats';
-              if (cat.id === 'pl_spotify_golden_classics') return catTag === 'Golden Classics';
-              if (cat.id === 'pl_spotify_sid_sriram') return catTag === 'Sid Sriram' || s.artist.toLowerCase().includes('sid sriram');
-              if (cat.id === 'pl_spotify_blockbusters') return catTag === 'Blockbusters' || s.artist.toLowerCase().includes('thaman') || s.artist.toLowerCase().includes('devi sri prasad') || s.artist.toLowerCase().includes('anirudh');
-              if (cat.id === 'pl_spotify_90s_classics') return catTag === '90s Classics';
-              if (cat.id === 'pl_spotify_travel_melodies') return catTag === 'Telugu Travel Melodies';
-              return true;
-            });
+            const playlistSongs = filterSpotifyCategorySongs(allSongs, cat.id);
 
             return (
               <div

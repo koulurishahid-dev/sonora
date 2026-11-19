@@ -98,6 +98,47 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   },
 ];
 
+export function filterSpotifyCategorySongs(songs: Song[], categoryId: string): Song[] {
+  return songs.filter(s => {
+    const catTag = s.category || s.genre || '';
+    if (categoryId === 'pl_spotify_hot_hits') {
+      return catTag === 'Hot Hits' || (s.year !== undefined && s.year >= 2023);
+    }
+    if (categoryId === 'pl_spotify_romance') {
+      return catTag === 'Love Songs' || catTag.toLowerCase().includes('love') || catTag.toLowerCase().includes('romance');
+    }
+    if (categoryId === 'pl_spotify_melodies') {
+      return catTag === 'Melodies' || catTag.toLowerCase().includes('melod');
+    }
+    if (categoryId === 'pl_spotify_mass_beats') {
+      return catTag === 'Mass & Beats' || catTag.toLowerCase().includes('mass') || catTag.toLowerCase().includes('beat');
+    }
+    if (categoryId === 'pl_spotify_golden_classics') {
+      return catTag === 'Golden Classics' || (s.year !== undefined && s.year >= 2000 && s.year <= 2012) || catTag.toLowerCase().includes('classic');
+    }
+    if (categoryId === 'pl_spotify_sid_sriram') {
+      return catTag === 'Sid Sriram' || s.artist.toLowerCase().includes('sid sriram');
+    }
+    if (categoryId === 'pl_spotify_blockbusters') {
+      const a = s.artist.toLowerCase();
+      return (
+        catTag === 'Blockbusters' ||
+        a.includes('thaman') ||
+        a.includes('devi sri prasad') ||
+        a.includes('anirudh') ||
+        a.includes('keeravaani')
+      );
+    }
+    if (categoryId === 'pl_spotify_90s_classics') {
+      return catTag === '90s Classics' || (s.year !== undefined && s.year >= 1989 && s.year <= 1999) || (s.year !== undefined && s.year < 2000);
+    }
+    if (categoryId === 'pl_spotify_travel_melodies') {
+      return catTag === 'Telugu Travel Melodies' || catTag.toLowerCase().includes('travel');
+    }
+    return false;
+  });
+}
+
 // Expanded Mass, Dance, Viral & Golden Classic Tracks to ensure complete Telugu representation
 export const SPOTIFY_TELUGU_MASS_AND_CLASSICS = [
   // --- 2024 & TRENDING CHARTBUSTERS ---
@@ -623,6 +664,8 @@ export async function importAllSpotifyTeluguCategories(
   }
 
   const allSongsToImport: Song[] = [];
+  const allLyricsToImport: any[] = [];
+  const allFavoritesToImport: any[] = [];
   const seenTitles = new Set<string>();
 
   function normSongKey(t: string): string {
@@ -681,11 +724,10 @@ export async function importAllSpotifyTeluguCategories(
       isOfflineAvailable: true,
     };
 
-    await db.songs.put(song);
     allSongsToImport.push(song);
 
     const parsed = parseLrc(item.lyrics);
-    await db.lyrics.put({
+    allLyricsToImport.push({
       id: `lyrics_${songId}`,
       songId: songId,
       plainLyrics: item.lyrics,
@@ -694,16 +736,11 @@ export async function importAllSpotifyTeluguCategories(
     });
 
     if (song.isFavorite) {
-      await db.favorites.put({
+      allFavoritesToImport.push({
         id: `fav_${songId}`,
         songId: songId,
         addedAt: Date.now(),
       });
-    }
-
-    if (onProgress && i % 8 === 0) {
-      const pct = Math.round(5 + (i / totalCore) * 45);
-      onProgress(pct, `Importing ${item.title} into Spotify library...`);
     }
   }
 
@@ -737,11 +774,10 @@ export async function importAllSpotifyTeluguCategories(
       isOfflineAvailable: true,
     };
 
-    await db.songs.put(song);
     allSongsToImport.push(song);
 
     const parsed = parseLrc(extra.lyrics);
-    await db.lyrics.put({
+    allLyricsToImport.push({
       id: `lyrics_${songId}`,
       songId: songId,
       plainLyrics: extra.lyrics,
@@ -751,9 +787,6 @@ export async function importAllSpotifyTeluguCategories(
   }
 
   // 3. Add Comprehensive Master Telugu Songs Collection (Strictly Single Instance per Song)
-  const telugu500SongsToAdd: Song[] = [];
-  const telugu500LyricsToAdd: any[] = [];
-
   for (let m = 0; m < TELUGU_500_SONGS.length; m++) {
     const item = TELUGU_500_SONGS[m];
     const key = normSongKey(item.title);
@@ -783,11 +816,10 @@ export async function importAllSpotifyTeluguCategories(
       isOfflineAvailable: true,
     };
 
-    telugu500SongsToAdd.push(song);
     allSongsToImport.push(song);
 
     const genericLyrics = `[00:00.00] ${item.title}\n[00:15.00] ${item.artist}\n[00:30.00] Movie: ${item.movie || item.album}\n[00:45.00] Verified 320kbps High Quality Master Audio on SONORA...`;
-    telugu500LyricsToAdd.push({
+    allLyricsToImport.push({
       id: `lyrics_${songId}`,
       songId: songId,
       plainLyrics: genericLyrics,
@@ -796,17 +828,22 @@ export async function importAllSpotifyTeluguCategories(
     });
   }
 
-  if (telugu500SongsToAdd.length > 0) {
-    if (onProgress) onProgress(65, `Saving ${telugu500SongsToAdd.length} master Telugu songs to library...`);
-    await db.songs.bulkPut(telugu500SongsToAdd);
-    await db.lyrics.bulkPut(telugu500LyricsToAdd);
+  // Perform Blazing-Fast Atomic Bulk Inserts
+  if (onProgress) onProgress(60, `Saving ${allSongsToImport.length} verified master tracks to library...`);
+  await db.songs.bulkPut(allSongsToImport);
+  await db.lyrics.bulkPut(allLyricsToImport);
+  if (allFavoritesToImport.length > 0) {
+    await db.favorites.bulkPut(allFavoritesToImport);
   }
 
   if (onProgress) onProgress(80, 'Organizing tracks into Spotify playlists & category shelves...');
 
-  // 4. Create Spotify Categorized Playlists in Dexie
+  // 4. Create Spotify Categorized Playlists and PlaylistSongs in Bulk
+  const allPlaylistsToImport: Playlist[] = [];
+  const allPlaylistSongsToImport: any[] = [];
+
   for (const cat of SPOTIFY_TELUGU_CATEGORIES) {
-    await db.playlists.put({
+    allPlaylistsToImport.push({
       id: cat.id,
       title: cat.title,
       description: cat.description,
@@ -815,47 +852,11 @@ export async function importAllSpotifyTeluguCategories(
       updatedAt: Date.now(),
     });
 
-    // Find all songs belonging to this category
-    const catSongs = allSongsToImport.filter(s => {
-      const catTag = s.category || s.genre || '';
-      if (cat.id === 'pl_spotify_hot_hits') {
-        return catTag === 'Hot Hits' || (s.year !== undefined && s.year >= 2023);
-      }
-      if (cat.id === 'pl_spotify_romance') {
-        return catTag === 'Love Songs';
-      }
-      if (cat.id === 'pl_spotify_melodies') {
-        return catTag === 'Melodies';
-      }
-      if (cat.id === 'pl_spotify_mass_beats') {
-        return catTag === 'Mass & Beats';
-      }
-      if (cat.id === 'pl_spotify_golden_classics') {
-        return catTag === 'Golden Classics';
-      }
-      if (cat.id === 'pl_spotify_sid_sriram') {
-        return catTag === 'Sid Sriram' || s.artist.toLowerCase().includes('sid sriram');
-      }
-      if (cat.id === 'pl_spotify_blockbusters') {
-        return (
-          catTag === 'Blockbusters' ||
-          s.artist.toLowerCase().includes('thaman') ||
-          s.artist.toLowerCase().includes('devi sri prasad') ||
-          s.artist.toLowerCase().includes('anirudh') ||
-          s.artist.toLowerCase().includes('keeravaani')
-        );
-      }
-      if (cat.id === 'pl_spotify_90s_classics') {
-        return catTag === '90s Classics' || (s.year !== undefined && s.year >= 1989 && s.year <= 1999);
-      }
-      if (cat.id === 'pl_spotify_travel_melodies') {
-        return catTag === 'Telugu Travel Melodies';
-      }
-      return false;
-    });
+    // Find all songs belonging to this category using the unified filter
+    const catSongs = filterSpotifyCategorySongs(allSongsToImport, cat.id);
 
     for (let order = 0; order < catSongs.length; order++) {
-      await db.playlistSongs.put({
+      allPlaylistSongsToImport.push({
         id: `${cat.id}_${catSongs[order].id}`,
         playlistId: cat.id,
         songId: catSongs[order].id,
@@ -865,9 +866,19 @@ export async function importAllSpotifyTeluguCategories(
     }
   }
 
+  await db.playlists.bulkPut(allPlaylistsToImport);
+  await db.playlistSongs.bulkPut(allPlaylistSongsToImport);
+
   if (onProgress) onProgress(90, 'Syncing Spotify album and artist indexes...');
-  await deduplicateSongsInLibrary();
   await syncAlbumsAndArtists();
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent('sonora_library_updated', {
+        detail: { count: allSongsToImport.length, playlistsCount: allPlaylistsToImport.length },
+      })
+    );
+  }
 
   if (onProgress) {
     onProgress(100, `Imported ${allSongsToImport.length} songs across ${SPOTIFY_TELUGU_CATEGORIES.length} Spotify categories!`);

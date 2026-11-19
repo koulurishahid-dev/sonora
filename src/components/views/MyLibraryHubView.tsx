@@ -67,6 +67,15 @@ export function MyLibraryHubView({
       setRecentSongs(sorted);
     }
     loadStats();
+
+    const handleUpdate = () => {
+      loadStats();
+    };
+    window.addEventListener('sonora_library_updated', handleUpdate);
+
+    return () => {
+      window.removeEventListener('sonora_library_updated', handleUpdate);
+    };
   }, []);
 
   const sections: { view: ViewType; title: string; count: number; desc: string; icon: any; color: string }[] = [
