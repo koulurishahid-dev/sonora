@@ -70,8 +70,9 @@ export function BottomPlayer() {
     return (
       <div className="h-20 w-full bg-[#0B0D12] border-t border-white/[0.08] flex items-center justify-between px-6 text-zinc-500 text-xs select-none">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/[0.08]">
-            <Music2 className="w-5 h-5 text-zinc-600" />
+          <div className="w-12 h-12 rounded-xl bg-[#141122] flex items-center justify-center border border-[#302744]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-icon.png" alt="" className="w-8 h-8 object-contain opacity-70 drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]" />
           </div>
           <div>
             <p className="font-semibold text-white/80">No track selected</p>
@@ -136,7 +137,8 @@ export function BottomPlayer() {
               <img src={artworkUrl} alt="" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-[#A99DBE]">
-                <Music2 className="w-6 h-6" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-icon.png" alt="" className="w-8 h-8 object-contain opacity-70" />
               </div>
             )}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">

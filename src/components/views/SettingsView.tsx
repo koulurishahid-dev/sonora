@@ -109,7 +109,7 @@ export function SettingsView() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `sonora-metadata-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `naa-paatalu-metadata-backup-${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
       showToast('Export Complete', 'Metadata & playlists JSON saved to disk', 'success');
@@ -133,7 +133,7 @@ export function SettingsView() {
       const url = URL.createObjectURL(zipBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `sonora-full-library-archive-${new Date().toISOString().slice(0, 10)}.zip`;
+      a.download = `naa-paatalu-full-library-archive-${new Date().toISOString().slice(0, 10)}.zip`;
       a.click();
       URL.revokeObjectURL(url);
 
@@ -243,7 +243,7 @@ export function SettingsView() {
 
   const handleResetApplication = async () => {
     const proceed = confirm(
-      'DANGER: Are you sure you want to completely reset SONORA? This will erase all songs, playlists, favorites, and settings from this browser.'
+      'DANGER: Are you sure you want to completely reset NAA PAATALU? This will erase all songs, playlists, favorites, and settings from this browser.'
     );
     if (proceed) {
       await db.delete();
@@ -495,7 +495,7 @@ export function SettingsView() {
         <div className="p-4 rounded-xl bg-[#121216] border border-[#303038]/60 flex items-start gap-3">
           <Info className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
           <p className="text-xs text-[#A1A1AA] leading-relaxed">
-            <strong className="text-white">Strict Single-User Local Storage:</strong> SONORA stores
+            <strong className="text-white">Strict Single-User Local Storage:</strong> NAA PAATALU stores
             your songs and metadata exclusively inside this browser instance (IndexedDB). Your files
             never sync to external servers or public clouds. To transfer music to another device,
             use the complete ZIP backup feature below.
@@ -768,7 +768,7 @@ export function SettingsView() {
             onClick={handleResetApplication}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-md"
           >
-            <AlertTriangle className="w-3.5 h-3.5" /> Reset All Sonora Data
+            <AlertTriangle className="w-3.5 h-3.5" /> Reset All Naa Paatalu Data
           </button>
         </div>
       </section>

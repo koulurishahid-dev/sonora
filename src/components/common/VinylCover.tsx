@@ -106,8 +106,8 @@ export function VinylCover({
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-[#71717A] bg-gradient-to-br from-[#1E1E26] to-[#121216]">
-            <Music2 className="w-8 h-8 mb-1 text-[#3E3E4C]" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[#525260]">Sonora</span>
+            <img src="/logo-icon.png" alt="" className="w-7 h-7 object-contain opacity-70 mb-1" />
+            <span className="text-[10px] uppercase font-bold tracking-widest text-[#A99DBE]">Naa Paatalu</span>
           </div>
         )}
 

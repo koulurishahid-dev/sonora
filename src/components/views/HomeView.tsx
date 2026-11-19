@@ -108,8 +108,8 @@ function ShelfSongCard({
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#211A32] to-[#141122] text-[#A99DBE]">
-            <Music2 className="w-8 h-8 text-[#A99DBE]/60 mb-1" />
-            <span className="text-[9px] font-bold tracking-wider text-[#A99DBE] uppercase">Sonora</span>
+            <img src="/logo-icon.png" alt="" className="w-7 h-7 object-contain opacity-70 mb-1" />
+            <span className="text-[9px] font-bold tracking-wider text-[#A99DBE] uppercase">Naa Paatalu</span>
           </div>
         )}
 

@@ -397,7 +397,7 @@ export async function importDatabaseFromJson(jsonString: string): Promise<{ succ
   try {
     const backup = JSON.parse(jsonString);
     if (!backup || !backup.data || (!backup.data.songs && !backup.data.playlists)) {
-      return { success: false, importedCount: 0, message: 'Invalid Sonora backup file format.' };
+      return { success: false, importedCount: 0, message: 'Invalid backup file format.' };
     }
 
     const { songs = [], playlists = [], playlistSongs = [], favorites = [], lyrics = [], settings = [] } = backup.data;

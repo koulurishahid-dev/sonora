@@ -106,6 +106,23 @@ export function HeaderBar({
           <Menu className="w-5 h-5" />
         </button>
 
+        {/* Mobile Brand Emblem */}
+        <div
+          className="md:hidden flex items-center gap-1.5 cursor-pointer py-1"
+          onClick={() => onNavigate('home')}
+          title="NAA PAATALU"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-icon.png"
+            alt="NAA PAATALU"
+            className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]"
+          />
+          <span className="font-extrabold text-xs tracking-wider text-[#F8F5FF]">
+            NAA PAATALU
+          </span>
+        </div>
+
         {/* History Navigation Arrows */}
         <div className="flex items-center gap-1">
           <button
@@ -128,7 +145,9 @@ export function HeaderBar({
 
         {/* Breadcrumb Pill */}
         <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#141122] border border-[#302744] text-xs">
-          <span className="text-[#A99DBE]">Sonora</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-icon.png" alt="" className="w-3.5 h-3.5 object-contain" />
+          <span className="text-[#A99DBE] font-medium">Naa Paatalu</span>
           <span className="text-[#302744]">&gt;</span>
           <span className="font-semibold text-[#F8F5FF] tracking-wide">{viewTitles[currentView] || 'Explore'}</span>
         </div>

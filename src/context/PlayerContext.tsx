@@ -400,7 +400,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: currentSong.title,
         artist: currentSong.artist,
-        album: currentSong.album || 'Sonora Studio',
+        album: currentSong.album || 'Naa Paatalu Studio',
         artwork: artworkList,
       });
 

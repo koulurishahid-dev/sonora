@@ -155,8 +155,8 @@ export function InteractiveSongCard({
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-zinc-500 bg-gradient-to-br from-[#211A32] to-[#141122]">
-            <Music2 className="w-8 h-8 text-zinc-600 mb-1" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[#A99DBE]">Sonora</span>
+            <img src="/logo-icon.png" alt="" className="w-7 h-7 object-contain opacity-70 mb-1" />
+            <span className="text-[10px] uppercase font-bold tracking-widest text-[#A99DBE]">Naa Paatalu</span>
           </div>
         )}
 

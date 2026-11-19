@@ -818,7 +818,7 @@ export async function importAllSpotifyTeluguCategories(
 
     allSongsToImport.push(song);
 
-    const genericLyrics = `[00:00.00] ${item.title}\n[00:15.00] ${item.artist}\n[00:30.00] Movie: ${item.movie || item.album}\n[00:45.00] Verified 320kbps High Quality Master Audio on SONORA...`;
+    const genericLyrics = `[00:00.00] ${item.title}\n[00:15.00] ${item.artist}\n[00:30.00] Movie: ${item.movie || item.album}\n[00:45.00] Verified 320kbps High Quality Master Audio on NAA PAATALU...`;
     allLyricsToImport.push({
       id: `lyrics_${songId}`,
       songId: songId,

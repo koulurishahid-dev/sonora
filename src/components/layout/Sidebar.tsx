@@ -51,31 +51,34 @@ export function Sidebar({
       } ${className}`}
     >
       {/* Personal Brand Header */}
-      <div className="flex items-center justify-between px-5 py-5 border-b border-[#302744]/60">
+      <div className="flex items-center justify-between px-3 py-3.5 border-b border-[#302744]/60">
         {!isCollapsed && (
           <div
             onClick={() => onNavigate('home')}
-            className="flex items-center gap-2.5 cursor-pointer group"
+            className="flex items-center gap-2 cursor-pointer group flex-1 min-w-0 mr-1"
+            title="NAA PAATALU – Every Song. Every Emotion. My World."
           >
-            <div className="w-8 h-8 rounded-xl bg-[#A78BFA] flex items-center justify-center text-[#090812] shadow-lg shadow-[#A78BFA]/25 group-hover:scale-105 transition-transform">
-              <Radio className="w-4 h-4 fill-[#090812]" />
-            </div>
-            <div>
-              <span className="font-extrabold text-base tracking-wider text-[#F8F5FF]">SONORA</span>
-              <span className="text-[10px] block text-[#C2B5D9] italic font-serif -mt-0.5">
-                my music journal
-              </span>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="NAA PAATALU"
+              className="h-10 w-auto max-w-[190px] object-contain drop-shadow-[0_0_12px_rgba(168,85,247,0.4)] group-hover:scale-[1.02] transition-transform"
+            />
           </div>
         )}
 
         {isCollapsed && (
           <div
             onClick={() => onNavigate('home')}
-            className="w-10 h-10 rounded-xl bg-[#A78BFA] flex items-center justify-center text-[#090812] mx-auto cursor-pointer shadow-lg shadow-[#A78BFA]/25"
-            title="SONORA – My Music Journal"
+            className="w-10 h-10 flex items-center justify-center mx-auto cursor-pointer group"
+            title="NAA PAATALU – Every Song. Every Emotion."
           >
-            <Radio className="w-5 h-5 fill-[#090812]" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-icon.png"
+              alt="NAA PAATALU"
+              className="w-10 h-10 object-contain drop-shadow-[0_0_12px_rgba(168,85,247,0.5)] group-hover:scale-110 transition-transform"
+            />
           </div>
         )}
 

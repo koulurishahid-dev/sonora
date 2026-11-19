@@ -167,7 +167,11 @@ export function AppLayout() {
           </div>
 
           <div>
-            <h1 className="text-xl font-extrabold text-white">SONORA Vault</h1>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-icon.png" alt="" className="w-8 h-8 object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
+              <h1 className="text-xl font-extrabold text-white">NAA PAATALU Vault</h1>
+            </div>
             <p className="text-xs text-[#A1A1AA] mt-1.5 leading-relaxed">
               This personal library is protected with a passcode.
             </p>

@@ -16,17 +16,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'SONORA – Personal Music Diary',
-  description: 'My private music collection, Telugu melodies, and cozy listening sanctuary.',
+  title: 'NAA PAATALU (నా పాటలు) – Every Song. Every Emotion.',
+  description: 'NAA PAATALU – Private Telugu Music Sanctuary, Vinyl Diary & Midnight Smoke Listening Room.',
   manifest: '/manifest.json',
   icons: {
-    icon: '/icon.svg',
-    apple: '/icon.svg',
+    icon: '/logo-icon.png',
+    apple: '/logo-icon.png',
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'SONORA',
+    title: 'NAA PAATALU',
   },
 };
 
@@ -47,11 +47,12 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/logo-icon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo-icon.png" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="SONORA" />
+        <meta name="apple-mobile-web-app-title" content="NAA PAATALU" />
       </head>
       <body className="h-full w-full overflow-hidden bg-[#0B0B0D] text-white">
         <ThemeProvider>

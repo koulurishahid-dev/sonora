@@ -77,7 +77,7 @@ export function TurntableStudioStage() {
   const artworkUrl = currentSong ? getArtworkObjectUrl(currentSong) : null;
   const isFav = currentSong?.isFavorite || false;
   const activeTitle = currentSong?.title || 'No Track Selected';
-  const activeArtist = currentSong?.artist || 'Sonora Studio';
+  const activeArtist = currentSong?.artist || 'Naa Paatalu Studio';
   const activeAlbum = currentSong?.album || 'Master Hi-Fi Collection';
   const activeYear = currentSong?.year;
 
@@ -231,9 +231,9 @@ export function TurntableStudioStage() {
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-[#211A32] to-[#090812] flex flex-col items-center justify-center p-2 text-center">
-                    <Disc className="w-10 h-10 text-[#A78BFA] opacity-90 mb-1" />
-                    <span className="text-[9px] font-bold tracking-widest uppercase text-[#F8F5FF]">
-                      SONORA HI-FI
+                    <img src="/logo-icon.png" alt="Naa Paatalu" className="w-9 h-9 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.5)] mb-1" />
+                    <span className="text-[8px] font-bold tracking-widest uppercase text-[#F8F5FF]">
+                      NAA PAATALU HI-FI
                     </span>
                   </div>
                 )}
@@ -283,7 +283,7 @@ export function TurntableStudioStage() {
                 {/* Headshell & Stylus Cartridge */}
                 <div className="absolute bottom-6 left-0.5 flex flex-col items-center">
                   <div className="w-4.5 h-7 bg-[#211A32] rounded-t-sm border border-[#302744] shadow-xl flex flex-col items-center justify-between p-0.5">
-                    <span className="text-[5px] font-mono text-[#D8B4FE]">SONORA</span>
+                    <span className="text-[4px] font-mono font-bold text-[#D8B4FE]">NAA PAATALU</span>
                     <div className="w-2.5 h-1.5 bg-[#A78BFA] rounded-b-xs shadow-[0_0_6px_#A78BFA]" />
                   </div>
                   {/* Needle tip */}

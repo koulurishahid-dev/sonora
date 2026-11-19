@@ -345,8 +345,8 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
                         />
                       ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center text-[#A99DBE] bg-[#141122]">
-                          <Music2 className="w-12 h-12 mb-2 text-[#A99DBE]/60" />
-                          <span className="text-[10px] uppercase font-mono tracking-wider">Sonora</span>
+                          <img src="/logo-icon.png" alt="" className="w-12 h-12 object-contain opacity-70 mb-2 drop-shadow-[0_0_8px_rgba(168,85,247,0.4)]" />
+                          <span className="text-[10px] uppercase font-mono tracking-wider">Naa Paatalu</span>
                         </div>
                       )}
 

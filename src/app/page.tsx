@@ -8,12 +8,17 @@ const AppLayout = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#0B0B0D] text-white">
-        <div className="w-12 h-12 rounded-2xl bg-[var(--accent)] flex items-center justify-center text-black font-extrabold text-xl shadow-2xl animate-pulse mb-4">
-          S
+      <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#050309] text-white">
+        <div className="relative mb-4 flex items-center justify-center">
+          <div className="absolute inset-0 bg-purple-600/30 blur-2xl rounded-full" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt="NAA PAATALU"
+            className="w-72 max-w-[85vw] h-auto object-contain relative z-10 drop-shadow-[0_0_25px_rgba(168,85,247,0.5)] animate-pulse"
+          />
         </div>
-        <p className="text-sm font-semibold tracking-wider text-white">SONORA</p>
-        <p className="text-xs text-[#71717A] mt-1">Initializing audio engine & library...</p>
+        <p className="text-xs text-[#A99DBE] mt-1 tracking-wide font-medium">Initializing audio sanctuary & library...</p>
       </div>
     ),
   }

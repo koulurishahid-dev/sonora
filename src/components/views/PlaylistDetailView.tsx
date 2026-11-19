@@ -317,8 +317,8 @@ export function PlaylistDetailView({
                 />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1C1E2A] to-[#0E1017] text-zinc-500">
-                  <ListMusic className="w-16 h-16 text-[var(--accent)] mb-2 opacity-80" />
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400">Sonora Mix</span>
+                  <img src="/logo-icon.png" alt="" className="w-14 h-14 object-contain opacity-80 mb-2 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400">Naa Paatalu Mix</span>
                 </div>
               )}
 
