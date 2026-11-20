@@ -274,6 +274,19 @@ export function HomeView({
   useEffect(() => {
     loadData();
 
+    // Clean up removed playlist categories (Hot Hits, Golden Classics, 90s Classics)
+    if (typeof window !== 'undefined' && !localStorage.getItem('sonora_cleanup_removed_playlists_v10')) {
+      Promise.all([
+        db.songs.where('category').anyOf(['Hot Hits', 'Golden Classics', '90s Classics']).delete(),
+        db.songs.where('genre').anyOf(['Hot Hits', 'Golden Classics', '90s Classics']).delete(),
+        db.playlists.where('id').anyOf(['pl_spotify_hot_hits', 'pl_spotify_golden_classics', 'pl_spotify_90s_classics']).delete(),
+        db.playlistSongs.where('playlistId').anyOf(['pl_spotify_hot_hits', 'pl_spotify_golden_classics', 'pl_spotify_90s_classics']).delete(),
+      ]).then(() => {
+        localStorage.setItem('sonora_cleanup_removed_playlists_v10', 'true');
+        loadData();
+      });
+    }
+
     // Listen for library updates from background seeder or imports
     const handleUpdate = () => {
       loadData();
@@ -323,21 +336,6 @@ export function HomeView({
   };
 
   // Distinct shelves
-  const hotHitsSongs = allSongs.filter(
-    s =>
-      (s.category || s.genre || '').toLowerCase() === 'hot hits' ||
-      (s.year !== undefined &&
-        s.year >= 2023 &&
-        (s.category === 'Mass & Beats' ||
-          s.category === 'Love Songs' ||
-          s.title.includes('Fear') ||
-          s.title.includes('Chuttamalle') ||
-          s.title.includes('Kurchi') ||
-          s.title.includes('Tillu') ||
-          s.title.includes('Sooseki') ||
-          s.title.includes('Pushpa')))
-  );
-
   const romanceSongs = allSongs.filter(
     s => (s.category || s.genre || '').toLowerCase() === 'love songs'
   );
@@ -348,10 +346,6 @@ export function HomeView({
 
   const massBeatsSongs = allSongs.filter(
     s => (s.category || s.genre || '').toLowerCase().includes('mass')
-  );
-
-  const classicsSongs = allSongs.filter(
-    s => (s.category || s.genre || '').toLowerCase().includes('classic') || (s.year && s.year <= 2012)
   );
 
   const sidSriramSongs = allSongs.filter(
@@ -367,12 +361,6 @@ export function HomeView({
       s.artist.toLowerCase().includes('keeravaani')
   );
 
-  const vintage90sSongs = allSongs.filter(
-    s =>
-      (s.category || s.genre || '').toLowerCase().includes('90s') ||
-      (s.year !== undefined && s.year >= 1989 && s.year <= 1999)
-  );
-
   const travelSongs = allSongs.filter(
     s => (s.category || s.genre || '').toLowerCase().includes('travel')
   );
@@ -386,12 +374,8 @@ export function HomeView({
       const target = activeCategory.toLowerCase();
       if (target === 'sid sriram') {
         matchesCategory = cat === 'sid sriram' || s.artist.toLowerCase().includes('sid sriram');
-      } else if (target === 'golden classics') {
-        matchesCategory = cat === 'golden classics' || (s.year !== undefined && s.year <= 2012);
       } else if (target === 'mass & beats') {
         matchesCategory = cat === 'mass & beats' || cat === 'mass beats' || cat === 'party';
-      } else if (target === '90s classics') {
-        matchesCategory = cat.includes('90s') || (s.year !== undefined && s.year >= 1989 && s.year <= 1999);
       } else if (target === 'blockbusters') {
         matchesCategory = cat === 'blockbusters' || s.artist.toLowerCase().includes('thaman') || s.artist.toLowerCase().includes('devi sri prasad') || s.artist.toLowerCase().includes('anirudh') || s.artist.toLowerCase().includes('keeravaani');
       } else if (target === 'telugu travel melodies' || target === 'travel melodies') {
@@ -535,13 +519,10 @@ export function HomeView({
                   />
                 </div>
 
-                <div className="min-w-0 flex-1 px-2 pr-3 sm:pr-12 flex flex-col justify-center">
+                <div className="min-w-0 flex-1 px-3 pr-4 sm:pr-12 flex flex-col justify-center">
                   <h3 className="text-xs sm:text-sm font-bold text-[#F8F5FF] group-hover:text-[#D8B4FE] line-clamp-2 leading-snug tracking-tight transition-colors">
                     {cat.shortTitle}
                   </h3>
-                  <p className="text-[10px] sm:text-[11px] text-[#C2B5D9] font-mono mt-0.5 truncate">
-                    {playlistSongs.length} tracks
-                  </p>
                 </div>
 
                 {/* Floating Play Button - Desktop Only */}
@@ -562,11 +543,11 @@ export function HomeView({
         </div>
       </section>
 
-      {/* 3. SHELF 1: HOT HITS TELUGU (TRENDING 2024 & VIRAL CHARTBUSTERS) */}
+      {/* 3. SHELF 1: TELUGU ROMANCE & SOULFUL LOVE SONGS */}
       <SpotifyShelf
-        title="⚡ Hot Hits Telugu — Trending Now"
-        subtitle="Devara, Pushpa 2, Guntur Kaaram, Kalki 2898 AD, Tillu Square & chartbusters"
-        songs={hotHitsSongs}
+        title="💖 Telugu Romance & Soulful Love Anthems"
+        subtitle="Unforgettable romantic duets, heart-touching melodies on repeat"
+        songs={romanceSongs}
         onPlaySong={playSong}
         currentSongId={currentSong?.id}
         isPlaying={isPlaying}
@@ -574,11 +555,11 @@ export function HomeView({
         onSongContextMenu={onSongContextMenu}
       />
 
-      {/* 4. SHELF 2: TELUGU ROMANCE & SOULFUL LOVE SONGS */}
+      {/* 4. SHELF 2: SOULFUL MELODIES & ACOUSTIC */}
       <SpotifyShelf
-        title="💖 Telugu Romance & Soulful Love Anthems"
-        subtitle="Unforgettable romantic duets, heart-touching melodies on repeat"
-        songs={romanceSongs}
+        title="🎵 Soulful Melodies & Acoustic Night Vibes"
+        subtitle="Acoustic guitar strings, peaceful vocals & tranquil Telugu melodies"
+        songs={melodySongs}
         onPlaySong={playSong}
         currentSongId={currentSong?.id}
         isPlaying={isPlaying}
@@ -598,19 +579,7 @@ export function HomeView({
         onSongContextMenu={onSongContextMenu}
       />
 
-      {/* 6. SHELF 4: 2000s NOSTALGIA & ALL-TIME GOLDEN CLASSICS */}
-      <SpotifyShelf
-        title="🌟 2000s Telugu Nostalgia & Golden Classics"
-        subtitle="Okkadu, Varsham, Arya, Jalsa, Ye Maya Chesave & golden memories"
-        songs={classicsSongs}
-        onPlaySong={playSong}
-        currentSongId={currentSong?.id}
-        isPlaying={isPlaying}
-        onTogglePlay={togglePlay}
-        onSongContextMenu={onSongContextMenu}
-      />
-
-      {/* 7. SHELF 5: ARTIST SPOTLIGHT: SID SRIRAM ESSENTIALS */}
+      {/* 6. SHELF 4: ARTIST SPOTLIGHT: SID SRIRAM ESSENTIALS */}
       <SpotifyShelf
         title="🎤 Artist Spotlight: Sid Sriram Essentials"
         subtitle="Every iconic Sid Sriram chartbuster in one continuous listening room"
@@ -622,7 +591,7 @@ export function HomeView({
         onSongContextMenu={onSongContextMenu}
       />
 
-      {/* 8. SHELF 6: COMPOSER BLOCKBUSTERS */}
+      {/* 7. SHELF 5: COMPOSER BLOCKBUSTERS */}
       <SpotifyShelf
         title="🎬 Composer Blockbusters: DSP, Thaman & Anirudh"
         subtitle="High-voltage Telugu chartbusters composed by the masters of Tollywood"
@@ -634,19 +603,7 @@ export function HomeView({
         onSongContextMenu={onSongContextMenu}
       />
 
-      {/* 9. SHELF 7: 90s GOLDEN ERA & VINTAGE CLASSICS */}
-      <SpotifyShelf
-        title="📻 90s Telugu Golden Era & Vintage Masterpieces"
-        subtitle="SP Balasubrahmanyam, Chithra, Ilaiyaraaja, Keeravani vintage gems"
-        songs={vintage90sSongs}
-        onPlaySong={playSong}
-        currentSongId={currentSong?.id}
-        isPlaying={isPlaying}
-        onTogglePlay={togglePlay}
-        onSongContextMenu={onSongContextMenu}
-      />
-
-      {/* 10. SHELF 8: TELUGU TRAVEL MELODIES & ROAD TRIPS */}
+      {/* 8. SHELF 6: TELUGU TRAVEL MELODIES & ROAD TRIPS */}
       <SpotifyShelf
         title="🚗 Telugu Travel Melodies & Road Trips"
         subtitle="Soulful travel tracks, breezy road trip anthems & wanderlust tunes from Spotify"
@@ -692,15 +649,12 @@ export function HomeView({
           <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-0.5 scrollbar-none flex-nowrap scroll-smooth touch-pan-x pr-4 sm:pr-0">
             {[
               { id: 'All', label: 'All', count: allSongs.length, icon: null },
-              { id: 'Telugu Travel Melodies', label: 'Travel Melodies', count: travelSongs.length, icon: '🚗' },
-              { id: 'Hot Hits', label: 'Hot Hits', count: hotHitsSongs.length, icon: '⚡' },
               { id: 'Love Songs', label: 'Romance', count: romanceSongs.length, icon: '💖' },
               { id: 'Melodies', label: 'Melodies', count: melodySongs.length, icon: '🎵' },
               { id: 'Mass & Beats', label: 'Mass Beats', count: massBeatsSongs.length, icon: '🔥' },
-              { id: 'Golden Classics', label: '2000s Classics', count: classicsSongs.length, icon: '🌟' },
               { id: 'Sid Sriram', label: 'Sid Sriram', count: sidSriramSongs.length, icon: '🎤' },
               { id: 'Blockbusters', label: 'Blockbusters', count: blockbustersSongs.length, icon: '🎬' },
-              { id: '90s Classics', label: '90s Vintage', count: vintage90sSongs.length, icon: '📻' },
+              { id: 'Telugu Travel Melodies', label: 'Travel Melodies', count: travelSongs.length, icon: '🚗' },
             ].map(tab => {
               const isActive = activeCategory === tab.id;
               return (

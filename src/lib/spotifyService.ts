@@ -16,15 +16,6 @@ export interface SpotifyCategoryDef {
 
 export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
   {
-    id: 'pl_spotify_hot_hits',
-    title: 'Hot Hits Telugu (Trending Chartbusters)',
-    shortTitle: 'Hot Hits Telugu',
-    spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX5cO1uWkF6vN',
-    description: 'The hottest trending chartbusters from Pushpa 2, Devara, Guntur Kaaram, Kalki 2898 AD & Tillu Square.',
-    categoryTag: 'Hot Hits',
-    coverImage: '/covers/hot_hits_telugu.jpg',
-  },
-  {
     id: 'pl_spotify_romance',
     title: 'Telugu Romance & Love Songs',
     shortTitle: 'Telugu Romance',
@@ -52,15 +43,6 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
     coverImage: '/covers/mass_party_beats.jpg',
   },
   {
-    id: 'pl_spotify_golden_classics',
-    title: '2000s Nostalgia & Golden Classics',
-    shortTitle: '2000s Nostalgia',
-    spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DWWvG80jTq5Z7',
-    description: 'Timeless Telugu nostalgic gems from Okkadu, Varsham, Arya, Jalsa, Ye Maya Chesave & more.',
-    categoryTag: 'Golden Classics',
-    coverImage: '/covers/golden_classics.jpg',
-  },
-  {
     id: 'pl_spotify_sid_sriram',
     title: 'Sid Sriram Essentials',
     shortTitle: 'Sid Sriram Hits',
@@ -79,15 +61,6 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
     coverImage: '/covers/blockbuster_hits.jpg',
   },
   {
-    id: 'pl_spotify_90s_classics',
-    title: '90s Telugu Golden Era & Vintage Gems',
-    shortTitle: '90s Golden Era',
-    spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DXcKq84G1W11B',
-    description: 'Nostalgic 90s Telugu masterpieces featuring SP Balasubrahmanyam, Chithra, Ilaiyaraaja.',
-    categoryTag: '90s Classics',
-    coverImage: '/covers/classics_90s.svg',
-  },
-  {
     id: 'pl_spotify_travel_melodies',
     title: 'Telugu Travel Melodies & Road Trips',
     shortTitle: 'Travel Melodies',
@@ -101,9 +74,6 @@ export const SPOTIFY_TELUGU_CATEGORIES: SpotifyCategoryDef[] = [
 export function filterSpotifyCategorySongs(songs: Song[], categoryId: string): Song[] {
   return songs.filter(s => {
     const catTag = s.category || s.genre || '';
-    if (categoryId === 'pl_spotify_hot_hits') {
-      return catTag === 'Hot Hits' || (s.year !== undefined && s.year >= 2023);
-    }
     if (categoryId === 'pl_spotify_romance') {
       return catTag === 'Love Songs' || catTag.toLowerCase().includes('love') || catTag.toLowerCase().includes('romance');
     }
@@ -112,9 +82,6 @@ export function filterSpotifyCategorySongs(songs: Song[], categoryId: string): S
     }
     if (categoryId === 'pl_spotify_mass_beats') {
       return catTag === 'Mass & Beats' || catTag.toLowerCase().includes('mass') || catTag.toLowerCase().includes('beat');
-    }
-    if (categoryId === 'pl_spotify_golden_classics') {
-      return catTag === 'Golden Classics' || (s.year !== undefined && s.year >= 2000 && s.year <= 2012) || catTag.toLowerCase().includes('classic');
     }
     if (categoryId === 'pl_spotify_sid_sriram') {
       return catTag === 'Sid Sriram' || s.artist.toLowerCase().includes('sid sriram');
@@ -128,9 +95,6 @@ export function filterSpotifyCategorySongs(songs: Song[], categoryId: string): S
         a.includes('anirudh') ||
         a.includes('keeravaani')
       );
-    }
-    if (categoryId === 'pl_spotify_90s_classics') {
-      return catTag === '90s Classics' || (s.year !== undefined && s.year >= 1989 && s.year <= 1999) || (s.year !== undefined && s.year < 2000);
     }
     if (categoryId === 'pl_spotify_travel_melodies') {
       return catTag === 'Telugu Travel Melodies' || catTag.toLowerCase().includes('travel');
@@ -407,161 +371,6 @@ export const SPOTIFY_TELUGU_MASS_AND_CLASSICS = [
     lyrics: "[00:00.00] Arey Jigelu Rani Vachindhe...\n[00:20.00] Rangasthalam Lona Racha Racha...\n[00:45.00] Jigelu Rani...",
   },
 
-  // --- 2000s NOSTALGIA & GOLDEN CLASSICS ---
-  {
-    title: "Hosanna",
-    artist: "Vijay Prakash, Suzanne D'Mello, Blaaze, A.R. Rahman",
-    movie: "Ye Maya Chesave",
-    year: 2010,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/73/e1/a1/73e1a17c-336b-b085-8382-f95bc41da42d/884977490596.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/000/05c5d77f6a8225d6667cf7a1fcaf37d8_320.mp4",
-    duration: 331,
-    lyrics: "[00:00.00] Hosanna... Pilla Gaalilo Thele Manasu...\n[00:25.00] Hosanna... Entha Haayi Ee Prema Sparsha...\n[00:50.00] Hello Hello Entha Baagundhe...\n[01:20.00] Hosanna...",
-  },
-  {
-    title: "Nuvvostanante Nenoddantana",
-    artist: "K.S. Chithra, Raqeeb Aalam, Devi Sri Prasad",
-    movie: "Varsham",
-    year: 2004,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/ae/7e/ea/ae7eeac9-edb2-11b7-dd94-51285e4edf50/cover.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/239/f76921b092abaf9d04a98e12e47675e3_320.mp4",
-    duration: 326,
-    lyrics: "[00:00.00] Nuvvostanante Nenoddantana...\n[00:22.00] Ee Chota Naa Praanam Aagipothunna...\n[00:50.00] Varsham Kurisina Vela...\n[01:15.00] Nuvvostanante Nenoddantana...",
-  },
-  {
-    title: "Mellaga Karagani",
-    artist: "Hariharan, Devi Sri Prasad",
-    movie: "Varsham",
-    year: 2004,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/ae/7e/ea/ae7eeac9-edb2-11b7-dd94-51285e4edf50/cover.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/237/7942edb73e64d4e35e488337e14753b7_320.mp4",
-    duration: 310,
-    lyrics: "[00:00.00] Mellaga Karagani Rendu Manasula Dooram...\n[00:25.00] Challaga Choodani Prema Saagaram...\n[00:55.00] Mellaga Karagani...",
-  },
-  {
-    title: "My Heart Is Beating",
-    artist: "KK, Devi Sri Prasad",
-    movie: "Jalsa",
-    year: 2008,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/7a/0b/e6/7a0be6ad-a11d-ece7-2fbd-0087d3cba671/12UMGIM01253.rgb.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/851/207631d6bacf7c75be31451f916be915_320.mp4",
-    duration: 298,
-    lyrics: "[00:00.00] My Heart Is Beating Adhola...\n[00:20.00] Nee Venta Paduthundhe Eela...\n[00:45.00] Jalsa Jalsa Cheyyira...\n[01:10.00] My Heart Is Beating...",
-  },
-  {
-    title: "Cheppave Chirugaali",
-    artist: "Udit Narayan, Sujatha, Mani Sharma",
-    movie: "Okkadu",
-    year: 2003,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/90/69/68/90696876-b8c3-6676-6551-ac3efc99e6ad/8905750020563.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/408/d5fadb97eff8b035a9885fe557cb6d26_320.mp4",
-    duration: 345,
-    lyrics: "[00:00.00] Cheppave Chirugaali Ekkadamma Aame...\n[00:22.00] Gundello Nilichindi Ee Janmake...\n[00:50.00] Cheppave Chirugaali...",
-  },
-  {
-    title: "Ammaye Sannaga",
-    artist: "Prashanthini, Hariharan, Mani Sharma",
-    movie: "Kushi",
-    year: 2001,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/07/0a/3d/070a3d85-bb09-17d5-6ab1-136c46655dfd/cover.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/679/85bf5d4b59843045f816ac905fd97219_320.mp4",
-    duration: 302,
-    lyrics: "[00:00.00] Ammaye Sannaga Meere Vennela...\n[00:20.00] Choosthunte Manasanta Kalavaramela...\n[00:45.00] Ammaye Sannaga...",
-  },
-  {
-    title: "O Maria",
-    artist: "Devan Ekambaram, Devi Sri Prasad",
-    movie: "Arya",
-    year: 2004,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/13/95/65/13956503-b669-dd7b-84b9-43197e15e673/19UM1IM00437.rgb.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/912/d6d2896cc368be3b110dcb216c51a121_320.mp4",
-    duration: 334,
-    lyrics: "[00:00.00] O Maria O Maria...\n[00:18.00] Feel My Love Feel My Love...\n[00:45.00] O Maria...",
-  },
-  {
-    title: "Feel My Love",
-    artist: "KK, Devi Sri Prasad",
-    movie: "Arya",
-    year: 2004,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/13/95/65/13956503-b669-dd7b-84b9-43197e15e673/19UM1IM00437.rgb.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/456/4d11a6a7766f341f5c7a8b27078d8b24_320.mp4",
-    duration: 310,
-    lyrics: "[00:00.00] Feel My Love Feel My Love...\n[00:22.00] Naa Gundellona Daachukunna Prema...\n[00:50.00] Feel My Love...",
-  },
-  {
-    title: "Uppenantha Ee Premaki",
-    artist: "KK, Devi Sri Prasad",
-    movie: "Arya 2",
-    year: 2009,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/a4/16/54/a4165466-92d7-7ac1-08d7-18bce6de58d2/cover.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/298/eb880c4cd78d1b29d128d430d4be0dcb_320.mp4",
-    duration: 329,
-    lyrics: "[00:00.00] Uppenantha Ee Premaki Guppedantha Gunde Kaavali...\n[00:24.00] Maro Janmantu Unte Nuvve Kaavali...\n[00:55.00] Uppenantha Ee Premaki...",
-  },
-  {
-    title: "Rooba Rooba",
-    artist: "Shail Hada, Chinmayi Sripaada, Harris Jayaraj",
-    movie: "Orange",
-    year: 2010,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/72/72/a6/7272a66e-c071-641c-1c88-8f2495d18d4e/cover.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/105/6edae5a98216eef5d60968c44889884c_320.mp4",
-    duration: 318,
-    lyrics: "[00:00.00] Rooba Rooba Rooba Rooba...\n[00:20.00] Gundello Nuvve Kalavarinchave...\n[00:45.00] Rooba Rooba...",
-  },
-  {
-    title: "Nenu Nuvvantu",
-    artist: "Naresh Iyer, Nadeem Mubarak, Harris Jayaraj",
-    movie: "Orange",
-    year: 2010,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/72/72/a6/7272a66e-c071-641c-1c88-8f2495d18d4e/cover.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/105/a24d2f0f3ab1547cc959b51ed6a9f48e_320.mp4",
-    duration: 295,
-    lyrics: "[00:00.00] Nenu Nuvvantu Verai Unna Kalisindhe Eevela...\n[00:22.00] Preme Chirunavvai Raasindhe O Maata...\n[00:50.00] Nenu Nuvvantu...",
-  },
-  {
-    title: "Appudo Ippudo",
-    artist: "Siddharth, Devi Sri Prasad",
-    movie: "Bommarillu",
-    year: 2006,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/af/4d/90/af4d90d2-40c4-bd4f-a7c6-74aede574dbd/cover.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/843/ca7e36439771ce63641bc47e457d8260_320.mp4",
-    duration: 242,
-    lyrics: "[00:00.00] Appudo Ippudo Eppudo...\n[00:18.00] Kalagannane Cheli Kalagannane...\n[00:42.00] Appudo Ippudo...",
-  },
-  {
-    title: "Ghal Ghal",
-    artist: "Tippu, Devi Sri Prasad",
-    movie: "Nuvvostanante Nenoddantana",
-    year: 2005,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/de/15/85/de15850d-fe77-36af-0eeb-0c96fc10d3d5/cover.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/347/56503bc98c59c98dc574419c5541c4e4_320.mp4",
-    duration: 320,
-    lyrics: "[00:00.00] Ghal Ghal Ghal Ghal Gajjelu Mogaga...\n[00:20.00] Paruvalaku Sandadi Kadhilindhe...\n[00:45.00] Ghal Ghal...",
-  },
-  {
-    title: "Arey Re Arey Re",
-    artist: "Karthik, Mickey J Meyer",
-    movie: "Happy Days",
-    year: 2007,
-    category: "Golden Classics",
-    artworkUrl: "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/b4/69/c6/b469c68e-034c-f537-0867-1b7e335e80fa/06UMGIM07216.rgb.jpg/600x600bb.jpg",
-    sourceUrl: "https://aac.saavncdn.com/134/8712c8dcdadb136a2ae27682fab5a365_320.mp4",
-    duration: 275,
-    lyrics: "[00:00.00] Arey Re Arey Re Manase Aagade...\n[00:20.00] Happy Days Ee College Rojullo...\n[00:45.00] Arey Re...",
-  },
   {
     title: "Gopikamma",
     artist: "K.S. Chithra, Mickey J Meyer",
@@ -652,13 +461,12 @@ export async function importAllSpotifyTeluguCategories(
 ): Promise<{ totalImported: number; categoriesCount: number }> {
   if (onProgress) onProgress(5, 'Connecting to Spotify Telugu Master Catalog...');
 
-  // Clean up removed categories (Devotional, Folk & Beats) from database
+  // Clean up removed categories (Hot Hits, Golden Classics, 90s Classics, Devotional, Folk & Beats) from database
   try {
-    await db.songs.where('category').anyOf(['Devotional', 'Folk & Beats']).delete();
-    await db.songs.where('genre').anyOf(['Devotional', 'Folk & Beats']).delete();
-    await db.playlists.delete('pl_spotify_folk_beats');
-    await db.playlists.delete('pl_spotify_devotional');
-    await db.playlistSongs.where('playlistId').anyOf(['pl_spotify_folk_beats', 'pl_spotify_devotional']).delete();
+    await db.songs.where('category').anyOf(['Hot Hits', 'Golden Classics', '90s Classics', 'Devotional', 'Folk & Beats']).delete();
+    await db.songs.where('genre').anyOf(['Hot Hits', 'Golden Classics', '90s Classics', 'Devotional', 'Folk & Beats']).delete();
+    await db.playlists.where('id').anyOf(['pl_spotify_hot_hits', 'pl_spotify_golden_classics', 'pl_spotify_90s_classics', 'pl_spotify_folk_beats', 'pl_spotify_devotional']).delete();
+    await db.playlistSongs.where('playlistId').anyOf(['pl_spotify_hot_hits', 'pl_spotify_golden_classics', 'pl_spotify_90s_classics', 'pl_spotify_folk_beats', 'pl_spotify_devotional']).delete();
   } catch {
     // continue
   }
@@ -697,8 +505,6 @@ export async function importAllSpotifyTeluguCategories(
     let category: string = item.mood;
     if (item.artist.toLowerCase().includes('sid sriram')) {
       category = 'Sid Sriram';
-    } else if (item.year <= 2012) {
-      category = 'Golden Classics';
     } else if (item.bpm >= 100) {
       category = 'Mass & Beats';
     }
@@ -789,6 +595,9 @@ export async function importAllSpotifyTeluguCategories(
   // 3. Add Comprehensive Master Telugu Songs Collection (Strictly Single Instance per Song)
   for (let m = 0; m < TELUGU_500_SONGS.length; m++) {
     const item = TELUGU_500_SONGS[m];
+    // Exclude removed categories (Hot Hits, Golden Classics, 90s Classics)
+    if (['Hot Hits', 'Golden Classics', '90s Classics'].includes(item.category)) continue;
+
     const key = normSongKey(item.title);
     if (seenTitles.has(key)) continue;
     seenTitles.add(key);

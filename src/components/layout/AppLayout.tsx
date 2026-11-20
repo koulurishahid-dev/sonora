@@ -89,23 +89,32 @@ export function AppLayout() {
 
   const currentRoute = history[historyIndex] || { view: 'home' };
 
-  // Auto-seed and verify all Telugu Melodies & Love Songs on startup
+  // Auto-seed, verify, and clean library on startup
   React.useEffect(() => {
     async function initCollection() {
       if (isAutoSeedingInProgress) return;
       try {
+        // One-time deletion of Hot Hits, Golden Classics, and 90s Classics
+        const migrationKey = 'sonora_telugu_v10_removed_3_playlists';
+        if (typeof window !== 'undefined' && !localStorage.getItem(migrationKey)) {
+          await db.songs.where('category').anyOf(['Hot Hits', 'Golden Classics', '90s Classics']).delete();
+          await db.songs.where('genre').anyOf(['Hot Hits', 'Golden Classics', '90s Classics']).delete();
+          await db.playlists.where('id').anyOf(['pl_spotify_hot_hits', 'pl_spotify_golden_classics', 'pl_spotify_90s_classics']).delete();
+          await db.playlistSongs.where('playlistId').anyOf(['pl_spotify_hot_hits', 'pl_spotify_golden_classics', 'pl_spotify_90s_classics']).delete();
+          localStorage.setItem(migrationKey, 'true');
+          window.dispatchEvent(new Event('sonora_library_updated'));
+        }
+
         const songCount = await db.songs.count();
         const plSongCount = await db.playlistSongs.count();
 
-        // If library already has songs and playlist mappings, do NOT wipe anything!
-        if (songCount >= 350 && plSongCount >= 100) {
-          localStorage.setItem('sonora_telugu_v9_audit_437_unique', 'true');
+        // If library already has songs and playlist mappings, do NOT re-seed
+        if (songCount >= 100 && plSongCount >= 50) {
           return;
         }
 
         isAutoSeedingInProgress = true;
         await importAllSpotifyTeluguCategories();
-        localStorage.setItem('sonora_telugu_v9_audit_437_unique', 'true');
       } catch (e) {
         console.warn('Initial seeding error:', e);
       } finally {
