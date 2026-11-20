@@ -15,6 +15,7 @@ export function QueueDrawer() {
     isQueueOpen,
     setIsQueueOpen,
     playSong,
+    playQueueIndex,
     removeFromQueue,
     clearQueue,
     reorderQueue,
@@ -183,7 +184,7 @@ export function QueueDrawer() {
 
                         {/* Artwork */}
                         <div
-                          onClick={() => playSong(song)}
+                          onClick={() => playQueueIndex(actualQueueIndex)}
                           className="w-10 h-10 rounded-lg overflow-hidden bg-[#141122] shrink-0 relative flex items-center justify-center cursor-pointer border border-[#302744]"
                         >
                           {artUrl ? (
@@ -197,7 +198,7 @@ export function QueueDrawer() {
                         </div>
 
                         {/* Metadata */}
-                        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => playSong(song)}>
+                        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => playQueueIndex(actualQueueIndex)}>
                           <p className="text-sm font-medium text-[#F8F5FF] truncate group-hover:text-[#D8B4FE] transition-colors">
                             {song.title}
                           </p>

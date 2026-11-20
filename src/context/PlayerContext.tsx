@@ -13,6 +13,18 @@ export const EQ_PRESETS: Record<Exclude<EqPresetName, 'custom'>, EqBands> = {
   'classical': { band60: 4, band250: 2, band1k: -1, band4k: 2, band12k: 4 },
 };
 
+/**
+ * Fisher-Yates True Random Permutation (Spotify/JioSaavn algorithm)
+ */
+export function fisherYatesShuffle<T>(items: T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 interface PlayerContextType {
   currentSong: Song | null;
   isPlaying: boolean;
@@ -45,6 +57,7 @@ interface PlayerContextType {
 
   // Actions
   playSong: (song: Song, newQueue?: Song[]) => Promise<void>;
+  playQueueIndex: (index: number) => Promise<void>;
   togglePlay: () => void;
   nextTrack: () => void;
   prevTrack: () => void;
@@ -84,14 +97,40 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
-  const [shuffle, setShuffle] = useState(false);
-  const [repeat, setRepeat] = useState<'off' | 'one' | 'all'>('off');
+  const [shuffle, setShuffleState] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('naa_paatalu_shuffle') === 'true';
+    }
+    return false;
+  });
+  const [repeat, setRepeatState] = useState<'off' | 'one' | 'all'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('naa_paatalu_repeat') as 'off' | 'one' | 'all';
+      if (saved === 'off' || saved === 'one' || saved === 'all') return saved;
+    }
+    return 'off';
+  });
   const [queue, setQueue] = useState<Song[]>([]);
   const [queueIndex, setQueueIndex] = useState(-1);
   const [isNowPlayingOpen, setIsNowPlayingOpen] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
   const [isSideViewOpen, setIsSideViewOpen] = useState(false);
+
+  // App-Grade (Spotify / JioSaavn) Queue & History References
+  const originalQueueRef = useRef<Song[]>([]);
+  const historyStackRef = useRef<Song[]>([]);
+  const shuffleRef = useRef<boolean>(shuffle);
+  const repeatRef = useRef<'off' | 'one' | 'all'>(repeat);
+
+  // Synchronize refs with state
+  useEffect(() => {
+    shuffleRef.current = shuffle;
+  }, [shuffle]);
+
+  useEffect(() => {
+    repeatRef.current = repeat;
+  }, [repeat]);
 
   // Auto-open sidebar on desktop screens (>=1024px), keep closed on mobile
   useEffect(() => {
@@ -586,39 +625,54 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     return cachedTimeDataRef.current;
   }, []);
 
-  // Play Song action
-  const playSong = async (song: Song, newQueue?: Song[]) => {
+  // Smart Autoplay recommendations for when a playlist or album reaches the end (Spotify feature)
+  const fetchAutoplayRecommendations = async (lastSong: Song, currentQueue: Song[]): Promise<Song[]> => {
+    try {
+      const existingIds = new Set(currentQueue.map(s => s.id));
+      let candidates: Song[] = [];
+      if (lastSong.artist) {
+        const byArtist = await db.songs.where('artist').equalsIgnoreCase(lastSong.artist).toArray();
+        candidates.push(...byArtist.filter(s => !existingIds.has(s.id)));
+      }
+      if (candidates.length < 5 && lastSong.genre) {
+        const byGenre = await db.songs.where('genre').equalsIgnoreCase(lastSong.genre).toArray();
+        for (const s of byGenre) {
+          if (!existingIds.has(s.id) && !candidates.some(c => c.id === s.id)) {
+            candidates.push(s);
+            if (candidates.length >= 10) break;
+          }
+        }
+      }
+      if (candidates.length < 5) {
+        const fallbackSongs = await db.songs.limit(25).toArray();
+        for (const s of fallbackSongs) {
+          if (!existingIds.has(s.id) && !candidates.some(c => c.id === s.id)) {
+            candidates.push(s);
+            if (candidates.length >= 8) break;
+          }
+        }
+      }
+      return fisherYatesShuffle(candidates).slice(0, 5);
+    } catch {
+      return [];
+    }
+  };
+
+  // Core audio player starter with smooth crossfading & stats logging
+  const startAudioPlayback = async (song: Song) => {
     setAudioError(null);
     if (!audioRef.current) return;
 
-    // Resume AudioContext non-blockingly so playback start is instantaneous even in background tabs
     if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
       audioCtxRef.current.resume().catch(() => {});
     } else {
       initWebAudio();
     }
 
-    let activeQueue = newQueue || queue;
-    let idx = activeQueue.findIndex(s => s.id === song.id);
-
-    if (newQueue) {
-      setQueue(newQueue);
-      if (idx === -1) {
-        setQueue([song, ...newQueue]);
-        idx = 0;
-      }
-      setQueueIndex(idx);
-    } else if (idx === -1) {
-      setQueue(prev => [...prev, song]);
-      setQueueIndex(queue.length);
-    } else {
-      setQueueIndex(idx);
-    }
-
     setCurrentSong(song);
     setDuration(song.duration || 0);
 
-    // If official YouTube embed, handle separately without HTML5 Audio tag conflict
+    // If official YouTube embed, handle without HTML5 Audio conflict
     if (song.providerType === 'youtube') {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -683,7 +737,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         masterGainRef.current.gain.value = 1.0;
       }
 
-      // Track play count and listening history
       await db.songs.update(song.id, {
         playCount: (song.playCount || 0) + 1,
         lastPlayedAt: Date.now(),
@@ -702,6 +755,54 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         setAudioError('Unable to start playback. Check browser autoplay permissions.');
       }
     }
+  };
+
+  // Play Song action (Spotify / JioSaavn model)
+  const playSong = async (song: Song, newQueue?: Song[]) => {
+    if (currentSong && currentSong.id !== song.id) {
+      historyStackRef.current.push(currentSong);
+      if (historyStackRef.current.length > 50) historyStackRef.current.shift();
+    }
+
+    if (newQueue && newQueue.length > 0) {
+      originalQueueRef.current = [...newQueue];
+
+      if (shuffleRef.current) {
+        // True App-grade Shuffle: clicked track plays first, rest of context is randomized
+        const others = newQueue.filter(s => s.id !== song.id);
+        const shuffledOthers = fisherYatesShuffle(others);
+        const activeList = [song, ...shuffledOthers];
+        setQueue(activeList);
+        setQueueIndex(0);
+      } else {
+        setQueue(newQueue);
+        const idx = newQueue.findIndex(s => s.id === song.id);
+        setQueueIndex(idx !== -1 ? idx : 0);
+      }
+    } else {
+      const idx = queue.findIndex(s => s.id === song.id);
+      if (idx !== -1) {
+        setQueueIndex(idx);
+      } else {
+        setQueue(prev => [...prev, song]);
+        setQueueIndex(queue.length);
+        originalQueueRef.current.push(song);
+      }
+    }
+
+    await startAudioPlayback(song);
+  };
+
+  // Jump directly to an exact queue index without disrupting the queue permutation
+  const playQueueIndex = async (index: number) => {
+    if (index < 0 || index >= queue.length) return;
+    const targetSong = queue[index];
+    if (currentSong && currentSong.id !== targetSong.id) {
+      historyStackRef.current.push(currentSong);
+      if (historyStackRef.current.length > 50) historyStackRef.current.shift();
+    }
+    setQueueIndex(index);
+    await startAudioPlayback(targetSong);
   };
 
   // Toggle Play/Pause
@@ -730,61 +831,165 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     if (!audioRef.current) return;
     audioRef.current.currentTime = time;
     setCurrentTime(time);
+    syncPositionState();
   };
 
-  // Next Track
-  const nextTrack = useCallback(() => {
+  // Toggle Shuffle with immediate queue reordering & lossless restoration
+  const toggleShuffle = () => {
+    const nextShuffle = !shuffleRef.current;
+    shuffleRef.current = nextShuffle;
+    setShuffleState(nextShuffle);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('naa_paatalu_shuffle', nextShuffle ? 'true' : 'false');
+    }
+
+    if (nextShuffle) {
+      // Shuffling ON: Keep current song at index 0, randomize upcoming tracks
+      if (queue.length > 1) {
+        if (originalQueueRef.current.length === 0) {
+          originalQueueRef.current = [...queue];
+        }
+        const cur = currentSong || (queueIndex >= 0 ? queue[queueIndex] : queue[0]);
+        const sourcePool = originalQueueRef.current.length > 0 ? originalQueueRef.current : queue;
+        const others = sourcePool.filter(s => s.id !== cur.id);
+        const shuffled = fisherYatesShuffle(others);
+        setQueue([cur, ...shuffled]);
+        setQueueIndex(0);
+      }
+    } else {
+      // Shuffling OFF: Restore original playlist/album sequence seamlessly
+      if (originalQueueRef.current.length > 0) {
+        const restored = [...originalQueueRef.current];
+        setQueue(restored);
+        if (currentSong) {
+          const origIdx = restored.findIndex(s => s.id === currentSong.id);
+          setQueueIndex(origIdx !== -1 ? origIdx : 0);
+        }
+      }
+    }
+  };
+
+  // Toggle Repeat: 'off' -> 'all' -> 'one' -> 'off'
+  const toggleRepeat = () => {
+    setRepeatState(prev => {
+      let next: 'off' | 'all' | 'one' = 'off';
+      if (prev === 'off') next = 'all';
+      else if (prev === 'all') next = 'one';
+      else next = 'off';
+
+      repeatRef.current = next;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('naa_paatalu_repeat', next);
+      }
+      return next;
+    });
+  };
+
+  // Next Track: Sequential queue progression, loop with re-shuffle, or Smart Autoplay
+  const nextTrack = useCallback(async () => {
     if (queue.length === 0) return;
 
-    if (repeat === 'one' && currentSong) {
+    // 1. Single track repeat
+    if (repeatRef.current === 'one' && currentSong) {
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
-        audioRef.current.play();
+        audioRef.current.play().catch(() => {});
       }
       return;
     }
 
-    let nextIdx: number;
-    if (shuffle) {
-      nextIdx = Math.floor(Math.random() * queue.length);
-    } else {
-      nextIdx = queueIndex + 1;
+    const nextIdx = queueIndex + 1;
+
+    // 2. Advance sequentially in queue
+    if (nextIdx < queue.length) {
+      if (currentSong) {
+        historyStackRef.current.push(currentSong);
+        if (historyStackRef.current.length > 50) historyStackRef.current.shift();
+      }
+      const nextSong = queue[nextIdx];
+      setQueueIndex(nextIdx);
+      await startAudioPlayback(nextSong);
+      return;
     }
 
-    if (nextIdx >= queue.length) {
-      if (repeat === 'all') {
-        nextIdx = 0;
+    // 3. Repeat all: loop back to beginning
+    if (repeatRef.current === 'all') {
+      if (currentSong) historyStackRef.current.push(currentSong);
+      if (shuffleRef.current && originalQueueRef.current.length > 1) {
+        const reshuffled = fisherYatesShuffle(originalQueueRef.current);
+        setQueue(reshuffled);
+        setQueueIndex(0);
+        await startAudioPlayback(reshuffled[0]);
       } else {
-        setIsPlaying(false);
+        setQueueIndex(0);
+        await startAudioPlayback(queue[0]);
+      }
+      return;
+    }
+
+    // 4. Repeat off: Smart Autoplay similar songs from IndexedDB
+    if (currentSong) {
+      const recs = await fetchAutoplayRecommendations(currentSong, queue);
+      if (recs.length > 0) {
+        historyStackRef.current.push(currentSong);
+        const updated = [...queue, ...recs];
+        setQueue(updated);
+        setQueueIndex(nextIdx);
+        await startAudioPlayback(recs[0]);
         return;
       }
     }
 
-    playSong(queue[nextIdx]);
-  }, [queue, queueIndex, repeat, shuffle, currentSong]);
+    setIsPlaying(false);
+  }, [queue, queueIndex, currentSong]);
 
   // Keep refs synchronized for native MediaSession background callbacks
   useEffect(() => {
     nextTrackRef.current = nextTrack;
   }, [nextTrack]);
 
-  // Previous Track
-  const prevTrack = useCallback(() => {
+  // Previous Track: 3-sec restart, listening history stack popping, or wrap
+  const prevTrack = useCallback(async () => {
     if (!audioRef.current) return;
-    // If more than 3 seconds played, restart track
+
+    // 1. If played > 3 seconds, restart current track
     if (audioRef.current.currentTime > 3) {
       audioRef.current.currentTime = 0;
       setCurrentTime(0);
+      syncPositionState();
       return;
     }
 
-    if (queue.length === 0) return;
-    let prevIdx = queueIndex - 1;
-    if (prevIdx < 0) {
-      prevIdx = repeat === 'all' ? queue.length - 1 : 0;
+    // 2. Pop from real listening history (Spotify/Apple Music behavior)
+    if (historyStackRef.current.length > 0) {
+      const prevSong = historyStackRef.current.pop()!;
+      const idxInQueue = queue.findIndex(s => s.id === prevSong.id);
+      if (idxInQueue !== -1) {
+        setQueueIndex(idxInQueue);
+      }
+      await startAudioPlayback(prevSong);
+      return;
     }
-    playSong(queue[prevIdx]);
-  }, [queue, queueIndex, repeat]);
+
+    // 3. Fallback: previous slot in queue
+    if (queueIndex > 0) {
+      const prevSong = queue[queueIndex - 1];
+      setQueueIndex(queueIndex - 1);
+      await startAudioPlayback(prevSong);
+      return;
+    }
+
+    // 4. Wrap to end of queue if repeat === 'all'
+    if (repeatRef.current === 'all' && queue.length > 0) {
+      const lastIdx = queue.length - 1;
+      setQueueIndex(lastIdx);
+      await startAudioPlayback(queue[lastIdx]);
+      return;
+    }
+
+    audioRef.current.currentTime = 0;
+    setCurrentTime(0);
+  }, [queue, queueIndex, syncPositionState]);
 
   useEffect(() => {
     prevTrackRef.current = prevTrack;
@@ -825,16 +1030,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const nextMuted = !isMuted;
     setIsMuted(nextMuted);
     audioRef.current.volume = nextMuted ? 0 : volume;
-  };
-
-  const toggleShuffle = () => setShuffle(prev => !prev);
-
-  const toggleRepeat = () => {
-    setRepeat(prev => {
-      if (prev === 'off') return 'all';
-      if (prev === 'all') return 'one';
-      return 'off';
-    });
   };
 
   // Queue Operations
@@ -1027,6 +1222,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         isShortcutsOpen,
         setIsShortcutsOpen,
         playSong,
+        playQueueIndex,
         togglePlay,
         nextTrack,
         prevTrack,

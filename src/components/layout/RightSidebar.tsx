@@ -64,6 +64,7 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
     toggleFavorite,
     setIsNowPlayingOpen,
     playSong,
+    playQueueIndex,
     removeFromQueue,
   } = usePlayer();
 
@@ -491,13 +492,16 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
                         playInteractionSound(settings.hapticSoundEnabled, 'switch');
                         toggleShuffle();
                       }}
-                      className={`p-2.5 rounded-xl transition-all ${
+                      className={`relative p-2.5 rounded-xl transition-all ${
                         shuffle
                           ? 'text-[#090812] bg-[#A78BFA] shadow-sm shadow-[#A78BFA]/30'
                           : 'text-[#A99DBE] hover:text-[#F8F5FF] hover:bg-[#141122]'
                       }`}
                     >
                       <Shuffle className="w-4 h-4" />
+                      {shuffle && (
+                        <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#090812]" />
+                      )}
                     </button>
                   </Tooltip>
 
@@ -553,16 +557,15 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
                         playInteractionSound(settings.hapticSoundEnabled, 'switch');
                         toggleRepeat();
                       }}
-                      className={`p-2.5 rounded-xl transition-all ${
+                      className={`relative p-2.5 rounded-xl transition-all ${
                         repeat !== 'off'
                           ? 'text-[#090812] bg-[#A78BFA] shadow-sm shadow-[#A78BFA]/30'
                           : 'text-[#A99DBE] hover:text-[#F8F5FF] hover:bg-[#141122]'
                       }`}
                     >
-                      {repeat === 'one' ? (
-                        <Repeat1 className="w-4 h-4" />
-                      ) : (
-                        <Repeat className="w-4 h-4" />
+                      {repeat === 'one' ? <Repeat1 className="w-4 h-4" /> : <Repeat className="w-4 h-4" />}
+                      {repeat !== 'off' && (
+                        <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#090812]" />
                       )}
                     </button>
                   </Tooltip>
@@ -659,7 +662,7 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
                         return (
                           <div
                             key={s.id + idx}
-                            onClick={() => playSong(s)}
+                            onClick={() => playQueueIndex(queueIndex + 1 + idx)}
                             className="flex items-center gap-2.5 p-2 rounded-xl bg-[#171326] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/40 cursor-pointer transition-all group"
                           >
                             <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#141122] shrink-0 border border-[#302744] relative">
@@ -764,7 +767,7 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
                     return (
                       <div
                         key={s.id + idx}
-                        onClick={() => playSong(s)}
+                        onClick={() => playQueueIndex(idx)}
                         className={`flex items-center gap-2.5 p-2 rounded-xl cursor-pointer transition-all ${
                           isCur
                             ? 'bg-[#211A32] border border-[#A78BFA]/40 text-[#D8B4FE]'

@@ -39,6 +39,7 @@ export function TurntableStudioStage() {
     queue,
     queueIndex,
     playSong,
+    playQueueIndex,
   } = usePlayer();
 
   const [turntableSpeed, setTurntableSpeed] = useState<'33' | '45'>('33');
@@ -433,7 +434,7 @@ export function TurntableStudioStage() {
         {/* 3. UP NEXT QUEUE STRIP PREVIEW */}
         {nextTrackInQueue ? (
           <div
-            onClick={() => playSong(nextTrackInQueue)}
+            onClick={() => playQueueIndex(queueIndex + 1)}
             className="group p-3 sm:p-3.5 rounded-2xl bg-[#171326] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/50 transition-all cursor-pointer flex items-center justify-between shadow-lg"
           >
             <div className="flex items-center gap-3 min-w-0">

@@ -204,11 +204,14 @@ export function BottomPlayer() {
             <Tooltip content={shuffle ? 'Shuffle: On' : 'Shuffle: Off'}>
               <button
                 onClick={toggleShuffle}
-                className={`p-1.5 rounded-lg transition-colors active:scale-90 ${
+                className={`relative p-1.5 rounded-lg transition-colors active:scale-90 ${
                   shuffle ? 'text-[#D8B4FE] bg-[#A78BFA]/15' : 'text-[#A99DBE] hover:text-[#F8F5FF]'
                 }`}
               >
                 <Shuffle className="w-4 h-4" />
+                {shuffle && (
+                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#A78BFA] shadow-[0_0_6px_#A78BFA]" />
+                )}
               </button>
             </Tooltip>
 
@@ -250,11 +253,14 @@ export function BottomPlayer() {
             <Tooltip content={`Repeat: ${repeat}`}>
               <button
                 onClick={toggleRepeat}
-                className={`p-1.5 rounded-lg transition-colors active:scale-90 ${
+                className={`relative p-1.5 rounded-lg transition-colors active:scale-90 ${
                   repeat !== 'off' ? 'text-[#D8B4FE] bg-[#A78BFA]/15' : 'text-[#A99DBE] hover:text-[#F8F5FF]'
                 }`}
               >
                 {repeat === 'one' ? <Repeat1 className="w-4 h-4" /> : <Repeat className="w-4 h-4" />}
+                {repeat !== 'off' && (
+                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#A78BFA] shadow-[0_0_6px_#A78BFA]" />
+                )}
               </button>
             </Tooltip>
           </div>

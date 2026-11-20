@@ -57,6 +57,7 @@ export function NowPlayingModal() {
     visualizerMode,
     setVisualizerMode,
     playSong,
+    playQueueIndex,
     togglePlay,
     nextTrack,
     prevTrack,
@@ -413,7 +414,7 @@ export function NowPlayingModal() {
                       className="group flex items-center justify-between p-3 rounded-2xl bg-[#141122]/70 hover:bg-[#2A2140] border border-[#302744]/60 hover:border-[#A78BFA]/40 transition-all"
                     >
                       <div
-                        onClick={() => playSong(song)}
+                        onClick={() => playQueueIndex(actualIdx)}
                         className="flex items-center gap-3.5 min-w-0 flex-1 cursor-pointer"
                       >
                         <span className="text-xs font-mono text-[#A99DBE] w-5 text-center group-hover:hidden">
@@ -612,12 +613,15 @@ export function NowPlayingModal() {
               <div className="flex items-center gap-3 sm:gap-5 md:gap-6">
                 <button
                   onClick={toggleShuffle}
-                  className={`p-1.5 rounded-lg transition-colors ${
+                  className={`relative p-1.5 rounded-lg transition-colors ${
                     shuffle ? 'text-[#D8B4FE]' : 'text-[#A99DBE] hover:text-[#F8F5FF]'
                   }`}
                   title="Shuffle"
                 >
                   <Shuffle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  {shuffle && (
+                    <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#A78BFA] shadow-[0_0_6px_#A78BFA]" />
+                  )}
                 </button>
 
                 <button
@@ -651,7 +655,7 @@ export function NowPlayingModal() {
 
                 <button
                   onClick={toggleRepeat}
-                  className={`p-1.5 rounded-lg transition-colors ${
+                  className={`relative p-1.5 rounded-lg transition-colors ${
                     repeat !== 'off' ? 'text-[#D8B4FE]' : 'text-[#A99DBE] hover:text-[#F8F5FF]'
                   }`}
                   title={`Repeat: ${repeat}`}
@@ -660,6 +664,9 @@ export function NowPlayingModal() {
                     <Repeat1 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   ) : (
                     <Repeat className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  )}
+                  {repeat !== 'off' && (
+                    <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#A78BFA] shadow-[0_0_6px_#A78BFA]" />
                   )}
                 </button>
               </div>
