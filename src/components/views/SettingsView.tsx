@@ -39,7 +39,13 @@ import {
   Heart,
   Smile,
   Music,
+  Database,
+  Cloud,
+  RefreshCw,
+  Server,
+  ExternalLink,
 } from 'lucide-react';
+import { checkCloudDatabaseHealth, syncLocalToMongoDB, CloudStatus } from '@/lib/cloudSync';
 
 export function SettingsView() {
   const { settings, updateSettings } = useTheme();
@@ -72,7 +78,38 @@ export function SettingsView() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // MongoDB Atlas Cloud Database state
+  const [cloudStatus, setCloudStatus] = useState<CloudStatus | null>(null);
+  const [isCheckingCloud, setIsCheckingCloud] = useState(false);
+  const [isSyncingCloud, setIsSyncingCloud] = useState(false);
+
+  const checkCloud = async () => {
+    setIsCheckingCloud(true);
+    try {
+      const status = await checkCloudDatabaseHealth();
+      setCloudStatus(status);
+    } finally {
+      setIsCheckingCloud(false);
+    }
+  };
+
+  const handleSyncToCloud = async () => {
+    setIsSyncingCloud(true);
+    try {
+      const res = await syncLocalToMongoDB();
+      if (res.success) {
+        showToast('MongoDB Cloud Synced', res.message || 'All records synced to MongoDB Atlas!', 'success');
+        checkCloud();
+      } else {
+        showToast('Sync Notice', res.error || 'Failed to sync to MongoDB Atlas', 'error');
+      }
+    } finally {
+      setIsSyncingCloud(false);
+    }
+  };
+
   useEffect(() => {
+    checkCloud();
     getStorageEstimate().then(setStorage);
     if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.persisted) {
       navigator.storage.persisted().then(setIsPersisted);
@@ -573,6 +610,136 @@ export function SettingsView() {
             </button>
           </div>
         )}
+      </section>
+
+      {/* MongoDB Atlas Cloud Database Integration */}
+      <section className="p-6 rounded-2xl bg-[#19191F] border border-[#303038] space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 text-white">
+            <Database className="w-5 h-5 text-[var(--accent)]" />
+            <div>
+              <h2 className="text-base font-bold flex items-center gap-2">
+                <span>Cloud Database (MongoDB Atlas)</span>
+                {cloudStatus?.isConnected ? (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/80 border border-emerald-500/40 text-emerald-400">
+                    Connected
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-950/80 border border-amber-500/40 text-amber-300">
+                    Atlas Configured
+                  </span>
+                )}
+              </h2>
+              <p className="text-xs text-[#A1A1AA]">
+                Cluster: <code className="text-[#D8B4FE]">cluster0.zap6gx4.mongodb.net</code> • Database:{' '}
+                <code className="text-[#D8B4FE]">naapaatalu</code>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={checkCloud}
+              disabled={isCheckingCloud}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#25252D] hover:bg-[#303038] border border-[#303038] text-white text-xs font-semibold transition-all disabled:opacity-50"
+              title="Test connection to MongoDB Atlas"
+            >
+              <RefreshCw
+                className={`w-3.5 h-3.5 ${isCheckingCloud ? 'animate-spin text-[var(--accent)]' : ''}`}
+              />
+              <span>Test Connection</span>
+            </button>
+
+            <button
+              onClick={handleSyncToCloud}
+              disabled={isSyncingCloud}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[var(--accent)] text-black text-xs font-bold hover:opacity-95 transition-all shadow-md disabled:opacity-50"
+            >
+              {isSyncingCloud ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Cloud className="w-3.5 h-3.5" />
+              )}
+              <span>Sync to MongoDB</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Live Status Card */}
+        <div className="p-4 rounded-xl bg-[#121216] border border-[#303038]/60 space-y-2.5">
+          {cloudStatus?.isConnected ? (
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2 text-emerald-400 font-semibold">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>MongoDB Atlas cluster is active and operational.</span>
+              </div>
+              {cloudStatus.counts && (
+                <div className="flex items-center gap-3 text-[#A1A1AA] font-mono text-[11px]">
+                  <span>
+                    Songs in Cloud: <strong className="text-white">{cloudStatus.counts.songs}</strong>
+                  </span>
+                  <span>
+                    Playlists in Cloud:{' '}
+                    <strong className="text-white">{cloudStatus.counts.playlists}</strong>
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center gap-2 text-amber-300 font-semibold">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>MongoDB Atlas Connection Notice</span>
+              </div>
+              <p className="text-[#A1A1AA] text-[11px] leading-relaxed">
+                Your connection string is configured in <code className="text-white">.env.local</code>.
+                If MongoDB Atlas rejects the connection, make sure your IP is added to the{' '}
+                <strong>IP Access List</strong> in the MongoDB Atlas console (Security → Network
+                Access → Add IP Address → Choose <em>Allow Access From Anywhere</em> or add your IP{' '}
+                <code className="text-[#D8B4FE]">106.192.211.218</code>).
+              </p>
+            </div>
+          )}
+
+          {/* Active Backend Endpoints */}
+          <div className="pt-2 border-t border-[#303038]/40 flex flex-wrap items-center gap-3 text-[11px] text-[#A1A1AA]">
+            <span className="font-semibold text-white flex items-center gap-1">
+              <Server className="w-3 h-3 text-[var(--accent)]" /> Active REST APIs:
+            </span>
+            <a
+              href="/api/health"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-[var(--accent)] underline flex items-center gap-0.5"
+            >
+              /api/health <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+            <a
+              href="/api/songs?limit=10"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-[var(--accent)] underline flex items-center gap-0.5"
+            >
+              /api/songs <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+            <a
+              href="/api/playlists"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-[var(--accent)] underline flex items-center gap-0.5"
+            >
+              /api/playlists <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+            <a
+              href="/api/sync"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-[var(--accent)] underline flex items-center gap-0.5"
+            >
+              /api/sync <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+          </div>
+        </div>
       </section>
 
       {/* Complete Backup & Restore (Distinguishing Metadata vs Full Archive) */}

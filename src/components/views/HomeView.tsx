@@ -337,7 +337,7 @@ export function HomeView({
 
   // Distinct shelves
   const romanceSongs = allSongs.filter(
-    s => (s.category || s.genre || '').toLowerCase() === 'love songs'
+    s => s.id.startsWith('spotify_romance_') || (s.category || s.genre || '').toLowerCase() === 'love songs'
   );
 
   const melodySongs = allSongs.filter(
@@ -545,8 +545,8 @@ export function HomeView({
 
       {/* 3. SHELF 1: TELUGU ROMANCE & SOULFUL LOVE SONGS */}
       <SpotifyShelf
-        title="💖 Telugu Romance & Soulful Love Anthems"
-        subtitle="Unforgettable romantic duets, heart-touching melodies on repeat"
+        title="💖 Romantic songs in Telugu"
+        subtitle="The official 100-track Spotify collection • Hridayam Lopala, Nuvvunte Chaley, Samayama & more"
         songs={romanceSongs}
         onPlaySong={playSong}
         currentSongId={currentSong?.id}

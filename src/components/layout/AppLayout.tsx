@@ -42,8 +42,9 @@ import { ListeningAnalyticsView } from '../views/ListeningAnalyticsView';
 import { KeyboardShortcutsModal } from '../modals/KeyboardShortcutsModal';
 import { SmartAiPlaylistModal } from '../modals/SmartAiPlaylistModal';
 import { seedCuratedPersonalMusic, CURATED_TELUGU_SONGS } from '@/lib/audioSynthesis';
-import { importAllSpotifyTeluguCategories } from '@/lib/spotifyService';
+import { importAllSpotifyTeluguCategories, syncNewRomanticSpotifyPlaylist } from '@/lib/spotifyService';
 import { db, deduplicateSongsInLibrary } from '@/lib/db';
+import { triggerBackgroundCloudSync } from '@/lib/cloudSync';
 
 let isAutoSeedingInProgress = false;
 
@@ -105,11 +106,20 @@ export function AppLayout() {
           window.dispatchEvent(new Event('sonora_library_updated'));
         }
 
+        // One-time sync/replacement of Telugu Romantic playlist with user's Spotify 100-song playlist
+        const romanceMigrationKey = 'sonora_telugu_romance_spotify_7jCOTOc9NBy41S7Uf4xfU1_v1';
+        if (typeof window !== 'undefined' && !localStorage.getItem(romanceMigrationKey)) {
+          await syncNewRomanticSpotifyPlaylist();
+          localStorage.setItem(romanceMigrationKey, 'true');
+          window.dispatchEvent(new Event('sonora_library_updated'));
+        }
+
         const songCount = await db.songs.count();
         const plSongCount = await db.playlistSongs.count();
 
         // If library already has songs and playlist mappings, do NOT re-seed
         if (songCount >= 100 && plSongCount >= 50) {
+          triggerBackgroundCloudSync(3000);
           return;
         }
 
@@ -119,6 +129,7 @@ export function AppLayout() {
         console.warn('Initial seeding error:', e);
       } finally {
         isAutoSeedingInProgress = false;
+        triggerBackgroundCloudSync(4000);
       }
     }
     initCollection();
