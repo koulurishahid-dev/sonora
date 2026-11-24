@@ -45,6 +45,7 @@ interface HomeViewProps {
 function ShelfSongCard({
   song,
   songs,
+  contextTitle,
   isThisCurrent,
   isThisPlaying,
   onPlaySong,
@@ -53,9 +54,10 @@ function ShelfSongCard({
 }: {
   song: Song;
   songs: Song[];
+  contextTitle?: string;
   isThisCurrent: boolean;
   isThisPlaying: boolean;
-  onPlaySong: (song: Song, queue: Song[]) => void;
+  onPlaySong: (song: Song, queue: Song[], contextTitle?: string) => void;
   onTogglePlay: () => void;
   onSongContextMenu: (e: React.MouseEvent, song: Song) => void;
 }) {
@@ -90,7 +92,7 @@ function ShelfSongCard({
 
   return (
     <div
-      onClick={() => (isThisCurrent ? onTogglePlay() : onPlaySong(song, songs))}
+      onClick={() => (isThisCurrent ? onTogglePlay() : onPlaySong(song, songs, contextTitle))}
       onContextMenu={e => onSongContextMenu(e, song)}
       className="shelf-song-card w-32 sm:w-44 shrink-0 snap-start p-2.5 sm:p-3 rounded-2xl bg-[#10051C]/80 backdrop-blur-xl hover:bg-[#21153B]/75 border border-[#302744]/70 hover:border-[#A855F7]/60 cursor-pointer transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-[rgba(168,85,247,0.25)] hover:-translate-y-1 group flex flex-col select-none"
     >
@@ -171,7 +173,7 @@ function SpotifyShelf({
   title: string;
   subtitle: string;
   songs: Song[];
-  onPlaySong: (song: Song, queue: Song[]) => void;
+  onPlaySong: (song: Song, queue: Song[], contextTitle?: string) => void;
   currentSongId?: string;
   isPlaying: boolean;
   onTogglePlay: () => void;
@@ -230,6 +232,7 @@ function SpotifyShelf({
             key={song.id}
             song={song}
             songs={songs}
+            contextTitle={title}
             isThisCurrent={currentSongId === song.id}
             isThisPlaying={currentSongId === song.id && isPlaying}
             onPlaySong={onPlaySong}
@@ -530,7 +533,7 @@ export function HomeView({
                   onClick={e => {
                     e.stopPropagation();
                     if (playlistSongs.length > 0) {
-                      playSong(playlistSongs[0], playlistSongs);
+                      playSong(playlistSongs[0], playlistSongs, cat.title);
                     }
                   }}
                   className="hidden sm:flex absolute right-2.5 w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#A78BFA] hover:bg-[#D8B4FE] text-[#090812] items-center justify-center shadow-xl opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 hover:scale-110 active:scale-95 transition-all"

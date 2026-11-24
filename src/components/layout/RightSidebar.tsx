@@ -53,6 +53,10 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
     repeat,
     queue,
     queueIndex,
+    userQueue,
+    contextName,
+    clearUserQueue,
+    removeUserQueueItem,
     togglePlay,
     nextTrack,
     prevTrack,
@@ -748,68 +752,159 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
               </div>
             )}
 
-            {/* TAB: QUEUE */}
+            {/* TAB: QUEUE (SPOTIFY 2-TIER ARCHITECTURE) */}
             {activeTab === 'queue' && (
-              <div className="p-5 space-y-4">
+              <div className="p-4 space-y-4 max-h-[550px] overflow-y-auto">
+                {/* Header */}
                 <div className="flex items-center justify-between pb-2 border-b border-[#302744]">
-                  <span className="text-xs font-bold text-[#F8F5FF] uppercase tracking-wider font-mono">
-                    Play Queue ({queue.length})
+                  <span className="text-xs font-bold text-[#F8F5FF] uppercase tracking-wider font-mono flex items-center gap-2">
+                    <span>Play Queue</span>
+                    {shuffle && (
+                      <span className="text-[10px] font-normal text-[#D8B4FE] font-sans px-1.5 py-0.2 rounded bg-[#A78BFA]/15">
+                        Shuffled
+                      </span>
+                    )}
                   </span>
                   <span className="text-[11px] font-mono text-[#A99DBE]">
-                    Playing #{queueIndex + 1}
+                    {queue.length - 1} upcoming
                   </span>
                 </div>
 
-                <div className="space-y-1.5 max-h-[500px] overflow-y-auto pr-1">
-                  {queue.map((s, idx) => {
-                    const isCur = idx === queueIndex;
-                    const sArt = getArtworkObjectUrl(s);
-                    return (
-                      <div
-                        key={s.id + idx}
-                        onClick={() => playQueueIndex(idx)}
-                        className={`flex items-center gap-2.5 p-2 rounded-xl cursor-pointer transition-all ${
-                          isCur
-                            ? 'bg-[#211A32] border border-[#A78BFA]/40 text-[#D8B4FE]'
-                            : 'hover:bg-[#141122] border border-transparent text-[#F8F5FF]'
-                        }`}
-                      >
-                        <span className="w-5 text-center text-[10px] font-mono text-[#A99DBE] shrink-0">
-                          {isCur ? '▶' : idx + 1}
-                        </span>
-
-                        <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#141122] shrink-0 border border-[#302744]">
-                          {sArt ? (
-                            <img src={sArt} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[#A99DBE]">
-                              <Music2 className="w-3.5 h-3.5" />
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-semibold truncate">{s.title}</p>
-                          <p className="text-[10px] opacity-60 truncate">{s.artist}</p>
-                        </div>
-
-                        <span className="text-[10px] font-mono opacity-50 shrink-0">
-                          {formatDuration(s.duration)}
-                        </span>
-
-                        <button
-                          onClick={e => {
-                            e.stopPropagation();
-                            removeFromQueue(idx);
-                          }}
-                          className="p-1 rounded text-[#A99DBE] hover:text-rose-400 hover:bg-[#171326] transition-colors"
-                          title="Remove from queue"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
+                {/* 1. NOW PLAYING */}
+                {currentSong && (
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#A99DBE] font-mono">
+                      Now Playing
+                    </span>
+                    <div className="flex items-center gap-2.5 p-2 rounded-xl bg-[#211A32] border border-[#A78BFA]/40 text-[#D8B4FE]">
+                      <span className="w-4 text-center text-xs font-mono text-[#A78BFA] shrink-0">
+                        ▶
+                      </span>
+                      <div className="w-8 h-8 rounded-lg overflow-hidden bg-[#141122] shrink-0 border border-[#302744]">
+                        {getArtworkObjectUrl(currentSong) ? (
+                          <img src={getArtworkObjectUrl(currentSong)} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-[#A99DBE]">
+                            <Music2 className="w-3.5 h-3.5" />
+                          </div>
+                        )}
                       </div>
-                    );
-                  })}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold truncate text-[#D8B4FE]">{currentSong.title}</p>
+                        <p className="text-[10px] opacity-75 truncate text-[#C2B5D9]">{currentSong.artist}</p>
+                      </div>
+                      <span className="text-[10px] font-mono opacity-60 shrink-0">
+                        {formatDuration(currentSong.duration)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. NEXT IN QUEUE (USER QUEUE) */}
+                {userQueue.length > 0 && (
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#D8B4FE] font-mono flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-[#A78BFA]" />
+                        <span>Next in Queue ({userQueue.length})</span>
+                      </span>
+                      <button
+                        onClick={clearUserQueue}
+                        className="text-[10px] text-[#A99DBE] hover:text-rose-400 font-semibold"
+                      >
+                        Clear
+                      </button>
+                    </div>
+
+                    {userQueue.map((s, idx) => {
+                      const sArt = getArtworkObjectUrl(s);
+                      return (
+                        <div
+                          key={`user_q_sb_${s.id}_${idx}`}
+                          onClick={() => playQueueIndex(idx + 1)}
+                          className="group flex items-center gap-2 p-1.5 rounded-xl cursor-pointer bg-[#2A1D45]/60 hover:bg-[#342457] border border-[#A78BFA]/25 transition-all"
+                        >
+                          <span className="w-4 text-center text-[10px] font-mono text-[#D8B4FE] shrink-0 font-bold">
+                            {idx + 1}
+                          </span>
+                          <div className="w-7 h-7 rounded-md overflow-hidden bg-[#141122] shrink-0 border border-[#302744]">
+                            {sArt ? (
+                              <img src={sArt} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <Music2 className="w-3 h-3 m-auto text-[#A99DBE]" />
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[11px] font-semibold truncate text-[#F8F5FF]">{s.title}</p>
+                            <p className="text-[9px] opacity-60 truncate text-[#C2B5D9]">{s.artist}</p>
+                          </div>
+                          <button
+                            onClick={e => {
+                              e.stopPropagation();
+                              removeUserQueueItem(idx);
+                            }}
+                            className="p-1 rounded text-[#A99DBE] hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Remove"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* 3. NEXT FROM CONTEXT */}
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#A99DBE] font-mono block truncate">
+                    Next from: {contextName}
+                  </span>
+
+                  {queue.slice(1 + userQueue.length).length === 0 ? (
+                    <p className="text-[10px] text-[#A99DBE]/60 italic py-2 text-center">
+                      End of context playlist
+                    </p>
+                  ) : (
+                    queue.slice(1 + userQueue.length).map((s, idx) => {
+                      const actualIdx = 1 + userQueue.length + idx;
+                      const sArt = getArtworkObjectUrl(s);
+                      return (
+                        <div
+                          key={`ctx_sb_${s.id}_${actualIdx}`}
+                          onClick={() => playQueueIndex(actualIdx)}
+                          className="group flex items-center gap-2 p-1.5 rounded-xl cursor-pointer hover:bg-[#171326] transition-all border border-transparent hover:border-[#302744]"
+                        >
+                          <span className="w-4 text-center text-[10px] font-mono text-[#A99DBE] shrink-0">
+                            {idx + 1}
+                          </span>
+                          <div className="w-7 h-7 rounded-md overflow-hidden bg-[#141122] shrink-0 border border-[#302744]">
+                            {sArt ? (
+                              <img src={sArt} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <Music2 className="w-3 h-3 m-auto text-[#A99DBE]" />
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[11px] font-semibold truncate text-[#F8F5FF]">{s.title}</p>
+                            <p className="text-[9px] opacity-60 truncate text-[#C2B5D9]">{s.artist}</p>
+                          </div>
+                          <span className="text-[9px] font-mono opacity-50 shrink-0">
+                            {formatDuration(s.duration)}
+                          </span>
+                          <button
+                            onClick={e => {
+                              e.stopPropagation();
+                              removeFromQueue(actualIdx);
+                            }}
+                            className="p-1 rounded text-[#A99DBE] hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Remove"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
             )}

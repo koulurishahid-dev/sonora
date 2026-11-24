@@ -63,6 +63,8 @@ export function BottomPlayer() {
   // Scrubber hover time preview
   const [hoverTime, setHoverTime] = useState<number | null>(null);
   const [hoverPosPercent, setHoverPosPercent] = useState<number>(0);
+  const [isScrubbing, setIsScrubbing] = useState(false);
+  const [scrubTime, setScrubTime] = useState(0);
   const progressContainerRef = useRef<HTMLDivElement | null>(null);
   const [showHeartBurst, setShowHeartBurst] = useState(false);
 
@@ -268,7 +270,7 @@ export function BottomPlayer() {
           {/* Seekbar and Times with Hover Tooltip Preview */}
           <div className="flex items-center gap-2.5 w-full">
             <span className="text-[11px] font-mono text-[#A99DBE] w-9 text-right shrink-0">
-              {formatDuration(currentTime)}
+              {formatDuration(isScrubbing ? scrubTime : currentTime)}
             </span>
 
             <div
@@ -292,8 +294,32 @@ export function BottomPlayer() {
                 min="0"
                 max={duration || 100}
                 step="0.1"
-                value={currentTime}
-                onChange={e => seek(parseFloat(e.target.value))}
+                value={isScrubbing ? scrubTime : currentTime}
+                onMouseDown={() => {
+                  setIsScrubbing(true);
+                  setScrubTime(currentTime);
+                }}
+                onTouchStart={() => {
+                  setIsScrubbing(true);
+                  setScrubTime(currentTime);
+                }}
+                onChange={e => {
+                  const val = parseFloat(e.target.value);
+                  setScrubTime(val);
+                  if (!isScrubbing) seek(val);
+                }}
+                onMouseUp={() => {
+                  if (isScrubbing) {
+                    seek(scrubTime);
+                    setIsScrubbing(false);
+                  }
+                }}
+                onTouchEnd={() => {
+                  if (isScrubbing) {
+                    seek(scrubTime);
+                    setIsScrubbing(false);
+                  }
+                }}
                 className="w-full cursor-pointer accent-[#A78BFA] h-1.5 hover:h-2 transition-all rounded-full bg-[#211A32]"
                 aria-label="Seek time"
               />

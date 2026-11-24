@@ -165,7 +165,7 @@ export function LibraryView({
   const handleBulkPlay = () => {
     const selectedList = songs.filter(s => selectedIds.has(s.id));
     if (selectedList.length > 0) {
-      playSong(selectedList[0], selectedList);
+      playSong(selectedList[0], selectedList, 'Selected Library Tracks');
       showToast('Playing Selection', `Playing ${selectedList.length} tracks`, 'info');
     }
   };
@@ -376,7 +376,7 @@ export function LibraryView({
                   <tr
                     key={song.id}
                     onContextMenu={e => onSongContextMenu(e, song)}
-                    onClick={() => (isCur ? togglePlay() : playSong(song, filteredSongs))}
+                    onClick={() => (isCur ? togglePlay() : playSong(song, filteredSongs, 'Your Library'))}
                     className={`group hover:bg-white/10 cursor-pointer transition-colors ${
                       isCur ? 'bg-[var(--accent)]/15 text-[var(--accent)]' : ''
                     } ${isSel ? 'bg-white/10' : ''}`}

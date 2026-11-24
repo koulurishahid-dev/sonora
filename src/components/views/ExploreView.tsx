@@ -44,7 +44,7 @@ const MOOD_CATEGORIES = [
 ];
 
 export function ExploreView({ onNavigate, onSongContextMenu, onOpenAiGenerator }: ExploreViewProps) {
-  const { playSong, currentSong, isPlaying, togglePlay } = usePlayer();
+  const { playSong, playContextWithShuffle, currentSong, isPlaying, togglePlay } = usePlayer();
 
   const [allSongs, setAllSongs] = useState<Song[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
@@ -172,7 +172,7 @@ export function ExploreView({ onNavigate, onSongContextMenu, onOpenAiGenerator }
           {/* Quick Action Buttons */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
-              onClick={() => trendingSongs.length > 0 && playSong(trendingSongs[0], trendingSongs)}
+              onClick={() => trendingSongs.length > 0 && playSong(trendingSongs[0], trendingSongs, 'Trending Hits')}
               className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent)] text-black text-xs font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--accent)]/20"
             >
               <Play className="w-4 h-4 fill-black" /> Play Trending Hits
@@ -342,7 +342,12 @@ export function ExploreView({ onNavigate, onSongContextMenu, onOpenAiGenerator }
             {selectedMood === 'all' ? 'All Curated Melodies' : `${MOOD_CATEGORIES.find(m => m.id === selectedMood)?.label} Tracks`}
           </h2>
           <button
-            onClick={() => filteredSongs.length > 0 && playSong(filteredSongs[0], filteredSongs)}
+            onClick={() => {
+              if (filteredSongs.length > 0) {
+                const title = selectedMood === 'all' ? 'All Curated Melodies' : `${MOOD_CATEGORIES.find(m => m.id === selectedMood)?.label} Tracks`;
+                playContextWithShuffle(filteredSongs, title);
+              }
+            }}
             disabled={filteredSongs.length === 0}
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#211A32] hover:bg-[#2C2344] border border-[#302744] text-xs font-semibold text-white transition-all disabled:opacity-40"
           >
@@ -356,6 +361,7 @@ export function ExploreView({ onNavigate, onSongContextMenu, onOpenAiGenerator }
               key={song.id}
               song={song}
               queueList={filteredSongs}
+              contextTitle={selectedMood === 'all' ? 'All Curated Melodies' : `${MOOD_CATEGORIES.find(m => m.id === selectedMood)?.label} Tracks`}
               onContextMenu={e => onSongContextMenu(e, song)}
             />
           ))}

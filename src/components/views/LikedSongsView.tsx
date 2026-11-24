@@ -18,7 +18,7 @@ export function LikedSongsView({
   onSongContextMenu,
   onOpenUpload,
 }: LikedSongsViewProps) {
-  const { playSong, currentSong, isPlaying, togglePlay, toggleFavorite } = usePlayer();
+  const { playSong, playContextWithShuffle, currentSong, isPlaying, togglePlay, toggleFavorite } = usePlayer();
   const [songs, setSongs] = useState<Song[]>([]);
 
   const loadData = async () => {
@@ -40,14 +40,13 @@ export function LikedSongsView({
 
   const handlePlayAll = () => {
     if (songs.length > 0) {
-      playSong(songs[0], songs);
+      playSong(songs[0], songs, 'Liked Songs');
     }
   };
 
   const handleShuffleAll = () => {
     if (songs.length > 0) {
-      const shuffled = [...songs].sort(() => Math.random() - 0.5);
-      playSong(shuffled[0], shuffled);
+      playContextWithShuffle(songs, 'Liked Songs');
     }
   };
 
@@ -144,7 +143,7 @@ export function LikedSongsView({
                     <tr
                       key={song.id}
                       onContextMenu={e => onSongContextMenu(e, song)}
-                      onClick={() => (isCur ? togglePlay() : playSong(song, songs))}
+                      onClick={() => (isCur ? togglePlay() : playSong(song, songs, 'Liked Songs'))}
                       className={`group hover:bg-[#19191F]/90 cursor-pointer transition-colors ${
                         isCur ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : ''
                       }`}

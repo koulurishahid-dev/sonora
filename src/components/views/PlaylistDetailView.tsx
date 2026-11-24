@@ -49,7 +49,7 @@ export function PlaylistDetailView({
   onEditPlaylist,
   onSongContextMenu,
 }: PlaylistDetailViewProps) {
-  const { playSong, currentSong, isPlaying, togglePlay, toggleFavorite } = usePlayer();
+  const { playSong, playContextWithShuffle, currentSong, isPlaying, togglePlay, toggleFavorite } = usePlayer();
   const { showToast } = useToast();
 
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
@@ -192,14 +192,13 @@ export function PlaylistDetailView({
 
   const handlePlayAll = () => {
     if (filteredSongs.length > 0) {
-      playSong(filteredSongs[0], filteredSongs);
+      playSong(filteredSongs[0], filteredSongs, playlist?.title || 'Playlist');
     }
   };
 
   const handleShuffleAll = () => {
     if (filteredSongs.length > 0) {
-      const shuffled = [...filteredSongs].sort(() => Math.random() - 0.5);
-      playSong(shuffled[0], shuffled);
+      playContextWithShuffle(filteredSongs, playlist?.title || 'Playlist');
     }
   };
 
@@ -617,7 +616,7 @@ export function PlaylistDetailView({
                     <tr
                       key={`${song.id}_table_${idx}`}
                       onContextMenu={e => onSongContextMenu(e, song)}
-                      onClick={() => (isCur ? togglePlay() : playSong(song, filteredSongs))}
+                      onClick={() => (isCur ? togglePlay() : playSong(song, filteredSongs, playlist?.title || 'Playlist'))}
                       className={`group hover:bg-white/[0.06] cursor-pointer transition-colors ${
                         isCur ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : ''
                       }`}

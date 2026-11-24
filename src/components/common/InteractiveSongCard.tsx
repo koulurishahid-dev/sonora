@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface InteractiveSongCardProps {
   song: Song;
   queueList?: Song[];
+  contextTitle?: string;
   index?: number;
   onContextMenu: (e: React.MouseEvent, song: Song) => void;
   className?: string;
@@ -21,6 +22,7 @@ interface InteractiveSongCardProps {
 export function InteractiveSongCard({
   song,
   queueList,
+  contextTitle,
   index = 0,
   onContextMenu,
   className = '',
@@ -100,7 +102,7 @@ export function InteractiveSongCard({
     if (isCurrent) {
       togglePlay();
     } else {
-      playSong(song, queueList);
+      playSong(song, queueList, contextTitle);
     }
   };
 

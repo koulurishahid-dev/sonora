@@ -4,54 +4,32 @@ import React from 'react';
 import { usePlayer } from '@/context/PlayerContext';
 import { getArtworkObjectUrl } from '@/lib/db';
 import { formatDuration } from '@/lib/utils';
-import { X, Trash2, Music2, Play, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
+import { X, Trash2, Music2, Play, Shuffle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function QueueDrawer() {
   const {
-    queue,
-    queueIndex,
     currentSong,
+    userQueue,
+    contextQueue,
+    contextName,
+    shuffle,
+    queue,
     isQueueOpen,
     setIsQueueOpen,
     playSong,
     playQueueIndex,
-    removeFromQueue,
     clearQueue,
-    reorderQueue,
+    clearUserQueue,
+    removeUserQueueItem,
+    removeFromQueue,
   } = usePlayer();
 
   if (!isQueueOpen) return null;
 
-  const currentTrack = currentSong || (queueIndex >= 0 ? queue[queueIndex] : null);
-  const upNextTracks = queue.slice(queueIndex + 1);
-
-  const [draggedIdx, setDraggedIdx] = React.useState<number | null>(null);
-
-  const moveItem = (fromIdx: number, toIdx: number) => {
-    if (toIdx < 0 || toIdx >= queue.length) return;
-    const newQueue = [...queue];
-    const [moved] = newQueue.splice(fromIdx, 1);
-    newQueue.splice(toIdx, 0, moved);
-    reorderQueue(newQueue);
-  };
-
-  const handleDragStart = (e: React.DragEvent, idx: number) => {
-    setDraggedIdx(idx);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDrop = (e: React.DragEvent, targetIdx: number) => {
-    e.preventDefault();
-    if (draggedIdx === null || draggedIdx === targetIdx) return;
-    moveItem(draggedIdx, targetIdx);
-    setDraggedIdx(null);
-  };
+  // Upcoming tracks from context (skipping current song)
+  const upcomingContext = queue.slice(1 + userQueue.length);
+  const totalQueued = userQueue.length + upcomingContext.length;
 
   return (
     <AnimatePresence>
@@ -76,17 +54,26 @@ export function QueueDrawer() {
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-5 border-b border-[#302744]">
             <div>
-              <h2 className="text-lg font-bold text-[#F8F5FF]">Play Queue</h2>
-              <p className="text-xs text-[#C2B5D9]">{queue.length} {queue.length === 1 ? 'track' : 'tracks'} queued</p>
+              <h2 className="text-lg font-bold text-[#F8F5FF] flex items-center gap-2">
+                <span>Play Queue</span>
+                {shuffle && (
+                  <span className="flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#A78BFA]/15 text-[#D8B4FE] border border-[#A78BFA]/30">
+                    <Shuffle className="w-2.5 h-2.5" /> Shuffled
+                  </span>
+                )}
+              </h2>
+              <p className="text-xs text-[#C2B5D9]">
+                {totalQueued} {totalQueued === 1 ? 'track' : 'tracks'} upcoming
+              </p>
             </div>
             <div className="flex items-center gap-2">
-              {queue.length > 1 && (
+              {totalQueued > 0 && (
                 <button
                   onClick={clearQueue}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#A99DBE] hover:text-rose-400 hover:bg-[#211A32] border border-transparent hover:border-rose-900/40 transition-all"
                   title="Clear Queue"
                 >
-                  <Trash2 className="w-3.5 h-3.5" /> Clear
+                  <Trash2 className="w-3.5 h-3.5" /> Clear All
                 </button>
               )}
               <button
@@ -101,18 +88,18 @@ export function QueueDrawer() {
 
           {/* Queue Content */}
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
-            {/* Now Playing */}
-            {currentTrack && (
+            {/* 1. NOW PLAYING */}
+            {currentSong && (
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-[#A99DBE] px-2 mb-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#A99DBE] px-2 mb-2 font-mono">
                   Now Playing
                 </h3>
                 <div className="flex items-center gap-3 p-3 rounded-xl bg-[#211A32] border border-[#A78BFA]/40 shadow-md">
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#141122] shrink-0 relative flex items-center justify-center border border-[#302744]">
-                    {getArtworkObjectUrl(currentTrack) ? (
+                    {getArtworkObjectUrl(currentSong) ? (
                       <img
-                        src={getArtworkObjectUrl(currentTrack)}
-                        alt={currentTrack.title}
+                        src={getArtworkObjectUrl(currentSong)}
+                        alt={currentSong.title}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -121,74 +108,51 @@ export function QueueDrawer() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-[#D8B4FE] truncate">
-                      {currentTrack.title}
+                      {currentSong.title}
                     </p>
-                    <p className="text-xs text-[#C2B5D9] truncate">{currentTrack.artist}</p>
+                    <p className="text-xs text-[#C2B5D9] truncate">{currentSong.artist}</p>
                   </div>
                   <span className="text-xs text-[#A99DBE] shrink-0 font-mono">
-                    {formatDuration(currentTrack.duration)}
+                    {formatDuration(currentSong.duration)}
                   </span>
                 </div>
               </div>
             )}
 
-            {/* Next Up */}
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#A99DBE] px-2 mb-2">
-                Next Up ({upNextTracks.length})
-              </h3>
-
-              {upNextTracks.length === 0 ? (
-                <div className="text-center py-10 text-[#A99DBE] border border-dashed border-[#302744] rounded-xl">
-                  <p className="text-sm">Queue is empty</p>
-                  <p className="text-xs text-[#A99DBE]/70 mt-1">Right-click any song to add it to the queue</p>
+            {/* 2. USER QUEUE (NEXT IN QUEUE - SPOTIFY MODEL) */}
+            {userQueue.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between px-2 mb-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#D8B4FE] font-mono flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#A78BFA]" />
+                    <span>Next in Queue ({userQueue.length})</span>
+                  </h3>
+                  <button
+                    onClick={clearUserQueue}
+                    className="text-[11px] font-semibold text-[#A99DBE] hover:text-rose-400 transition-colors"
+                  >
+                    Clear User Queue
+                  </button>
                 </div>
-              ) : (
-                <div className="space-y-1.5">
-                  {upNextTracks.map((song, idx) => {
-                    const actualQueueIndex = queueIndex + 1 + idx;
-                    const artUrl = getArtworkObjectUrl(song);
 
+                <div className="space-y-1.5">
+                  {userQueue.map((song, idx) => {
+                    const artUrl = getArtworkObjectUrl(song);
                     return (
                       <div
-                        key={`${song.id}_${actualQueueIndex}`}
-                        draggable
-                        onDragStart={e => handleDragStart(e, actualQueueIndex)}
-                        onDragOver={handleDragOver}
-                        onDrop={e => handleDrop(e, actualQueueIndex)}
-                        className={`group flex items-center gap-2.5 p-2 rounded-xl border transition-all cursor-grab active:cursor-grabbing ${
-                          draggedIdx === actualQueueIndex
-                            ? 'opacity-40 border-[#A855F7] bg-[#211A32]'
-                            : 'bg-[#171326]/70 hover:bg-[#2A2140] border-transparent hover:border-[#302744]'
-                        }`}
+                        key={`user_q_${song.id}_${idx}`}
+                        className="group flex items-center gap-2.5 p-2 rounded-xl bg-[#2A1D45]/70 hover:bg-[#342457] border border-[#A78BFA]/25 hover:border-[#A78BFA]/50 transition-all"
                       >
-                        {/* Drag / Move Up/Down Controls */}
-                        <div className="flex flex-col items-center justify-center text-[#A99DBE] opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => moveItem(actualQueueIndex, actualQueueIndex - 1)}
-                            disabled={actualQueueIndex <= queueIndex + 1}
-                            className="p-0.5 hover:text-[#F8F5FF] disabled:opacity-20"
-                            title="Move Up"
-                          >
-                            <ChevronUp className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => moveItem(actualQueueIndex, actualQueueIndex + 1)}
-                            disabled={actualQueueIndex >= queue.length - 1}
-                            className="p-0.5 hover:text-[#F8F5FF] disabled:opacity-20"
-                            title="Move Down"
-                          >
-                            <ChevronDown className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+                        <span className="w-4 text-center text-[10px] font-mono text-[#D8B4FE] shrink-0 font-bold">
+                          {idx + 1}
+                        </span>
 
-                        {/* Artwork */}
                         <div
-                          onClick={() => playQueueIndex(actualQueueIndex)}
+                          onClick={() => playQueueIndex(idx + 1)}
                           className="w-10 h-10 rounded-lg overflow-hidden bg-[#141122] shrink-0 relative flex items-center justify-center cursor-pointer border border-[#302744]"
                         >
                           {artUrl ? (
-                            <img src={artUrl} alt={song.title} className="w-full h-full object-cover" />
+                            <img src={artUrl} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <Music2 className="w-4 h-4 text-[#A99DBE]" />
                           )}
@@ -197,24 +161,97 @@ export function QueueDrawer() {
                           </div>
                         </div>
 
-                        {/* Metadata */}
-                        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => playQueueIndex(actualQueueIndex)}>
+                        <div
+                          className="flex-1 min-w-0 cursor-pointer"
+                          onClick={() => playQueueIndex(idx + 1)}
+                        >
                           <p className="text-sm font-medium text-[#F8F5FF] truncate group-hover:text-[#D8B4FE] transition-colors">
                             {song.title}
                           </p>
                           <p className="text-xs text-[#C2B5D9] truncate">{song.artist}</p>
                         </div>
 
-                        {/* Duration */}
+                        <span className="text-xs text-[#A99DBE] font-mono shrink-0">
+                          {formatDuration(song.duration)}
+                        </span>
+
+                        <button
+                          onClick={() => removeUserQueueItem(idx)}
+                          className="p-1.5 rounded-lg text-[#A99DBE] hover:text-rose-400 hover:bg-[#141122] opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Remove from queue"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* 3. NEXT FROM CONTEXT (ALBUM / PLAYLIST TRACKLIST) */}
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#A99DBE] px-2 mb-2 font-mono flex items-center justify-between">
+                <span>Next from: {contextName}</span>
+                <span className="font-normal text-[11px] text-[#A99DBE]">
+                  ({upcomingContext.length} remaining)
+                </span>
+              </h3>
+
+              {upcomingContext.length === 0 ? (
+                <div className="text-center py-8 text-[#A99DBE] border border-dashed border-[#302744] rounded-xl text-xs">
+                  <p>End of context tracklist</p>
+                  <p className="text-[11px] text-[#A99DBE]/60 mt-0.5">
+                    Smart Autoplay will recommend similar songs when finished
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  {upcomingContext.map((song, idx) => {
+                    const actualIdx = 1 + userQueue.length + idx;
+                    const artUrl = getArtworkObjectUrl(song);
+
+                    return (
+                      <div
+                        key={`ctx_${song.id}_${actualIdx}`}
+                        className="group flex items-center gap-2.5 p-2 rounded-xl bg-[#171326]/70 hover:bg-[#2A2140] border border-transparent hover:border-[#302744] transition-all"
+                      >
+                        <span className="w-4 text-center text-[10px] font-mono text-[#A99DBE] shrink-0">
+                          {idx + 1}
+                        </span>
+
+                        <div
+                          onClick={() => playQueueIndex(actualIdx)}
+                          className="w-10 h-10 rounded-lg overflow-hidden bg-[#141122] shrink-0 relative flex items-center justify-center cursor-pointer border border-[#302744]"
+                        >
+                          {artUrl ? (
+                            <img src={artUrl} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <Music2 className="w-4 h-4 text-[#A99DBE]" />
+                          )}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <Play className="w-4 h-4 fill-[#F8F5FF] text-[#F8F5FF]" />
+                          </div>
+                        </div>
+
+                        <div
+                          className="flex-1 min-w-0 cursor-pointer"
+                          onClick={() => playQueueIndex(actualIdx)}
+                        >
+                          <p className="text-sm font-medium text-[#F8F5FF] truncate group-hover:text-[#D8B4FE] transition-colors">
+                            {song.title}
+                          </p>
+                          <p className="text-xs text-[#C2B5D9] truncate">{song.artist}</p>
+                        </div>
+
                         <span className="text-xs text-[#A1A1AA] font-mono shrink-0">
                           {formatDuration(song.duration)}
                         </span>
 
-                        {/* Remove Action */}
                         <button
-                          onClick={() => removeFromQueue(actualQueueIndex)}
+                          onClick={() => removeFromQueue(actualIdx)}
                           className="p-1.5 rounded-lg text-[#71717A] hover:text-rose-400 hover:bg-[#303038] opacity-0 group-hover:opacity-100 transition-opacity"
-                          title="Remove from Queue"
+                          title="Remove from queue"
                         >
                           <X className="w-4 h-4" />
                         </button>

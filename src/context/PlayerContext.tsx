@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Song, VisualizerMode, EqBands, EqPresetName } from '@/types/music';
 import { db, getAudioObjectUrl, getArtworkObjectUrl } from '@/lib/db';
 import { useTheme } from './ThemeContext';
@@ -14,7 +14,7 @@ export const EQ_PRESETS: Record<Exclude<EqPresetName, 'custom'>, EqBands> = {
 };
 
 /**
- * Fisher-Yates True Random Permutation (Spotify/JioSaavn algorithm)
+ * Fisher-Yates True Random Permutation (Spotify/JioSaavn standard)
  */
 export function fisherYatesShuffle<T>(items: T[]): T[] {
   const result = [...items];
@@ -34,8 +34,15 @@ interface PlayerContextType {
   isMuted: boolean;
   shuffle: boolean;
   repeat: 'off' | 'one' | 'all';
-  queue: Song[];
+
+  // Spotify 2-Tier Queue & Context Model
+  queue: Song[]; // Derived active queue for backwards compatibility
   queueIndex: number;
+  userQueue: Song[]; // Explicit user-added queue (Play Next / Add to Queue)
+  contextQueue: Song[]; // Natural album/playlist tracklist
+  contextIndex: number; // Position in context tracklist
+  contextName: string; // e.g. "Romantic songs in Telugu", "Sid Sriram Hits"
+
   isNowPlayingOpen: boolean;
   isQueueOpen: boolean;
   isLyricsOpen: boolean;
@@ -56,7 +63,8 @@ interface PlayerContextType {
   setIsShortcutsOpen: (open: boolean) => void;
 
   // Actions
-  playSong: (song: Song, newQueue?: Song[]) => Promise<void>;
+  playSong: (song: Song, newQueue?: Song[], contextTitle?: string) => Promise<void>;
+  playContextWithShuffle: (songs: Song[], contextTitle?: string, startSong?: Song) => Promise<void>;
   playQueueIndex: (index: number) => Promise<void>;
   togglePlay: () => void;
   nextTrack: () => void;
@@ -70,11 +78,17 @@ interface PlayerContextType {
   setEqBand: (band: keyof EqBands, val: number) => void;
   setEqPreset: (preset: Exclude<EqPresetName, 'custom'>) => void;
   resetEq: () => void;
+
+  // Queue Operations
   addToQueue: (song: Song) => void;
   playNext: (song: Song) => void;
   removeFromQueue: (index: number) => void;
   clearQueue: () => void;
+  clearUserQueue: () => void;
+  removeUserQueueItem: (index: number) => void;
+  reorderUserQueue: (newQueue: Song[]) => void;
   reorderQueue: (newQueue: Song[]) => void;
+
   toggleFavorite: (songId: string) => Promise<void>;
   setIsNowPlayingOpen: (open: boolean) => void;
   setIsQueueOpen: (open: boolean) => void;
@@ -97,12 +111,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
+
   const [shuffle, setShuffleState] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('naa_paatalu_shuffle') === 'true';
     }
     return false;
   });
+
   const [repeat, setRepeatState] = useState<'off' | 'one' | 'all'>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('naa_paatalu_repeat') as 'off' | 'one' | 'all';
@@ -110,20 +126,50 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
     return 'off';
   });
-  const [queue, setQueue] = useState<Song[]>([]);
-  const [queueIndex, setQueueIndex] = useState(-1);
+
+  // Spotify 2-Tier Queue System:
+  // 1. userQueue: tracks explicitly added by user ("Play Next" / "Add to Queue")
+  // 2. contextQueue: original tracklist sequence of the active album/playlist/shelf
+  // 3. contextIndex: position inside contextQueue
+  // 4. shuffledContextIndices: randomized order of remaining context tracks when shuffle is on
+  const [userQueue, setUserQueue] = useState<Song[]>([]);
+  const [contextQueue, setContextQueue] = useState<Song[]>([]);
+  const [contextIndex, setContextIndex] = useState<number>(-1);
+  const [contextName, setContextName] = useState<string>('Music Collection');
+  const [shuffledContextIndices, setShuffledContextIndices] = useState<number[]>([]);
+
   const [isNowPlayingOpen, setIsNowPlayingOpen] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [isLyricsOpen, setIsLyricsOpen] = useState(false);
   const [isSideViewOpen, setIsSideViewOpen] = useState(false);
 
-  // App-Grade (Spotify / JioSaavn) Queue & History References
-  const originalQueueRef = useRef<Song[]>([]);
-  const historyStackRef = useRef<Song[]>([]);
+  // Synchronized Refs for event listeners & callbacks
+  const userQueueRef = useRef<Song[]>([]);
+  const contextQueueRef = useRef<Song[]>([]);
+  const contextIndexRef = useRef<number>(-1);
+  const shuffledIndicesRef = useRef<number[]>([]);
   const shuffleRef = useRef<boolean>(shuffle);
   const repeatRef = useRef<'off' | 'one' | 'all'>(repeat);
+  const historyStackRef = useRef<Song[]>([]);
+  const currentSongRef = useRef<Song | null>(null);
+  const autoSkipCountRef = useRef<number>(0);
 
-  // Synchronize refs with state
+  useEffect(() => {
+    userQueueRef.current = userQueue;
+  }, [userQueue]);
+
+  useEffect(() => {
+    contextQueueRef.current = contextQueue;
+  }, [contextQueue]);
+
+  useEffect(() => {
+    contextIndexRef.current = contextIndex;
+  }, [contextIndex]);
+
+  useEffect(() => {
+    shuffledIndicesRef.current = shuffledContextIndices;
+  }, [shuffledContextIndices]);
+
   useEffect(() => {
     shuffleRef.current = shuffle;
   }, [shuffle]);
@@ -132,12 +178,49 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     repeatRef.current = repeat;
   }, [repeat]);
 
+  useEffect(() => {
+    currentSongRef.current = currentSong;
+  }, [currentSong]);
+
+  // Derived unified queue for UI components (Spotify Model: Now Playing + User Queue + Upcoming Context)
+  const queue = useMemo(() => {
+    const list: Song[] = [];
+    if (currentSong) list.push(currentSong);
+    list.push(...userQueue);
+
+    if (contextQueue.length > 0) {
+      if (shuffle && shuffledContextIndices.length > 0) {
+        for (const idx of shuffledContextIndices) {
+          if (idx >= 0 && idx < contextQueue.length) {
+            const s = contextQueue[idx];
+            if (s.id !== currentSong?.id && !userQueue.some(u => u.id === s.id)) {
+              list.push(s);
+            }
+          }
+        }
+      } else {
+        const start = Math.max(0, contextIndex + 1);
+        for (let i = start; i < contextQueue.length; i++) {
+          const s = contextQueue[i];
+          if (s.id !== currentSong?.id && !userQueue.some(u => u.id === s.id)) {
+            list.push(s);
+          }
+        }
+      }
+    }
+    return list;
+  }, [currentSong, userQueue, contextQueue, contextIndex, shuffle, shuffledContextIndices]);
+
+  // Derived active queue index (Current song is always at 0 in the combined upcoming view)
+  const queueIndex = useMemo(() => (currentSong ? 0 : -1), [currentSong]);
+
   // Auto-open sidebar on desktop screens (>=1024px), keep closed on mobile
   useEffect(() => {
     if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
       setIsSideViewOpen(true);
     }
   }, []);
+
   const [visualizerMode, setVisualizerMode] = useState<VisualizerMode>('bars');
   const [audioError, setAudioError] = useState<string | null>(null);
   const [playbackRate, setPlaybackRateState] = useState<number>(1);
@@ -221,7 +304,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       setSleepTimerRemaining(prev => {
         if (prev === null) return null;
         const next = prev - 1;
-        // Gradual fade out over the final 15 seconds
         if (next <= 15 && next > 0 && audioRef.current) {
           const fadeRatio = next / 15;
           audioRef.current.volume = originalVolumeBeforeFadeRef.current * fadeRatio;
@@ -241,7 +323,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       const ctx = new AudioCtx();
       audioCtxRef.current = ctx;
 
-      // Auto-resume AudioContext if the browser attempts to suspend it during screen off or background tabs
       ctx.onstatechange = () => {
         if (ctx.state === 'suspended' && audioRef.current && !audioRef.current.paused) {
           ctx.resume().catch(() => {});
@@ -297,7 +378,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       masterGainRef.current = masterGain;
 
       // Connect 5-band filter pipeline:
-      // source -> 60Hz -> 250Hz -> 1kHz -> 4kHz -> 12kHz -> analyser -> masterGain -> destination
       const source = ctx.createMediaElementSource(audioRef.current);
       sourceNodeRef.current = source;
       source.connect(f60);
@@ -376,7 +456,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audio.id = 'sonora-core-audio';
       audio.preload = 'auto';
       audio.crossOrigin = 'anonymous';
-      // Attributes for background audio playback on mobile browsers (iOS & Android)
       audio.setAttribute('playsinline', 'true');
       audio.setAttribute('webkit-playsinline', 'true');
       audio.setAttribute('x-webkit-airplay', 'allow');
@@ -389,6 +468,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     const onPlay = () => {
       setIsPlaying(true);
+      setAudioError(null);
+      autoSkipCountRef.current = 0;
       if ('mediaSession' in navigator) {
         navigator.mediaSession.playbackState = 'playing';
       }
@@ -421,17 +502,24 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     const onError = (e: Event) => {
       console.warn('Audio playback notice (source link temporarily unavailable or interrupted):', e);
-      setAudioError('Audio stream unavailable. Skipping to next playable track...');
       setIsPlaying(false);
       if ('mediaSession' in navigator) {
         navigator.mediaSession.playbackState = 'none';
       }
-      setTimeout(() => {
-        nextTrackRef.current();
-      }, 1200);
+
+      // Spotify resilient recovery: auto-skip to next playable track (with 4-skip circuit breaker)
+      if (autoSkipCountRef.current < 4) {
+        autoSkipCountRef.current += 1;
+        setAudioError('Stream unavailable. Automatically advancing to next track...');
+        setTimeout(() => {
+          nextTrackRef.current();
+        }, 500);
+      } else {
+        setAudioError('Network or audio stream unavailable. Check connection.');
+        autoSkipCountRef.current = 0;
+      }
     };
 
-    // Auto-resume AudioContext when app is placed in recent tabs or screen turns off/on
     const onVisibilityChange = async () => {
       if (audioRef.current && !audioRef.current.paused) {
         if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
@@ -470,8 +558,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
           const song = await db.songs.get(lastSongId);
           if (song && audio) {
             setCurrentSong(song);
-            setQueue([song]);
-            setQueueIndex(0);
+            setContextQueue([song]);
+            setContextIndex(0);
             setDuration(song.duration);
             const url = getAudioObjectUrl(song);
             audio.src = url;
@@ -497,7 +585,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     };
   }, [syncPositionState]);
 
-  // Save current time and track to localStorage periodically (throttled to at most every 5 seconds)
+  // Save current time and track to localStorage periodically
   const lastSaveTimeRef = useRef<number>(0);
   useEffect(() => {
     if (!currentSong || currentTime <= 0) return;
@@ -511,7 +599,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
   }, [currentSong, currentTime]);
 
-  // Update Media Session API for lock screen and native media controls (Android, iOS, Windows, macOS)
+  // Update Media Session API for lock screen and native media controls
   useEffect(() => {
     if (typeof window === 'undefined' || !('mediaSession' in navigator) || !currentSong) return;
 
@@ -535,13 +623,12 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: currentSong.title,
         artist: currentSong.artist,
-        album: currentSong.album || 'Naa Paatalu Studio',
+        album: currentSong.album || contextName || 'Naa Paatalu Studio',
         artwork: artworkList,
       });
 
       navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
 
-      // Full action handlers for native lock screen & notification controls
       navigator.mediaSession.setActionHandler('play', async () => {
         if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
           audioCtxRef.current.resume().catch(() => {});
@@ -599,9 +686,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       console.warn('MediaSession configuration error:', e);
     }
-  }, [currentSong, isPlaying, syncPositionState]);
+  }, [currentSong, isPlaying, contextName, syncPositionState]);
 
-  // Visualizer data extractors (reusing typed arrays to eliminate frame garbage collection)
+  // Visualizer data extractors
   const cachedFreqDataRef = useRef<Uint8Array | null>(null);
   const cachedTimeDataRef = useRef<Uint8Array | null>(null);
 
@@ -625,10 +712,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     return cachedTimeDataRef.current;
   }, []);
 
-  // Smart Autoplay recommendations for when a playlist or album reaches the end (Spotify feature)
-  const fetchAutoplayRecommendations = async (lastSong: Song, currentQueue: Song[]): Promise<Song[]> => {
+  // Smart Autoplay recommendations for when a playlist reaches the end (Spotify Autoplay)
+  const fetchAutoplayRecommendations = async (lastSong: Song, currentContext: Song[]): Promise<Song[]> => {
     try {
-      const existingIds = new Set(currentQueue.map(s => s.id));
+      const existingIds = new Set(currentContext.map(s => s.id));
       let candidates: Song[] = [];
       if (lastSong.artist) {
         const byArtist = await db.songs.where('artist').equalsIgnoreCase(lastSong.artist).toArray();
@@ -752,56 +839,133 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       isSwitchingTrackRef.current = false;
       console.warn('Playback play request was prevented or failed:', err);
       if (err.name !== 'AbortError') {
-        setAudioError('Unable to start playback. Check browser autoplay permissions.');
+        setAudioError('Audio playback restricted. Tap anywhere to allow audio.');
       }
     }
   };
 
-  // Play Song action (Spotify / JioSaavn model)
-  const playSong = async (song: Song, newQueue?: Song[]) => {
+  /**
+   * Play Song action (Spotify 2-Tier Architecture):
+   * Sets the context queue (original album/playlist), determines the starting song,
+   * respects current shuffle state, and pushes to listening history.
+   */
+  const playSong = async (song: Song, newQueue?: Song[], contextTitle?: string) => {
     if (currentSong && currentSong.id !== song.id) {
       historyStackRef.current.push(currentSong);
-      if (historyStackRef.current.length > 50) historyStackRef.current.shift();
+      if (historyStackRef.current.length > 100) historyStackRef.current.shift();
+    }
+
+    if (contextTitle) {
+      setContextName(contextTitle);
     }
 
     if (newQueue && newQueue.length > 0) {
-      originalQueueRef.current = [...newQueue];
+      setContextQueue(newQueue);
+      const songIdx = newQueue.findIndex(s => s.id === song.id);
+      const targetIdx = songIdx !== -1 ? songIdx : 0;
+      setContextIndex(targetIdx);
 
+      // If shuffle is active, create randomized upcoming sequence while keeping current song first
       if (shuffleRef.current) {
-        // True App-grade Shuffle: clicked track plays first, rest of context is randomized
-        const others = newQueue.filter(s => s.id !== song.id);
-        const shuffledOthers = fisherYatesShuffle(others);
-        const activeList = [song, ...shuffledOthers];
-        setQueue(activeList);
-        setQueueIndex(0);
+        const remainingIndices: number[] = [];
+        for (let i = 0; i < newQueue.length; i++) {
+          if (i !== targetIdx) remainingIndices.push(i);
+        }
+        const shuffled = fisherYatesShuffle(remainingIndices);
+        setShuffledContextIndices([targetIdx, ...shuffled]);
       } else {
-        setQueue(newQueue);
-        const idx = newQueue.findIndex(s => s.id === song.id);
-        setQueueIndex(idx !== -1 ? idx : 0);
+        setShuffledContextIndices([]);
       }
     } else {
-      const idx = queue.findIndex(s => s.id === song.id);
+      // Single track click without context list
+      const idx = contextQueueRef.current.findIndex(s => s.id === song.id);
       if (idx !== -1) {
-        setQueueIndex(idx);
+        setContextIndex(idx);
       } else {
-        setQueue(prev => [...prev, song]);
-        setQueueIndex(queue.length);
-        originalQueueRef.current.push(song);
+        setContextQueue([song]);
+        setContextIndex(0);
+        setShuffledContextIndices([]);
       }
     }
 
     await startAudioPlayback(song);
   };
 
-  // Jump directly to an exact queue index without disrupting the queue permutation
+  /**
+   * Spotify-style "Shuffle Play" action for Playlist/Album/Artist pages:
+   * Turns shuffle ON, preserves natural order in contextQueue, picks a starting song,
+   * and creates a randomized sequence for the rest.
+   */
+  const playContextWithShuffle = async (songs: Song[], contextTitle?: string, startSong?: Song) => {
+    if (songs.length === 0) return;
+
+    if (contextTitle) {
+      setContextName(contextTitle);
+    }
+
+    // Turn shuffle ON
+    setShuffleState(true);
+    shuffleRef.current = true;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('naa_paatalu_shuffle', 'true');
+    }
+
+    // Preserve original tracklist in contextQueue
+    setContextQueue(songs);
+
+    // Pick starting song (either explicit startSong or random index)
+    const initialIdx = startSong
+      ? Math.max(0, songs.findIndex(s => s.id === startSong.id))
+      : Math.floor(Math.random() * songs.length);
+
+    const selectedSong = songs[initialIdx];
+    setContextIndex(initialIdx);
+
+    // Shuffle remaining indices
+    const otherIndices: number[] = [];
+    for (let i = 0; i < songs.length; i++) {
+      if (i !== initialIdx) otherIndices.push(i);
+    }
+    const shuffledRemainder = fisherYatesShuffle(otherIndices);
+    setShuffledContextIndices([initialIdx, ...shuffledRemainder]);
+
+    await startAudioPlayback(selectedSong);
+  };
+
+  /**
+   * Play directly from an index in the combined queue:
+   * Checks if it's within userQueue or contextQueue and handles transition smoothly.
+   */
   const playQueueIndex = async (index: number) => {
     if (index < 0 || index >= queue.length) return;
     const targetSong = queue[index];
+
     if (currentSong && currentSong.id !== targetSong.id) {
       historyStackRef.current.push(currentSong);
-      if (historyStackRef.current.length > 50) historyStackRef.current.shift();
+      if (historyStackRef.current.length > 100) historyStackRef.current.shift();
     }
-    setQueueIndex(index);
+
+    // Check if targetSong was in userQueue
+    const userQIdx = userQueue.findIndex(s => s.id === targetSong.id);
+    if (userQIdx !== -1) {
+      // Remove all user queue items up to and including this one
+      setUserQueue(prev => prev.slice(userQIdx + 1));
+    } else {
+      // Find within contextQueue
+      const ctxIdx = contextQueue.findIndex(s => s.id === targetSong.id);
+      if (ctxIdx !== -1) {
+        setContextIndex(ctxIdx);
+        if (shuffleRef.current) {
+          const remainingIndices: number[] = [];
+          for (let i = 0; i < contextQueue.length; i++) {
+            if (i !== ctxIdx) remainingIndices.push(i);
+          }
+          const shuffled = fisherYatesShuffle(remainingIndices);
+          setShuffledContextIndices([ctxIdx, ...shuffled]);
+        }
+      }
+    }
+
     await startAudioPlayback(targetSong);
   };
 
@@ -834,7 +998,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     syncPositionState();
   };
 
-  // Toggle Shuffle with immediate queue reordering & lossless restoration
+  /**
+   * Toggle Shuffle (Spotify Model):
+   * When turned ON: randomizes upcoming context indices, keeping current track and user queue intact.
+   * When turned OFF: immediately restores natural tracklist order from current position onwards.
+   */
   const toggleShuffle = () => {
     const nextShuffle = !shuffleRef.current;
     shuffleRef.current = nextShuffle;
@@ -844,28 +1012,19 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (nextShuffle) {
-      // Shuffling ON: Keep current song at index 0, randomize upcoming tracks
-      if (queue.length > 1) {
-        if (originalQueueRef.current.length === 0) {
-          originalQueueRef.current = [...queue];
+      // ON: Generate randomized order for remaining context tracks
+      if (contextQueueRef.current.length > 1) {
+        const curIdx = contextIndexRef.current >= 0 ? contextIndexRef.current : 0;
+        const otherIndices: number[] = [];
+        for (let i = 0; i < contextQueueRef.current.length; i++) {
+          if (i !== curIdx) otherIndices.push(i);
         }
-        const cur = currentSong || (queueIndex >= 0 ? queue[queueIndex] : queue[0]);
-        const sourcePool = originalQueueRef.current.length > 0 ? originalQueueRef.current : queue;
-        const others = sourcePool.filter(s => s.id !== cur.id);
-        const shuffled = fisherYatesShuffle(others);
-        setQueue([cur, ...shuffled]);
-        setQueueIndex(0);
+        const shuffled = fisherYatesShuffle(otherIndices);
+        setShuffledContextIndices([curIdx, ...shuffled]);
       }
     } else {
-      // Shuffling OFF: Restore original playlist/album sequence seamlessly
-      if (originalQueueRef.current.length > 0) {
-        const restored = [...originalQueueRef.current];
-        setQueue(restored);
-        if (currentSong) {
-          const origIdx = restored.findIndex(s => s.id === currentSong.id);
-          setQueueIndex(origIdx !== -1 ? origIdx : 0);
-        }
-      }
+      // OFF: Revert to natural playlist order
+      setShuffledContextIndices([]);
     }
   };
 
@@ -885,12 +1044,18 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // Next Track: Sequential queue progression, loop with re-shuffle, or Smart Autoplay
+  /**
+   * Next Track (Spotify Progression):
+   * 1. If repeat === 'one': loop current track.
+   * 2. If userQueue has items: play next user-queued item.
+   * 3. Else play next from contextQueue (shuffled or sequential).
+   * 4. If end of context reached:
+   *    - If repeat === 'all': loop context back to start.
+   *    - If repeat === 'off': Smart Autoplay recommendations.
+   */
   const nextTrack = useCallback(async () => {
-    if (queue.length === 0) return;
-
     // 1. Single track repeat
-    if (repeatRef.current === 'one' && currentSong) {
+    if (repeatRef.current === 'one' && currentSongRef.current) {
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
         audioRef.current.play().catch(() => {});
@@ -898,61 +1063,99 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const nextIdx = queueIndex + 1;
-
-    // 2. Advance sequentially in queue
-    if (nextIdx < queue.length) {
-      if (currentSong) {
-        historyStackRef.current.push(currentSong);
-        if (historyStackRef.current.length > 50) historyStackRef.current.shift();
+    // 2. Play next song from User Queue (highest priority)
+    if (userQueueRef.current.length > 0) {
+      if (currentSongRef.current) {
+        historyStackRef.current.push(currentSongRef.current);
+        if (historyStackRef.current.length > 100) historyStackRef.current.shift();
       }
-      const nextSong = queue[nextIdx];
-      setQueueIndex(nextIdx);
+      const [nextSong, ...remainingUserQueue] = userQueueRef.current;
+      setUserQueue(remainingUserQueue);
       await startAudioPlayback(nextSong);
       return;
     }
 
-    // 3. Repeat all: loop back to beginning
-    if (repeatRef.current === 'all') {
-      if (currentSong) historyStackRef.current.push(currentSong);
-      if (shuffleRef.current && originalQueueRef.current.length > 1) {
-        const reshuffled = fisherYatesShuffle(originalQueueRef.current);
-        setQueue(reshuffled);
-        setQueueIndex(0);
-        await startAudioPlayback(reshuffled[0]);
+    // 3. Context queue progression
+    const ctx = contextQueueRef.current;
+    if (ctx.length > 0) {
+      if (shuffleRef.current && shuffledIndicesRef.current.length > 0) {
+        const curOrderPos = shuffledIndicesRef.current.findIndex(idx => idx === contextIndexRef.current);
+        const nextOrderPos = curOrderPos !== -1 ? curOrderPos + 1 : 1;
+
+        if (nextOrderPos < shuffledIndicesRef.current.length) {
+          const nextTargetIdx = shuffledIndicesRef.current[nextOrderPos];
+          if (nextTargetIdx >= 0 && nextTargetIdx < ctx.length) {
+            if (currentSongRef.current) {
+              historyStackRef.current.push(currentSongRef.current);
+              if (historyStackRef.current.length > 100) historyStackRef.current.shift();
+            }
+            setContextIndex(nextTargetIdx);
+            await startAudioPlayback(ctx[nextTargetIdx]);
+            return;
+          }
+        }
       } else {
-        setQueueIndex(0);
-        await startAudioPlayback(queue[0]);
+        // Sequential natural order
+        const nextIdx = contextIndexRef.current + 1;
+        if (nextIdx < ctx.length) {
+          if (currentSongRef.current) {
+            historyStackRef.current.push(currentSongRef.current);
+            if (historyStackRef.current.length > 100) historyStackRef.current.shift();
+          }
+          setContextIndex(nextIdx);
+          await startAudioPlayback(ctx[nextIdx]);
+          return;
+        }
       }
-      return;
+
+      // 4. End of context reached
+      if (repeatRef.current === 'all') {
+        if (currentSongRef.current) historyStackRef.current.push(currentSongRef.current);
+        if (shuffleRef.current && ctx.length > 1) {
+          const allIndices = ctx.map((_, i) => i);
+          const freshShuffle = fisherYatesShuffle(allIndices);
+          setShuffledContextIndices(freshShuffle);
+          setContextIndex(freshShuffle[0]);
+          await startAudioPlayback(ctx[freshShuffle[0]]);
+        } else {
+          setContextIndex(0);
+          await startAudioPlayback(ctx[0]);
+        }
+        return;
+      }
     }
 
-    // 4. Repeat off: Smart Autoplay similar songs from IndexedDB
-    if (currentSong) {
-      const recs = await fetchAutoplayRecommendations(currentSong, queue);
+    // 5. Smart Autoplay when playlist ends (Spotify feature)
+    if (currentSongRef.current) {
+      const recs = await fetchAutoplayRecommendations(currentSongRef.current, ctx);
       if (recs.length > 0) {
-        historyStackRef.current.push(currentSong);
-        const updated = [...queue, ...recs];
-        setQueue(updated);
-        setQueueIndex(nextIdx);
+        historyStackRef.current.push(currentSongRef.current);
+        const updated = [...ctx, ...recs];
+        setContextQueue(updated);
+        const nextPos = ctx.length;
+        setContextIndex(nextPos);
         await startAudioPlayback(recs[0]);
         return;
       }
     }
 
     setIsPlaying(false);
-  }, [queue, queueIndex, currentSong]);
+  }, []);
 
-  // Keep refs synchronized for native MediaSession background callbacks
   useEffect(() => {
     nextTrackRef.current = nextTrack;
   }, [nextTrack]);
 
-  // Previous Track: 3-sec restart, listening history stack popping, or wrap
+  /**
+   * Previous Track (Spotify 3-Second Rule):
+   * 1. If played > 3 seconds, restart current track from 0:00.
+   * 2. If <= 3 seconds, pop previous track from historyStack.
+   * 3. Fallback: previous track in context queue.
+   */
   const prevTrack = useCallback(async () => {
     if (!audioRef.current) return;
 
-    // 1. If played > 3 seconds, restart current track
+    // 1. Spotify 3-second restart rule
     if (audioRef.current.currentTime > 3) {
       audioRef.current.currentTime = 0;
       setCurrentTime(0);
@@ -960,42 +1163,51 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // 2. Pop from real listening history (Spotify/Apple Music behavior)
+    // 2. Pop from real listening history (Spotify behavior)
     if (historyStackRef.current.length > 0) {
       const prevSong = historyStackRef.current.pop()!;
-      const idxInQueue = queue.findIndex(s => s.id === prevSong.id);
-      if (idxInQueue !== -1) {
-        setQueueIndex(idxInQueue);
+      const idxInCtx = contextQueueRef.current.findIndex(s => s.id === prevSong.id);
+      if (idxInCtx !== -1) {
+        setContextIndex(idxInCtx);
       }
       await startAudioPlayback(prevSong);
       return;
     }
 
-    // 3. Fallback: previous slot in queue
-    if (queueIndex > 0) {
-      const prevSong = queue[queueIndex - 1];
-      setQueueIndex(queueIndex - 1);
-      await startAudioPlayback(prevSong);
+    // 3. Fallback: previous slot in context
+    const ctx = contextQueueRef.current;
+    if (shuffleRef.current && shuffledIndicesRef.current.length > 0) {
+      const curOrderPos = shuffledIndicesRef.current.findIndex(idx => idx === contextIndexRef.current);
+      if (curOrderPos > 0) {
+        const prevTargetIdx = shuffledIndicesRef.current[curOrderPos - 1];
+        setContextIndex(prevTargetIdx);
+        await startAudioPlayback(ctx[prevTargetIdx]);
+        return;
+      }
+    } else if (contextIndexRef.current > 0) {
+      const prevIdx = contextIndexRef.current - 1;
+      setContextIndex(prevIdx);
+      await startAudioPlayback(ctx[prevIdx]);
       return;
     }
 
-    // 4. Wrap to end of queue if repeat === 'all'
-    if (repeatRef.current === 'all' && queue.length > 0) {
-      const lastIdx = queue.length - 1;
-      setQueueIndex(lastIdx);
-      await startAudioPlayback(queue[lastIdx]);
+    // 4. Wrap to end of context if repeat === 'all'
+    if (repeatRef.current === 'all' && ctx.length > 0) {
+      const lastIdx = ctx.length - 1;
+      setContextIndex(lastIdx);
+      await startAudioPlayback(ctx[lastIdx]);
       return;
     }
 
     audioRef.current.currentTime = 0;
     setCurrentTime(0);
-  }, [queue, queueIndex, syncPositionState]);
+  }, [syncPositionState]);
 
   useEffect(() => {
     prevTrackRef.current = prevTrack;
   }, [prevTrack]);
 
-  // Handle Track Ended
+  // Handle Track Ended (triggers next track or sleep timer finish)
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -1013,7 +1225,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     audio.addEventListener('ended', onEnded);
     return () => audio.removeEventListener('ended', onEnded);
-  }, [nextTrack]);
+  }, [nextTrack, sleepTimerOption]);
 
   // Volume
   const setVolume = (val: number) => {
@@ -1032,12 +1244,17 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     audioRef.current.volume = nextMuted ? 0 : volume;
   };
 
-  // Queue Operations
+  /**
+   * Spotify User Queue Operations:
+   * addToQueue: appends to userQueue (plays next after other user-queued songs, before playlist resumes).
+   * playNext: inserts at index 0 of userQueue (plays immediately next).
+   */
   const addToQueue = (song: Song) => {
-    setQueue(prev => [...prev, song]);
     if (!currentSong) {
       playSong(song);
+      return;
     }
+    setUserQueue(prev => [...prev, song]);
   };
 
   const playNext = (song: Song) => {
@@ -1045,39 +1262,58 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       playSong(song);
       return;
     }
-    setQueue(prev => {
-      const copy = [...prev];
-      copy.splice(queueIndex + 1, 0, song);
-      return copy;
-    });
+    setUserQueue(prev => [song, ...prev]);
   };
 
   const removeFromQueue = (index: number) => {
-    setQueue(prev => {
-      const copy = [...prev];
-      copy.splice(index, 1);
-      return copy;
-    });
-    if (index < queueIndex) {
-      setQueueIndex(prev => prev - 1);
+    // If index is within userQueue
+    if (index > 0 && index <= userQueue.length) {
+      const userQIdx = index - 1;
+      setUserQueue(prev => prev.filter((_, i) => i !== userQIdx));
+      return;
+    }
+
+    // If removing from upcoming context tracks
+    const contextOffset = index - 1 - userQueue.length;
+    if (contextOffset >= 0 && contextOffset < contextQueue.length) {
+      setContextQueue(prev => {
+        const copy = [...prev];
+        copy.splice(contextIndex + 1 + contextOffset, 1);
+        return copy;
+      });
     }
   };
 
+  const clearUserQueue = () => {
+    setUserQueue([]);
+  };
+
+  const removeUserQueueItem = (index: number) => {
+    setUserQueue(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const reorderUserQueue = (newQueue: Song[]) => {
+    setUserQueue(newQueue);
+  };
+
   const clearQueue = () => {
+    setUserQueue([]);
     if (currentSong) {
-      setQueue([currentSong]);
-      setQueueIndex(0);
+      setContextQueue([currentSong]);
+      setContextIndex(0);
+      setShuffledContextIndices([]);
     } else {
-      setQueue([]);
-      setQueueIndex(-1);
+      setContextQueue([]);
+      setContextIndex(-1);
+      setShuffledContextIndices([]);
     }
   };
 
   const reorderQueue = (newQueue: Song[]) => {
-    setQueue(newQueue);
-    if (currentSong) {
-      const newIdx = newQueue.findIndex(s => s.id === currentSong.id);
-      if (newIdx !== -1) setQueueIndex(newIdx);
+    // If reordering the unified queue, update userQueue with any tracks between current and context
+    if (currentSong && newQueue.length > 1) {
+      const withoutCurrent = newQueue.filter(s => s.id !== currentSong.id);
+      setUserQueue(withoutCurrent.slice(0, userQueue.length));
     }
   };
 
@@ -1096,14 +1332,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     if (currentSong && currentSong.id === songId) {
       setCurrentSong(prev => prev ? { ...prev, isFavorite: nextFav } : null);
     }
-    // Update queue items
-    setQueue(prev => prev.map(s => s.id === songId ? { ...s, isFavorite: nextFav } : s));
+    setUserQueue(prev => prev.map(s => s.id === songId ? { ...s, isFavorite: nextFav } : s));
+    setContextQueue(prev => prev.map(s => s.id === songId ? { ...s, isFavorite: nextFav } : s));
   };
 
-  // Global Keyboard Shortcuts
+  // Global Keyboard Shortcuts (Space, Arrow keys, N, P, S, R, M, L, Q, F, ?)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in an input or textarea
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
         return;
@@ -1168,7 +1403,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
           break;
         case 'Slash':
           if (e.shiftKey) {
-            // '?' shortcut
             e.preventDefault();
             setIsShortcutsOpen(prev => !prev);
           }
@@ -1205,6 +1439,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         repeat,
         queue,
         queueIndex,
+        userQueue,
+        contextQueue,
+        contextIndex,
+        contextName,
         isNowPlayingOpen,
         isQueueOpen,
         isLyricsOpen,
@@ -1222,6 +1460,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         isShortcutsOpen,
         setIsShortcutsOpen,
         playSong,
+        playContextWithShuffle,
         playQueueIndex,
         togglePlay,
         nextTrack,
@@ -1239,6 +1478,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         playNext,
         removeFromQueue,
         clearQueue,
+        clearUserQueue,
+        removeUserQueueItem,
+        reorderUserQueue,
         reorderQueue,
         toggleFavorite,
         setIsNowPlayingOpen,

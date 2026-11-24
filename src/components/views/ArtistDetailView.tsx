@@ -18,7 +18,7 @@ export function ArtistDetailView({
   onNavigate,
   onSongContextMenu,
 }: ArtistDetailViewProps) {
-  const { playSong, currentSong, isPlaying, togglePlay, toggleFavorite } = usePlayer();
+  const { playSong, playContextWithShuffle, currentSong, isPlaying, togglePlay, toggleFavorite } = usePlayer();
   const [songs, setSongs] = useState<Song[]>([]);
   const [artworkUrl, setArtworkUrl] = useState<string | undefined>();
 
@@ -75,17 +75,14 @@ export function ArtistDetailView({
 
           <div className="flex items-center justify-center sm:justify-start gap-3 pt-3">
             <button
-              onClick={() => playSong(songs[0], songs)}
+              onClick={() => playSong(songs[0], songs, `Artist: ${artistName}`)}
               disabled={songs.length === 0}
               className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[var(--accent)] text-black text-xs font-bold hover:scale-105 active:scale-95 transition-all shadow-lg disabled:opacity-40"
             >
               <Play className="w-4 h-4 fill-black" /> Play
             </button>
             <button
-              onClick={() => {
-                const shuffled = [...songs].sort(() => Math.random() - 0.5);
-                playSong(shuffled[0], shuffled);
-              }}
+              onClick={() => playContextWithShuffle(songs, `Artist: ${artistName}`)}
               disabled={songs.length === 0}
               className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#25252D] hover:bg-[#303038] text-white text-xs font-semibold transition-all border border-[#303038] disabled:opacity-40"
             >
@@ -114,7 +111,7 @@ export function ArtistDetailView({
                 <tr
                   key={song.id}
                   onContextMenu={e => onSongContextMenu(e, song)}
-                  onClick={() => (isCur ? togglePlay() : playSong(song, songs))}
+                  onClick={() => (isCur ? togglePlay() : playSong(song, songs, `Artist: ${artistName}`))}
                   className={`group hover:bg-[#19191F]/90 cursor-pointer transition-colors ${
                     isCur ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : ''
                   }`}
