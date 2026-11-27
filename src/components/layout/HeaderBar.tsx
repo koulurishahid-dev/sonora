@@ -223,16 +223,16 @@ export function HeaderBar({
         {/* User Profile Pill */}
         <div
           onClick={() => onNavigate('settings')}
-          className="flex items-center gap-1 sm:gap-2 p-1 sm:pl-1.5 sm:pr-3 sm:py-1 rounded-full bg-[#171326] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/40 cursor-pointer transition-all shrink-0"
+          className="flex items-center gap-1 sm:gap-2 p-1 sm:pl-1.5 sm:pr-3 sm:py-1 rounded-full bg-white/[0.05] hover:bg-white/[0.09] border border-white/[0.08] hover:border-white/[0.16] cursor-pointer transition-colors shrink-0"
           title="Open My Space (Profile & Settings)"
         >
           <div className="w-6 h-6 rounded-full bg-[#A78BFA]/20 text-[#A78BFA] flex items-center justify-center text-xs">
             {settings.listenerAvatar || '🎧'}
           </div>
-          <span className="text-xs font-semibold text-[#F8F5FF] max-w-[80px] truncate hidden md:inline">
+          <span className="text-xs font-semibold text-[#F8FAFC] max-w-[80px] truncate hidden md:inline">
             {settings.listenerName || 'Shahid'}
           </span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#A78BFA] shadow-[0_0_6px_#A78BFA] animate-pulse hidden sm:inline-block" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#A78BFA] hidden sm:inline-block" />
         </div>
       </div>
     </header>

@@ -94,9 +94,9 @@ function ShelfSongCard({
     <div
       onClick={() => (isThisCurrent ? onTogglePlay() : onPlaySong(song, songs, contextTitle))}
       onContextMenu={e => onSongContextMenu(e, song)}
-      className="shelf-song-card w-32 sm:w-44 shrink-0 snap-start p-2.5 sm:p-3 rounded-2xl bg-[#10051C]/80 backdrop-blur-xl hover:bg-[#21153B]/75 border border-[#302744]/70 hover:border-[#A855F7]/60 cursor-pointer transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-[rgba(168,85,247,0.25)] hover:-translate-y-1 group flex flex-col select-none"
+      className="shelf-song-card w-32 sm:w-44 shrink-0 snap-start p-2.5 sm:p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.07] hover:border-white/[0.16] cursor-pointer transition-colors duration-150 shadow-sm group flex flex-col select-none"
     >
-      <div className="aspect-square rounded-xl overflow-hidden bg-[#050309]/80 relative mb-2 sm:mb-3 flex items-center justify-center border border-[#302744]/60">
+      <div className="aspect-square rounded-xl overflow-hidden bg-[#0E0E14] relative mb-2 sm:mb-3 flex items-center justify-center border border-white/[0.06]">
         {!hasFailed ? (
           <img
             src={currentSrc}
@@ -106,33 +106,33 @@ function ShelfSongCard({
             referrerPolicy="no-referrer"
             crossOrigin="anonymous"
             onError={handleImgError}
-            className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500 ease-out"
+            className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#211A32] to-[#141122] text-[#A99DBE]">
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[#14141C] text-[#94A3B8]">
             <img src="/logo-icon.png" alt="" className="w-7 h-7 object-contain opacity-70 mb-1" />
-            <span className="text-[9px] font-bold tracking-wider text-[#A99DBE] uppercase">Naa Paatalu</span>
+            <span className="text-[9px] font-bold tracking-wider text-[#94A3B8] uppercase">Naa Paatalu</span>
           </div>
         )}
 
-        {/* Electric Lavender Play Circle that rises on hover */}
+        {/* Crisp Play Circle */}
         <div
-          className={`absolute right-2 bottom-2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#A78BFA] hover:bg-[#D8B4FE] text-[#090812] flex items-center justify-center shadow-2xl transition-all duration-300 ${
+          className={`absolute right-2 bottom-2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-[#E2E8F0] text-[#07070A] flex items-center justify-center shadow-lg transition-opacity duration-150 ${
             isThisPlaying
-              ? 'opacity-100 scale-100'
-              : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-105 active:scale-95'
+              ? 'opacity-100'
+              : 'opacity-0 group-hover:opacity-100'
           }`}
         >
           {isThisPlaying ? (
-            <Pause className="w-4 h-4 sm:w-5 sm:h-5 fill-[#090812]" />
+            <Pause className="w-4 h-4 sm:w-4 sm:h-4 fill-[#07070A]" />
           ) : (
-            <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-[#090812] ml-0.5" />
+            <Play className="w-4 h-4 sm:w-4 sm:h-4 fill-[#07070A] ml-0.5" />
           )}
         </div>
 
         {/* Genre Tag */}
         {song.category && (
-          <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] font-mono font-bold tracking-wider bg-[#090812]/80 backdrop-blur-md border border-[#302744] text-[#D8B4FE]">
+          <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] font-mono font-bold tracking-wider bg-[#07070A]/80 border border-white/10 text-[#CBD5E1]">
             {song.category}
           </div>
         )}
@@ -411,15 +411,15 @@ export function HomeView({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#A78BFA] shadow-[0_0_8px_#A78BFA] animate-pulse" />
-            <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-[#A78BFA]">
+            <span className="w-2 h-2 rounded-full bg-[#A78BFA]" />
+            <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-[#94A3B8]">
               Studio Audio Engine
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F8F5FF] tracking-tight mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] tracking-tight mt-1">
             {greeting}, {displayName}
           </h1>
-          <p className="text-xs sm:text-sm text-[#C2B5D9] mt-0.5">
+          <p className="text-xs sm:text-sm text-[#94A3B8] mt-0.5">
             {allSongs.length} Full Telugu Master Tracks • Verified High-Bitrate Studio Audio
           </p>
         </div>
@@ -429,7 +429,7 @@ export function HomeView({
           {onOpenSpotifyImport && (
             <button
               onClick={onOpenSpotifyImport}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#A78BFA] hover:bg-[#D8B4FE] active:scale-95 text-[#090812] text-xs font-extrabold transition-all shadow-lg shadow-[#A78BFA]/25"
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-[#E2E8F0] text-[#07070A] text-xs font-extrabold transition-colors shadow-sm"
               title="Import all Telugu songs using Spotify"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -442,11 +442,11 @@ export function HomeView({
           <button
             onClick={handleSeedAllSpotify}
             disabled={isSeeding}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#141122] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/40 text-[#F8F5FF] text-xs font-semibold transition-all disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] hover:border-white/[0.18] text-[#F8FAFC] text-xs font-semibold transition-colors disabled:opacity-50"
             title="Reload complete Spotify Telugu collection"
           >
             {isSeeding ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#A78BFA]" />
+              <Loader2 className="w-3.5 h-3.5 text-[#A78BFA]" />
             ) : (
               <Sparkles className="w-3.5 h-3.5 text-[#A78BFA]" />
             )}
@@ -455,7 +455,7 @@ export function HomeView({
 
           <button
             onClick={() => setIsNowPlayingOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#141122] hover:bg-[#2A2140] border border-[#302744] hover:border-[#A78BFA]/40 text-[#D8B4FE] text-xs font-semibold transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] hover:border-white/[0.18] text-[#E2E8F0] text-xs font-semibold transition-colors"
             title="Launch Full Turntable Studio"
           >
             <Disc className="w-3.5 h-3.5 text-[#A78BFA]" />
@@ -504,9 +504,9 @@ export function HomeView({
               <div
                 key={cat.id}
                 onClick={() => onNavigate('playlist-detail', cat.id)}
-                className="flex items-center gap-3 h-16 sm:h-18 rounded-2xl bg-[#10051C]/65 backdrop-blur-xl hover:bg-[#21153B]/75 active:bg-[#21153B] active:scale-[0.99] border border-[#302744]/70 hover:border-[#A855F7]/60 cursor-pointer transition-all duration-200 overflow-hidden group shadow-md hover:shadow-xl hover:shadow-[rgba(168,85,247,0.2)] relative select-none"
+                className="flex items-center gap-3 h-16 sm:h-18 rounded-2xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.07] hover:border-white/[0.16] cursor-pointer transition-colors duration-150 overflow-hidden group shadow-sm relative select-none"
               >
-                <div className="w-16 sm:w-18 h-full shrink-0 relative bg-[#141122] overflow-hidden">
+                <div className="w-16 sm:w-18 h-full shrink-0 relative bg-[#0E0E14] overflow-hidden">
                   <img
                     src={cat.coverImage}
                     alt=""
@@ -518,12 +518,12 @@ export function HomeView({
                       const target = e.currentTarget;
                       target.src = '/covers/hot_hits_telugu.jpg';
                     }}
-                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                    className="w-full h-full object-cover"
                   />
                 </div>
 
                 <div className="min-w-0 flex-1 px-3 pr-4 sm:pr-12 flex flex-col justify-center">
-                  <h3 className="text-xs sm:text-sm font-bold text-[#F8F5FF] group-hover:text-[#D8B4FE] line-clamp-2 leading-snug tracking-tight transition-colors">
+                  <h3 className="text-xs sm:text-sm font-bold text-[#F8FAFC] group-hover:text-white line-clamp-2 leading-snug tracking-tight">
                     {cat.shortTitle}
                   </h3>
                 </div>
@@ -536,9 +536,9 @@ export function HomeView({
                       playSong(playlistSongs[0], playlistSongs, cat.title);
                     }
                   }}
-                  className="hidden sm:flex absolute right-2.5 w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#A78BFA] hover:bg-[#D8B4FE] text-[#090812] items-center justify-center shadow-xl opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 hover:scale-110 active:scale-95 transition-all"
+                  className="hidden sm:flex absolute right-2.5 w-8 h-8 md:w-9 md:h-9 rounded-full bg-white hover:bg-[#E2E8F0] text-[#07070A] items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-150"
                 >
-                  <Play className="w-3.5 h-3.5 fill-[#090812] ml-0.5" />
+                  <Play className="w-3.5 h-3.5 fill-[#07070A] ml-0.5" />
                 </div>
               </div>
             );

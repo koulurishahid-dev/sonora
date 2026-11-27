@@ -140,25 +140,21 @@ export function Sidebar({
             <button
               key={item.view}
               onClick={() => onNavigate(item.view)}
-              className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
+              className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors group ${
                 isActive
-                  ? 'bg-[#211A32] text-[#D8B4FE] border border-[#302744] shadow-md shadow-[#A78BFA]/10'
-                  : 'text-[#C2B5D9] hover:text-[#F8F5FF] hover:bg-[#141122] hover:translate-x-1'
+                  ? 'bg-white/[0.09] text-white border border-white/[0.12]'
+                  : 'text-[#94A3B8] hover:text-white hover:bg-white/[0.04]'
               }`}
               title={item.label}
             >
               <Icon
-                className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-                  isActive ? 'scale-110 text-[#A78BFA]' : 'group-hover:text-[#F8F5FF]'
+                className={`w-4 h-4 shrink-0 ${
+                  isActive ? 'text-[#A78BFA]' : 'text-[#94A3B8] group-hover:text-white'
                 }`}
               />
               {!isCollapsed && <span className="truncate">{item.label}</span>}
               {!isCollapsed && isActive && (
-                <span className="ml-auto flex items-end gap-0.5 h-2.5">
-                  <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-1 h-2.5" />
-                  <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-2 h-2.5" />
-                  <span className="w-0.5 bg-[#A78BFA] rounded-full animate-eq-3 h-2.5" />
-                </span>
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#A78BFA]" />
               )}
             </button>
           );
@@ -166,13 +162,13 @@ export function Sidebar({
       </div>
 
       {/* Settings Footer */}
-      <div className="p-3 border-t border-[#302744]">
+      <div className="p-3 border-t border-white/[0.07]">
         <button
           onClick={() => onNavigate('settings')}
-          className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+          className={`w-full flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors ${
             currentView === 'settings'
-              ? 'bg-[#211A32] text-[#D8B4FE] border border-[#302744]'
-              : 'text-[#C2B5D9] hover:text-[#F8F5FF] hover:bg-[#141122]'
+              ? 'bg-white/[0.09] text-white border border-white/[0.12]'
+              : 'text-[#94A3B8] hover:text-white hover:bg-white/[0.04]'
           }`}
           title="My Space / Settings"
         >

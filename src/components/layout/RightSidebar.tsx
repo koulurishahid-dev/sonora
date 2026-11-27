@@ -177,24 +177,16 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 380, opacity: 0 }}
         transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-        className="fixed lg:relative right-0 top-0 bottom-0 z-50 lg:z-30 flex flex-col w-[85vw] max-w-sm sm:w-92 lg:w-84 xl:w-92 2xl:w-98 h-full bg-[#10051C]/95 lg:bg-[#10051C]/75 backdrop-blur-2xl border-l border-[#302744]/70 shadow-[-16px_0_40px_rgba(5,3,9,0.85)] select-none shrink-0 overflow-hidden"
+        className="fixed lg:relative right-0 top-0 bottom-0 z-50 lg:z-30 flex flex-col w-[85vw] max-w-sm sm:w-92 lg:w-84 xl:w-92 2xl:w-98 h-full bg-[#0B0B0F]/95 lg:bg-[#0B0B0F]/90 backdrop-blur-2xl border-l border-white/[0.07] shadow-[-16px_0_40px_rgba(0,0,0,0.6)] select-none shrink-0 overflow-hidden"
       >
-      {/* Background ambient glow with cyan-purple spotlight scattering */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-[#8BE9FF]/15 via-[#A855F7]/15 to-transparent rounded-full blur-3xl pointer-events-none -z-0" />
-
       {/* 1. TOP HEADER */}
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#302744] z-10 shrink-0 bg-[#090812]/50">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.07] z-10 shrink-0 bg-black/20">
         <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            {isPlaying && (
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#A78BFA] opacity-75" />
-            )}
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#A78BFA]" />
-          </span>
-          <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-[#F8F5FF]">
+          <span className="inline-flex rounded-full h-2 w-2 bg-[#A78BFA]" />
+          <span className="text-[11px] font-mono font-bold tracking-widest uppercase text-[#F8FAFC]">
             Player Sidebar
           </span>
-          <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold tracking-wider bg-[#211A32] text-[#A78BFA] border border-[#302744]">
+          <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold tracking-wider bg-white/[0.06] text-[#CBD5E1] border border-white/[0.08]">
             320K HI-RES
           </span>
         </div>
@@ -204,9 +196,9 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
           <Tooltip content="Launch Turntable Studio">
             <button
               onClick={() => setIsNowPlayingOpen(true)}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-[#211A32] border border-[#302744] hover:border-[#A78BFA]/40 text-[#D8B4FE] hover:bg-[#2A2140] transition-all active:scale-95 shadow-sm"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-white/[0.06] border border-white/[0.08] hover:border-white/[0.18] text-[#E2E8F0] hover:bg-white/[0.1] transition-colors shadow-sm"
             >
-              <Disc className={`w-3.5 h-3.5 text-[#A78BFA] ${isPlaying ? 'animate-spin' : ''}`} style={{ animationDuration: '3s' }} />
+              <Disc className="w-3.5 h-3.5 text-[#A78BFA]" />
               <span>Studio</span>
             </button>
           </Tooltip>
@@ -910,10 +902,10 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
             )}
           </>
         ) : (
-          <div className="py-24 text-center space-y-3 text-[#A99DBE]">
-            <Disc className="w-12 h-12 mx-auto text-[#A99DBE]/30 animate-spin-slow" />
-            <p className="text-xs font-semibold text-[#F8F5FF]">No Track Playing</p>
-            <p className="text-[11px] text-[#A99DBE] max-w-[200px] mx-auto">
+          <div className="py-24 text-center space-y-3 text-[#94A3B8]">
+            <Disc className="w-12 h-12 mx-auto text-[#94A3B8]/30" />
+            <p className="text-xs font-semibold text-[#F8FAFC]">No Track Playing</p>
+            <p className="text-[11px] text-[#94A3B8] max-w-[200px] mx-auto">
               Select any song from your library or playlists to begin listening.
             </p>
           </div>
@@ -921,7 +913,7 @@ export function RightSidebar({ isOpen = true, onToggle }: RightSidebarProps) {
       </div>
 
       {/* 4. BOTTOM ACTION BAR */}
-      <div className="p-3 border-t border-[#302744] bg-[#090812]/70 z-10 shrink-0">
+      <div className="p-3 border-t border-white/[0.07] bg-black/30 z-10 shrink-0">
         <button
           onClick={() => setIsNowPlayingOpen(true)}
           className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#7C3AED]/25 to-[#A78BFA]/25 hover:from-[#7C3AED]/35 hover:to-[#A78BFA]/35 border border-[#A78BFA]/30 text-[#D8B4FE] flex items-center justify-center gap-2 text-xs font-bold transition-all hover:scale-[1.01] active:scale-[0.99] shadow-md shadow-[#A78BFA]/10"

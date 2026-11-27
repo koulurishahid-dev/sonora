@@ -20,7 +20,7 @@ import { CinematicSmokeAtmosphere } from '../common/CinematicSmokeAtmosphere';
 import { usePlayer } from '@/context/PlayerContext';
 import { useTheme } from '@/context/ThemeContext';
 import { Lock, Radio, Disc } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 
 // Views
 import { HomeView } from '../views/HomeView';
@@ -231,8 +231,9 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#050309] text-white relative">
-      {/* Cinematic Purple Smoke Atmosphere Effect */}
+    <MotionConfig reducedMotion="always">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#07070A] text-white relative">
+      {/* Static Obsidian Studio Backdrop */}
       <CinematicSmokeAtmosphere />
 
       {/* Left Sidebar for Desktop */}
@@ -464,18 +465,18 @@ export function AppLayout() {
         {!isSideViewOpen && (
           <button
             onClick={toggleSideView}
-            className="hidden lg:flex fixed right-0 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 py-4 px-2.5 rounded-l-2xl bg-[#141720]/95 border-l border-y border-white/10 hover:border-amber-500/40 text-white/70 hover:text-white shadow-2xl transition-all hover:translate-x-[-2px] group"
+            className="hidden lg:flex fixed right-0 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 py-4 px-2.5 rounded-l-2xl bg-[#111117]/95 border-l border-y border-white/10 hover:border-white/25 text-white/70 hover:text-white shadow-xl transition-colors group"
             title="Open Player Sidebar"
           >
-            <Disc className={`w-5 h-5 text-amber-400 ${isPlaying ? 'animate-spin' : ''}`} style={{ animationDuration: '3s' }} />
-            <span className="text-[10px] font-mono uppercase tracking-widest [writing-mode:vertical-rl] rotate-180 text-white/60 group-hover:text-amber-300">
+            <Disc className="w-5 h-5 text-[#A78BFA]" />
+            <span className="text-[10px] font-mono uppercase tracking-widest [writing-mode:vertical-rl] rotate-180 text-white/60 group-hover:text-white">
               Player
             </span>
           </button>
         )}
 
         {/* Mobile Navigation Bar only (Desktop uses Player Sidebar with no bottom player bar) */}
-        <div className="md:hidden absolute bottom-0 left-0 right-0 z-40 bg-[#10051C]/90 backdrop-blur-2xl border-t border-[#302744]/70 flex flex-col pointer-events-auto shadow-[0_-20px_50px_rgba(5,3,9,0.95)]">
+        <div className="md:hidden absolute bottom-0 left-0 right-0 z-40 bg-[#0B0B0F]/95 backdrop-blur-xl border-t border-white/[0.08] flex flex-col pointer-events-auto shadow-[0_-16px_40px_rgba(0,0,0,0.85)]">
           <MobileNavBar currentView={currentRoute.view} onNavigate={handleNavigate} />
         </div>
       </div>
@@ -543,5 +544,6 @@ export function AppLayout() {
         />
       )}
     </div>
+    </MotionConfig>
   );
 }

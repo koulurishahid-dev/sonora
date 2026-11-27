@@ -230,15 +230,12 @@ export function BottomPlayer() {
             <Tooltip content={isPlaying ? 'Pause (Space)' : 'Play (Space)'}>
               <button
                 onClick={handlePlayToggle}
-                className="relative w-10 h-10 rounded-full bg-[#A78BFA] hover:bg-[#D8B4FE] text-[#090812] flex items-center justify-center hover:scale-108 active:scale-95 transition-all shadow-lg shadow-[#A78BFA]/35 border border-white/20 cursor-pointer"
+                className="relative w-10 h-10 rounded-full bg-white hover:bg-[#E2E8F0] text-[#07070A] flex items-center justify-center transition-colors shadow-md cursor-pointer"
               >
                 {isPlaying ? (
-                  <Pause className="w-5 h-5 fill-[#090812]" />
+                  <Pause className="w-5 h-5 fill-[#07070A]" />
                 ) : (
-                  <Play className="w-5 h-5 fill-[#090812] ml-0.5" />
-                )}
-                {isPlaying && (
-                  <span className="absolute inset-0 rounded-full border-2 border-white/40 animate-ping opacity-30 pointer-events-none" />
+                  <Play className="w-5 h-5 fill-[#07070A] ml-0.5" />
                 )}
               </button>
             </Tooltip>
@@ -408,9 +405,9 @@ export function BottomPlayer() {
           <Tooltip content="Turntable Studio">
             <button
               onClick={() => setIsNowPlayingOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-[#211A32] border border-[#302744] hover:border-[#A78BFA]/40 text-[#D8B4FE] hover:bg-[#2A2140] transition-all shadow-sm active:scale-95"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-white/[0.06] border border-white/[0.08] hover:border-white/[0.18] text-[#E2E8F0] hover:bg-white/[0.1] transition-colors shadow-sm"
             >
-              <Disc className={`w-3.5 h-3.5 text-[#A78BFA] ${isPlaying ? 'animate-spin' : ''}`} style={{ animationDuration: '3s' }} />
+              <Disc className="w-3.5 h-3.5 text-[#A78BFA]" />
               <span className="hidden xl:inline">Studio</span>
             </button>
           </Tooltip>
